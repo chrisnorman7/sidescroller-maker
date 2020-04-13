@@ -85,8 +85,10 @@ class Level {
     this.title = "Untitled Level"
     this.beforeScene = null
     this.afterScene = null
-    this.start = 0
-    this.end = 200
+    this.size = 200
+    this.music = null
+    this.ambience = null
+    this.convolver = null
   }
 }
 
@@ -173,7 +175,7 @@ class Book{
 
   push(page) {
     this.pages.push(page)
-    this.message(page.title)
+    this.message(this.getText(page.title))
   }
 
   pop() {
@@ -203,7 +205,7 @@ class Book{
     const page = this.getPage()
     const line = page.getLine()
     page.moveSound.play()
-    this.message(line.title)
+    this.message(this.getText(line.title))
   }
 
   moveUp() {
@@ -217,7 +219,7 @@ class Book{
     }
     page.focus --
     if (page.focus == -1) {
-      this.message(page.title)
+      this.message(this.getText(page.title))
     } else {
       this.showFocus()
     }
@@ -279,6 +281,13 @@ class Book{
       e.stopPropagation()
       func()
     }
+  }
+
+  getText(text) {
+    if (typeof(text) == "function") {
+      return text()
+    }
+    return text
   }
 }
 
