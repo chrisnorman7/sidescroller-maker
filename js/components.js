@@ -1,4 +1,96 @@
-/* globals showMessage, Sound */
+let audio = null
+let gain = null
+window.AudioContext = window.AudioContext || window.webkitAudioContext
+
+const buffers = {}
+
+function startAudio() {
+  audio = new AudioContext()
+  gain = audio.createGain()
+  gain.gain.value = 0.5
+  gain.connect(audio.destination)
+  const music = new Sound("/res/music/start.wav")
+  music.play()
+}
+
+this.startAudio = startAudio
+
+class Sound {
+  constructor(url, loop) {
+    this.buffer = null
+    this.stop = false
+    this.url = url
+    this.onended = null
+    if (loop === undefined) {
+      loop = false
+    }
+    this.loop = loop
+  }
+
+  getBuffer() {
+    let xhr = new XMLHttpRequest()
+    xhr.open("GET", this.url)
+    xhr.responseType = "arraybuffer"
+    xhr.onload = () => {
+      audio.decodeAudioData(xhr.response).then(
+        (buffer) => {
+          this.playBuffer(buffer)
+        }
+      )
+    }
+    xhr.send()
+  }
+
+  playBuffer(buffer) {
+    if (buffer === undefined) {
+      buffer = this.buffer
+    } else {
+      this.buffer = buffer
+      buffers[this.url] = buffer
+    }
+    if (!this.stop) {
+      const source = audio.createBufferSource()
+      source.onended = this.onended
+      source.loop = this.loop
+      source.buffer = buffer
+      source.connect(gain)
+      source.start(0)
+    }
+  }
+
+  play() {
+    if (this.buffer === null) {
+      this.getBuffer()
+    } else {
+      this.playBuffer()
+    }
+  }
+}
+
+class Game {
+  constructor() {
+    this.reset()
+  }
+
+  reset() {
+    this.title = "Untitled Game"
+    this.levels = []
+  }
+}
+
+this.Game = Game
+
+class Level {
+  constructor() {
+    this.title = "Untitled Level"
+    this.beforeScene = null
+    this.afterScene = null
+    this.start = 0
+    this.end = 200
+  }
+}
+
+this.Level = Level
 
 class Line{
   constructor(title, func) {
@@ -65,11 +157,23 @@ class Book{
 
   constructor() {
     this.pages = []
+    this.volumeChangeAmount = 0.1
+    this.hotkeys = {
+      "ArrowUp": () => this.moveUp(),
+      "ArrowDown": () => this.moveDown(),
+      " ": () => this.activate(),
+      "ArrowRight": () => this.activate(),
+      "Enter": () => this.activate(),
+      "ArrowLeft": () => this.cancel(),
+      "[": () => this.volumeDown(),
+      "]": () => this.volumeUp(),
+    }
+    this.message = null
   }
 
   push(page) {
     this.pages.push(page)
-    showMessage(page.title)
+    this.message(page.title)
   }
 
   pop() {
@@ -99,7 +203,7 @@ class Book{
     const page = this.getPage()
     const line = page.getLine()
     page.moveSound.play()
-    showMessage(line.title)
+    this.message(line.title)
   }
 
   moveUp() {
@@ -113,7 +217,7 @@ class Book{
     }
     page.focus --
     if (page.focus == -1) {
-      showMessage(page.title)
+      this.message(page.title)
     } else {
       this.showFocus()
     }
@@ -151,6 +255,30 @@ class Book{
       return null // No page, or the page can't be dismissed that easily.
     }
     this.pop()
+  }
+
+  setVolume(v) {
+    const volumeSound = new Sound("/res/volume.wav")
+    gain.gain.value = v
+    volumeSound.play()
+    this.message(`${Math.floor(gain.gain.value * 100)}%.`)
+  }
+
+  volumeUp() {
+    this.setVolume(Math.min(1.0, gain.gain.value + this.volumeChangeAmount))
+  }
+
+  volumeDown() {
+    this.setVolume(Math.max(0.0, gain.gain.value - this.volumeChangeAmount))
+  }
+
+  onkeydown(e) {
+    const key = e.key
+    const func = this.hotkeys[key]
+    if (func !== undefined) {
+      e.stopPropagation()
+      func()
+    }
   }
 }
 

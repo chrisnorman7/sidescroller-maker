@@ -1,4 +1,4 @@
-/* globals Book */
+/* globals Book, Game */
 
 this.startDiv = document.querySelector("#startDiv")
 this.mainDiv = document.querySelector("#main")
@@ -7,13 +7,6 @@ this.gameJson = document.querySelector("#gameJson")
 this.startButton = document.querySelector("#startButton")
 this.message = document.querySelector("#message")
 
-function showMessage(text) {
-  this.message.innerText = text
-}
-
-this.showMessage = showMessage
-
-this.game = {}
-this.volumeChangeAmount = 0.05
+this.game = new Game()
 
 this.book = new Book()

@@ -1,4 +1,4 @@
-/* globals book, game, gameJson, hotkeys, keyboardArea, Line, mainDiv, Page, startAudio, startButton, startDiv */
+/* globals book, game, gameJson, keyboardArea, Line, mainDiv, message, Page, startAudio, startButton, startDiv */
 
 startButton.onclick = () => {
   startAudio()
@@ -27,15 +27,7 @@ startButton.onclick = () => {
           new Line(
             "Reset Game", () => {
               if (confirm("Are you sure you want to reset the game?")) {
-                for (let name of [
-                  "title",
-                  "objects",
-                  "monsters",
-                  "levels",
-                  "weapons",
-                ]) {
-                  delete game[name]
-                }
+                game.reset()
               }
             }
           ),
@@ -49,11 +41,8 @@ window.onload = () => {
   mainDiv.hidden = true
 }
 
-keyboardArea.onkeydown = (e) => {
-  const key = e.key
-  const func = hotkeys[key]
-  if (func !== undefined) {
-    e.stopPropagation()
-    func()
-  }
+keyboardArea.onkeydown = (e) => book.onkeydown(e)
+
+book.message = (text) => {
+  message.innerText = text
 }
