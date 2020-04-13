@@ -85,7 +85,7 @@ class Level {
     this.isLevel = true
     this.title = "Untitled Level"
     this.size = 200
-    this.speed = 250
+    this.speed = 100
     this.beforeScene = null
     this.afterScene = null
     this.music = null
@@ -108,18 +108,22 @@ class Level {
   }
 
   move(book, direction) {
-    let position = book.player.position + direction
-    if (position < 0 || position > this.size) {
-      if (this.wall !== null) {
-        this.wall.play()
+    const time = new Date().getTime()
+    if ((time - book.player.lastMoved) > this.speed) {
+      book.player.lastMoved = time
+      let position = book.player.position + direction
+      if (position < 0 || position > this.size) {
+        if (this.wall !== null) {
+          this.wall.play()
+        }
+      } else {
+        book.player.position = position
+        if (this.footstep !== null) {
+          this.footstep.play()
+        }
       }
-    } else {
-      book.player.position = position
-      if (this.footstep !== null) {
-        this.footstep.play()
-      }
-    }
   }
+}
 
   play(book) {
     book.push(this)
@@ -194,6 +198,7 @@ class Player {
   constructor() {
     this.position = null
     this.health = 100
+    this.lastMoved = 0
   }
 }
 
