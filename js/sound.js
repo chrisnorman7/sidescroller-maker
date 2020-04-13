@@ -15,9 +15,10 @@ function startAudio() {
 
 class Sound {
   constructor(url, loop) {
-    this.source = null
+    this.buffer = null
     this.stop = false
     this.url = url
+    this.onended = null
     if (loop === undefined) {
       loop = false
     }
@@ -28,15 +29,26 @@ class Sound {
     let xhr = new XMLHttpRequest()
     xhr.open("GET", this.url)
     xhr.responseType = "arraybuffer"
-    xhr.onload = () => audio.decodeAudioData(xhr.response).then((buffer) => this.playBuffer(buffer))
+    xhr.onload = () => {
+      audio.decodeAudioData(xhr.response).then(
+        (buffer) => {
+          this.playBuffer(buffer)
+        }
+      )
+    }
     xhr.send()
   }
 
   playBuffer(buffer) {
-    buffers[this.url] = buffer
+    if (buffer === undefined) {
+      buffer = this.buffer
+    } else {
+      this.buffer = buffer
+      buffers[this.url] = buffer
+    }
     if (!this.stop) {
-      let source = audio.createBufferSource()
-      this.source = source
+      const source = audio.createBufferSource()
+      source.onended = this.onended
       source.loop = this.loop
       source.buffer = buffer
       source.connect(gain)
@@ -45,11 +57,10 @@ class Sound {
   }
 
   play() {
-    let buffer = buffers[this.url]
-    if (buffer === undefined) {
+    if (this.buffer === null) {
       this.getBuffer()
     } else {
-      this.playBuffer(buffer)
+      this.playBuffer()
     }
   }
 }
