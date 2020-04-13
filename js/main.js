@@ -34,6 +34,7 @@ startButton.onclick = () => {
                   "objects",
                   "monsters",
                   "levels",
+                  "weapons",
                 ]) {
                   delete game[name]
                 }
@@ -60,6 +61,12 @@ keyboardArea.onkeydown = (e) => {
     book.activate()
   } else if (key == "ArrowLeft") {
     book.cancel()
+  } else if (key == "[") {
+    gain.gain.value = Math.max(0.0, gain.gain.value - 0.05)
+    showMessage(`Volume: ${Math.floor(gain.gain.value * 100)}%.`)
+  } else if (key == "]") {
+    gain.gain.value = Math.min(1.0, gain.gain.value + 0.05)
+    showMessage(`Volume: ${Math.floor(gain.gain.value * 100)}%.`)
   } else {
     return null
   }
