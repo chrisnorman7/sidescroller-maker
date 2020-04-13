@@ -1,30 +1,74 @@
-/* globals book, game, gameJson, keyboardArea, Level, Line, mainDiv, message, Page, Sound, startAudio, startButton, startDiv */
+/* globals book, buffers, game, gameJson, keyboardArea, Level, levelSounds, Line, mainDiv, message, Page, Sound, startAudio, startButton, startDiv */
 
 function EditLevelMenu(b, level) {
+  const lines = [
+    new Line(
+      "Rename", (b) => {
+        const title = prompt("Enter new level name", level.title)
+        if (title && title != level.title) {
+          level.title = title
+          b.message("Level renamed.")
+        }
+      }
+    ),
+    new Line(
+      () => `Edit Size (${level.size})`, (b) => {
+        let size = Number(prompt("Enter new size", level.size), 0)
+        if (isNaN(size)) {
+          b.message("Invalid number.")
+        } else {
+          level.size = size
+        }
+      }
+    ),
+    new Line(
+      "Play", (b) => {
+        level.play(b)
+      }
+    ),
+  ]
+  for (let name in levelSounds) {
+    let description = levelSounds[name]
+    // Let's save some old details, but the title won't reflect changes if we don't get them every time.
+    let oldSound = level[name]
+    let oldUrl = null
+    let loop = undefined
+    if (oldSound !== null) {
+      oldUrl = oldSound.url
+      loop = oldSound.loop
+    }
+    lines.push(
+      new Line(
+        () => `${description} (${level[name] === null ? "not set" : level[name].url}`, () => {
+          const url = prompt("Enter a URL", oldUrl || "")
+          if (url) {
+            level[name] = new Sound(url, loop)
+            delete buffers[oldUrl]
+          } else {
+            level[name] = null
+          }
+        }
+      )
+    )
+  }
+  lines.push(
+    new Line(
+      "Delete", (b) => {
+        if (confirm(`Are you sure you want to delete "${level.title}"?`)) {
+          const index = game.levels.indexOf(level)
+          game.levels.splice(index, 1)
+          for (let i = 0; i < 2; i++) {
+            b.pop()
+          }
+          b.push(LevelsMenu())
+        }
+      }
+    )
+  )
   return new Page(
     {
       title: () => `Edit ${level.title}`,
-      lines: [
-        new Line(
-          "Rename", (b) => {
-            const title = prompt("Enter new level name", level.title)
-            if (title && title != level.title) {
-              level.title = title
-              b.message("Level renamed.")
-            }
-          }
-        ),
-        new Line(
-          () => `Edit Size (${level.size})`, (b) => {
-            let size = Number(prompt("Enter new size", level.size), 0)
-            if (isNaN(size)) {
-              b.message("Invalid number.")
-            } else {
-              level.size = size
-            }
-          }
-        ),
-      ]
+      lines: lines
     }
   )
 }
@@ -77,7 +121,23 @@ startButton.onclick = () => {
           ),
           new Line(
             "Copy Game JSON", () => {
-              gameJson.value = JSON.stringify(game)
+              const data = {title: game.title, levels: []}
+              for (let i = 0; i < game.levels.length; i++) {
+                const level = game.levels[i]
+                const levelData = {
+                  title: level.title,
+                  size: level.size,
+                }
+                for (let name in levelSounds) {
+                  if (level[name] === null) {
+                    levelData[name] = null
+                  } else {
+                    levelData[name] = level[name].url
+                  }
+                }
+                data.levels.push(levelData)
+              }
+              gameJson.value = JSON.stringify(data)
               gameJson.select()
               gameJson.setSelectionRange(0, -1)
               document.execCommand("copy")
@@ -95,8 +155,11 @@ startButton.onclick = () => {
                     for (let name of ["title", "size"]) {
                       l[name] = data[name]
                     }
-                    for (let name of ["beforeScene", "afterScene", "music", "ambience"]) {
-                      l[name] = new Sound(data[name])
+                    for (let name in levelSounds) {
+                      const url = data[name]
+                      if (url) {
+                        l[name] = new Sound(url)
+                      }
                     }
                     game.levels.push(l)
                   }
@@ -123,7 +186,18 @@ window.onload = () => {
   mainDiv.hidden = true
 }
 
-keyboardArea.onkeydown = (e) => book.onkeydown(e)
+keyboardArea.onkeydown = (e) => {
+  if (e.key == "Escape") {
+    e.stopPropagation()
+    if (book.getPage().isLevel) {
+      book.pop()
+    } else {
+      book.message("You can't escape from here.")
+    }
+  } else {
+    return book.onkeydown(e)
+  }
+}
 
 book.message = (text) => {
   message.innerText = text

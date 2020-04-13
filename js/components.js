@@ -82,13 +82,47 @@ this.Game = Game
 
 class Level {
   constructor() {
+    this.isLevel = true
     this.title = "Untitled Level"
+    this.size = 200
     this.beforeScene = null
     this.afterScene = null
-    this.size = 200
     this.music = null
     this.ambience = null
+    this.footstep = new Sound("/res/footsteps/stone.wav")
+    this.wall = new Sound("/res/wall.wav")
     this.convolver = null
+  }
+
+  jump(book) {
+    book.message("Jumping.")
+  }
+
+  left(book) {
+    this.move(book, -1)
+  }
+
+  right(book) {
+    this.move(book, 1)
+  }
+
+  move(book, direction) {
+    let position = book.player.position + direction
+    if (position < 0 || position > this.size) {
+      if (this.wall !== null) {
+        this.wall.play()
+      }
+    } else {
+      book.player.position = position
+      if (this.footstep !== null) {
+        this.footstep.play()
+      }
+    }
+  }
+
+  play(book) {
+    book.push(this)
+    book.player.position = 0
   }
 }
 
@@ -121,6 +155,7 @@ class Page{
     //
     // bool dismissible:
     // Whether or not this menu can be easily dismissed.
+    this.isLevel = false
     if (obj === undefined) {
       throw("You must pass an object.")
     }
@@ -154,11 +189,19 @@ class Page{
 
 this.Page = Page
 
+class Player {
+  constructor() {
+    this.position = null
+    this.health = 100
+  }
+}
+
 class Book{
   // Got the idea from the Navigator class in Flutter.
 
   constructor() {
     this.pages = []
+    this.player = new Player()
     this.volumeChangeAmount = 0.1
     this.hotkeys = {
       "ArrowUp": () => this.moveUp(),
@@ -211,24 +254,27 @@ class Book{
   moveUp() {
     const page = this.getPage()
     if (page === null) {
-      return // There's probably no pages.
-    }
-    const focus = this.getFocus()
-    if (focus == -1) {
-      return // Do nothing.
-    }
-    page.focus --
-    if (page.focus == -1) {
-      this.message(this.getText(page.title))
+      return // There"s probably no pages.
+    } else if (page.isLevel) {
+      page.jump(this)
     } else {
-      this.showFocus()
+      const focus = this.getFocus()
+      if (focus == -1) {
+        return // Do nothing.
+      }
+      page.focus --
+      if (page.focus == -1) {
+        this.message(this.getText(page.title))
+      } else {
+        this.showFocus()
+      }
     }
   }
 
   moveDown() {
     const page = this.getPage()
-    if (page === null) {
-      return // There's probably no pages.
+    if (page === null || page.isLevel) {
+      return // There"s probably no pages.
     }
     const focus = this.getFocus()
     if (focus == (page.lines.length - 1)) {
@@ -241,22 +287,28 @@ class Book{
   activate() {
     const page = this.getPage()
     if (page === null) {
-      return // Can't do anything with no page.
+      return // Can"t do anything with no page.
+    } else if (page.isLevel) {
+      page.right(this)
+    } else {
+      const line = page.getLine()
+      if (line === null) {
+        return // They are probably looking at the title.
+      }
+      page.activateSound.play()
+      line.func(this)
     }
-    const line = page.getLine()
-    if (line === null) {
-      return // They are probably looking at the title.
-    }
-    page.activateSound.play()
-    line.func(this)
   }
 
   cancel() {
     const page = this.getPage()
-    if (page === null || !page.dismissible) {
-      return null // No page, or the page can't be dismissed that easily.
+    if (page === null || page.dismissible == false) {
+      return null // No page, or the page can"t be dismissed that easily.
+    } else if (page.isLevel) {
+      page.left(this)
+    } else {
+      this.pop()
     }
-    this.pop()
   }
 
   setVolume(v) {

@@ -10,3 +10,13 @@ this.message = document.querySelector("#message")
 this.game = new Game()
 
 this.book = new Book()
+
+this.levelSounds = {
+  "footstep": "Footstep sound",
+  "wall": "Wall sound",
+  "ambience": "Background sound",
+  "music": "Background music",
+  "convolver": "Impulse",
+  "beforeScene": "Audio to play before the level can be played",
+  "afterScene": "The audio which should be played after the level has been completed",
+}
