@@ -1,4 +1,4 @@
-/* globals Book, keyboardArea, mainDiv, Page, startAudio, startButton, startDiv */
+/* globals Book, game, gameJson, keyboardArea, Line, mainDiv, Page, startAudio, startButton, startDiv */
 
 const book = new Book()
 
@@ -12,6 +12,35 @@ startButton.onclick = () => {
       {
         title: "Main Menu",
         dismissible: false,
+        lines: [
+          new Line(
+            "Set Game Name", () => {
+              game.title = prompt("Enter a new name", game.title || "Untitled Game")
+            }
+          ),
+          new Line(
+            "Copy Game JavaScript", () => {
+              gameJson.value = `const game = ${JSON.stringify(game)}`
+              gameJson.select()
+              gameJson.setSelectionRange(0, -1)
+              document.execCommand("copy")
+            }
+          ),
+          new Line(
+            "Reset Game", () => {
+              if (confirm("Are you sure you want to reset the game?")) {
+                for (let name of [
+                  "title",
+                  "objects",
+                  "monsters",
+                  "levels",
+                ]) {
+                  delete game[name]
+                }
+              }
+            }
+          ),
+        ]
       }
     )
   )
