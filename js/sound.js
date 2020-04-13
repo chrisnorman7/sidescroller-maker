@@ -4,6 +4,15 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext
 
 const buffers = {}
 
+function startAudio() {
+  audio = new AudioContext()
+  gain = audio.createGain()
+  gain.gain.value = 0.5
+  gain.connect(audio.destination)
+  const music = new Sound("/res/music/start.wav")
+  music.play()
+}
+
 class Sound {
   constructor(url, loop) {
     this.source = null
@@ -43,15 +52,6 @@ class Sound {
       this.playBuffer(buffer)
     }
   }
-}
-
-function startAudio() {
-  audio = new AudioContext()
-  gain = audio.createGain()
-  gain.gain.value = 0.5
-  gain.connect(audio.destination)
-  const music = new Sound("/res/music/start.wav")
-  music.play()
 }
 
 this.startAudio = startAudio

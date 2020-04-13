@@ -1,3 +1,5 @@
+/* globals Book */
+
 this.startDiv = document.querySelector("#startDiv")
 this.mainDiv = document.querySelector("#main")
 this.keyboardArea = document.querySelector("#keyboardArea")
@@ -12,3 +14,6 @@ function showMessage(text) {
 this.showMessage = showMessage
 
 this.game = {}
+this.volumeChangeAmount = 0.05
+
+this.book = new Book()

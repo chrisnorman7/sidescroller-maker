@@ -1,6 +1,4 @@
-/* globals Book, game, gameJson, keyboardArea, Line, mainDiv, Page, startAudio, startButton, startDiv */
-
-const book = new Book()
+/* globals book, game, gameJson, hotkeys, keyboardArea, Line, mainDiv, Page, startAudio, startButton, startDiv */
 
 startButton.onclick = () => {
   startAudio()
@@ -53,22 +51,9 @@ window.onload = () => {
 
 keyboardArea.onkeydown = (e) => {
   const key = e.key
-  if (key == "ArrowUp") {
-    book.moveUp()
-  } else if (key == "ArrowDown") {
-    book.moveDown()
-  } else if ([" ", "ArrowRight", "Enter"].includes(key)) {
-    book.activate()
-  } else if (key == "ArrowLeft") {
-    book.cancel()
-  } else if (key == "[") {
-    gain.gain.value = Math.max(0.0, gain.gain.value - 0.05)
-    showMessage(`Volume: ${Math.floor(gain.gain.value * 100)}%.`)
-  } else if (key == "]") {
-    gain.gain.value = Math.min(1.0, gain.gain.value + 0.05)
-    showMessage(`Volume: ${Math.floor(gain.gain.value * 100)}%.`)
-  } else {
-    return null
+  const func = hotkeys[key]
+  if (func !== undefined) {
+    e.stopPropagation()
+    func()
   }
-  e.stopPropagation()
 }
