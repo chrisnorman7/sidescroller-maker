@@ -1,4 +1,4 @@
-/* globals book, buffers, game, gameJson, keyboardArea, Level, levelSounds, Line, mainDiv, message, Page, Sound, startAudio, startButton, startDiv */
+/* globals book, buffers, game, gameJson, keyboardArea, Level, levelNumericPropertyNames, levelSounds, Line, mainDiv, message, Page, Sound, startAudio, startButton, startDiv */
 
 function EditLevelMenu(b, level) {
   const lines = [
@@ -12,21 +12,25 @@ function EditLevelMenu(b, level) {
       }
     ),
     new Line(
-      () => `Edit Size (${level.size})`, (b) => {
-        let size = Number(prompt("Enter new size", level.size), 0)
-        if (isNaN(size)) {
-          b.message("Invalid number.")
-        } else {
-          level.size = size
-        }
-      }
-    ),
-    new Line(
       "Play", (b) => {
         level.play(b)
       }
     ),
   ]
+  for (let name of levelNumericPropertyNames) {
+    lines.push(
+      new Line(
+        () => `Edit ${name} (${level[name]})`, (b) => {
+          let value = Number(prompt(`Enter new ${name}`, level[name])) || level[name]
+          if (isNaN(value)) {
+            b.message("Invalid number.")
+          } else {
+            level[name] = value
+          }
+        }
+      )
+    )
+  }
   for (let name in levelSounds) {
     let description = levelSounds[name]
     // Let's save some old details, but the title won't reflect changes if we don't get them every time.
@@ -124,9 +128,9 @@ startButton.onclick = () => {
               const data = {title: game.title, levels: []}
               for (let i = 0; i < game.levels.length; i++) {
                 const level = game.levels[i]
-                const levelData = {
-                  title: level.title,
-                  size: level.size,
+                const levelData = {title: level.title}
+                for (let name of levelNumericPropertyNames) {
+                  levelData[name] = level[name]
                 }
                 for (let name in levelSounds) {
                   if (level[name] === null) {
@@ -152,7 +156,8 @@ startButton.onclick = () => {
                   game.title = obj.title || game.title
                   for (let data of obj.levels) {
                     let l = new Level()
-                    for (let name of ["title", "size"]) {
+                    l.title = data.title
+                    for (let name of levelNumericPropertyNames) {
                       l[name] = data[name]
                     }
                     for (let name in levelSounds) {

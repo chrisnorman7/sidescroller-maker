@@ -20,3 +20,8 @@ this.levelSounds = {
   "beforeScene": "Audio to play before the level can be played",
   "afterScene": "The audio which should be played after the level has been completed",
 }
+
+this.levelNumericPropertyNames = [
+  "size",
+  "speed"
+]

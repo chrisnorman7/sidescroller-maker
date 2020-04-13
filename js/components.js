@@ -85,6 +85,7 @@ class Level {
     this.isLevel = true
     this.title = "Untitled Level"
     this.size = 200
+    this.speed = 250
     this.beforeScene = null
     this.afterScene = null
     this.music = null
