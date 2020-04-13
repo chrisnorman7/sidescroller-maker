@@ -1,4 +1,4 @@
-/* globals book, game, gameJson, keyboardArea, Level, Line, mainDiv, message, Page, startAudio, startButton, startDiv */
+/* globals book, game, gameJson, keyboardArea, Level, Line, mainDiv, message, Page, Sound, startAudio, startButton, startDiv */
 
 function EditLevelMenu(b, level) {
   return new Page(
@@ -11,6 +11,16 @@ function EditLevelMenu(b, level) {
             if (title && title != level.title) {
               level.title = title
               b.message("Level renamed.")
+            }
+          }
+        ),
+        new Line(
+          () => `Edit Size (${level.size})`, (b) => {
+            let size = Number(prompt("Enter new size", level.size), 0)
+            if (isNaN(size)) {
+              b.message("Invalid number.")
+            } else {
+              level.size = size
             }
           }
         ),
@@ -66,11 +76,34 @@ startButton.onclick = () => {
             }
           ),
           new Line(
-            "Copy Game JavaScript", () => {
-              gameJson.value = `const game = ${JSON.stringify(game)}`
+            "Copy Game JSON", () => {
+              gameJson.value = JSON.stringify(game)
               gameJson.select()
               gameJson.setSelectionRange(0, -1)
               document.execCommand("copy")
+            }
+          ),
+          new Line(
+            "Load Game JSON", (b) => {
+              if (confirm("Are you sure you want to reset your game and load from JSON?")) {
+                try {
+                  let obj = JSON.parse(gameJson.value)
+                  game.reset()
+                  game.title = obj.title || game.title
+                  for (let data of obj.levels) {
+                    let l = new Level()
+                    for (let name of ["title", "size"]) {
+                      l[name] = data[name]
+                    }
+                    for (let name of ["beforeScene", "afterScene", "music", "ambience"]) {
+                      l[name] = new Sound(data[name])
+                    }
+                    game.levels.push(l)
+                  }
+                } catch(e) {
+                  b.message(e)
+                }
+              }
             }
           ),
           new Line(
