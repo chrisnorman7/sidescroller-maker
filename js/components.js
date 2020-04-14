@@ -72,6 +72,17 @@ class Game {
     this.reset()
   }
 
+  static fromJson(obj) {
+    const g = new this()
+    g.  title = obj["title"] || g.title
+    return g
+  }
+
+  toJson() {
+    const data = {title: this.title, levels: []}
+    return data
+  }
+
   reset() {
     this.title = "Untitled Game"
     this.levels = []
@@ -220,6 +231,7 @@ class Book{
       "]": () => this.volumeUp(),
     }
     this.message = null
+    this.game = new Game()
   }
 
   push(page) {
@@ -343,7 +355,7 @@ class Book{
 
   getText(text) {
     if (typeof(text) == "function") {
-      return text()
+      return text(this)
     }
     return text
   }

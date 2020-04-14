@@ -1,4 +1,4 @@
-/* globals book, buffers, game, gameJson, keyboardArea, Level, levelNumericPropertyNames, levelSounds, Line, mainDiv, message, Page, Sound, startAudio, startButton, startDiv */
+/* globals book, buffers, Game, gameJson, keyboardArea, Level, levelNumericPropertyNames, levelSounds, Line, mainDiv, message, Page, Sound, startAudio, startButton, startDiv */
 
 function EditLevelMenu(b, level) {
   const lines = [
@@ -59,8 +59,8 @@ function EditLevelMenu(b, level) {
     new Line(
       "Delete", (b) => {
         if (confirm(`Are you sure you want to delete "${level.title}"?`)) {
-          const index = game.levels.indexOf(level)
-          game.levels.splice(index, 1)
+          const index = b.game.levels.indexOf(level)
+          b.game.levels.splice(index, 1)
           for (let i = 0; i < 2; i++) {
             b.pop()
           }
@@ -81,13 +81,13 @@ function LevelsMenu() {
   const lines = [
     new Line(
       "Add Level", (b) => {
-        game.levels.push(new Level())
+        b.game.levels.push(new Level())
         b.pop()
         b.push(LevelsMenu())
       }
     )
   ]
-  for (let level of game.levels) {
+  for (let level of book.game.levels) {
     lines.push(
       new Line(
         () => level.title, (b) => b.push(EditLevelMenu(b, level))
@@ -96,7 +96,7 @@ function LevelsMenu() {
   }
   return new Page(
     {
-      title: () => `Levels (${game.levels.length})`,
+      title: (b) => `Levels (${b.game.levels.length})`,
       lines: lines
     }
   )
@@ -114,8 +114,8 @@ startButton.onclick = () => {
         dismissible: false,
         lines: [
           new Line(
-            "Set Game Name", () => {
-              game.title = prompt("Enter a new name", game.title || "Untitled Game")
+            "Set Game Name", (b) => {
+              b.game.title = prompt("Enter a new name", b.game.title || "Untitled Game")
             }
           ),
           new Line(
@@ -124,24 +124,8 @@ startButton.onclick = () => {
             }
           ),
           new Line(
-            "Copy Game JSON", () => {
-              const data = {title: game.title, levels: []}
-              for (let i = 0; i < game.levels.length; i++) {
-                const level = game.levels[i]
-                const levelData = {title: level.title}
-                for (let name of levelNumericPropertyNames) {
-                  levelData[name] = level[name]
-                }
-                for (let name in levelSounds) {
-                  if (level[name] === null) {
-                    levelData[name] = null
-                  } else {
-                    levelData[name] = level[name].url
-                  }
-                }
-                data.levels.push(levelData)
-              }
-              gameJson.value = JSON.stringify(data)
+            "Copy Game JSON", (b) => {
+              gameJson.value = JSON.stringify(b.game.toJson())
               gameJson.select()
               gameJson.setSelectionRange(0, -1)
               document.execCommand("copy")
@@ -152,22 +136,7 @@ startButton.onclick = () => {
               if (confirm("Are you sure you want to reset your game and load from JSON?")) {
                 try {
                   let obj = JSON.parse(gameJson.value)
-                  game.reset()
-                  game.title = obj.title || game.title
-                  for (let data of obj.levels) {
-                    let l = new Level()
-                    l.title = data.title
-                    for (let name of levelNumericPropertyNames) {
-                      l[name] = data[name]
-                    }
-                    for (let name in levelSounds) {
-                      const url = data[name]
-                      if (url) {
-                        l[name] = new Sound(url)
-                      }
-                    }
-                    game.levels.push(l)
-                  }
+                  b.game = Game.fromJson(obj)
                 } catch(e) {
                   b.message(e)
                 }
@@ -175,9 +144,9 @@ startButton.onclick = () => {
             }
           ),
           new Line(
-            "Reset Game", () => {
+            "Reset Game", (b) => {
               if (confirm("Are you sure you want to reset the game?")) {
-                game.reset()
+                b.game.reset()
               }
             }
           ),
