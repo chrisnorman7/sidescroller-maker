@@ -6,10 +6,11 @@ const buffers = {}
 
 function startAudio() {
   audio = new AudioContext()
+  audio.listener.setOrientation(0, 0, -1, 0, 1, 0)
   gain = audio.createGain()
   gain.gain.value = 0.5
   gain.connect(audio.destination)
-  const music = new Sound("/res/music/start.wav")
+  const music = new Sound("res/music/start.wav")
   music.play()
 }
 
@@ -26,7 +27,7 @@ function getBuffer(url, done) {
 }
 
 class Sound {
-  constructor(url, loop) {
+  constructor(url, loop, output) {
     this.buffer = null
     this.stop = false
     this.url = url
@@ -35,6 +36,10 @@ class Sound {
       loop = false
     }
     this.loop = loop
+    if (output === undefined) {
+      output = gain
+    }
+    this.output = output
   }
 
   playBuffer(buffer) {
@@ -49,7 +54,7 @@ class Sound {
       source.onended = this.onended
       source.loop = this.loop
       source.buffer = buffer
-      source.connect(gain)
+      source.connect(this.output)
       source.start(0)
     }
   }
@@ -110,8 +115,7 @@ this.Game = Game
 class Object {
   constructor() {
     this.title = null
-    this.soundUrl = "/res/object.wav"
-    this.sound = new Sound(this.soundUrl, true)
+    this.soundUrl = "res/object.wav"
   }
 
   static fromJson(data) {
@@ -132,6 +136,8 @@ class LevelObject {
   constructor(obj, position) {
     this.object = obj
     this.position = position
+    this.panner = null
+    this.sound = null
   }
 
   static fromJson(data, game) {
@@ -143,6 +149,46 @@ class LevelObject {
 
   toJson(game) {
     return {objectIndex: game.objects.indexOf(this.object), position: this.position}
+  }
+
+  spawn(level) {
+    if (this.object.soundUrl !== null) {
+      this.panner = audio.createPanner(
+        {
+          positionX: this.position,
+          maxDistance: 15,
+          panningModel: "HRTF",
+          distanceModel: "linear",
+          orientationX: 0.0,
+          orientationY: 0.0,
+          orientationZ: -1.0,
+          rolloffFactor: 10,
+          coneInnerAngle: 40,
+          coneOuterAngle: 50,
+          coneOuterGain: 0.4,
+        }
+      )
+      this.panner.connect(level.convolver || gain)
+      this.sound = new Sound(this.object.soundUrl, true, this.panner)
+      this.sound.play()
+    }
+  }
+
+  destroy(level) {
+    const index = level.contents.indexOf(this)
+    level.contents.splice(index, 1)
+    if (this.sound !== null) {
+      this.sound.stop()
+      this.panner.disconnect()
+      this.sound.source.disconnect()
+    }
+  }
+
+  move(position) {
+    this.position = position
+    if (this.sound !== null) {
+      this.panner.positionX = position
+    }
   }
 }
 
@@ -178,9 +224,9 @@ class Level {
     this.music = new Sound(this.musicUrl, true)
     this.ambienceUrl = null
     this.ambience = new Sound(this.ambienceUrl, true)
-    this.footstepUrl = "/res/footsteps/stone.wav"
+    this.footstepUrl = "res/footsteps/stone.wav"
     this.footstep = new Sound(this.footstepUrl, false)
-    this.wallUrl = "/res/wall.wav"
+    this.wallUrl = "res/wall.wav"
     this.wall = new Sound(this.wallUrl, false)
     this.convolverUrl = null
     this.convolverVolume = 0.5
@@ -245,7 +291,7 @@ class Level {
           this.playSound(this.wallUrl, this.wall)
         }
       } else {
-        book.player.position = position
+        book.setPlayerPosition(position)
         if (this.footstepUrl !== null) {
           this.playSound(this.footstepUrl, this.footstep)
         }
@@ -260,7 +306,7 @@ class Level {
 
   play(book) {
     book.push(this)
-    book.player.position = 0
+    book.setPlayerPosition(0)
     if (this.convolverUrl !== null) {
       this.loading = true
       getBuffer(this.convolverUrl, (buffer) => {
@@ -271,9 +317,18 @@ class Level {
         this.convolverGain.gain.value = this.convolverVolume
         this.convolver.connect(this.convolverGain)
         this.convolverGain.connect(audio.destination)
-        this.loading = false
+        this.loadContents()
       })
+    } else {
+      this.loadContents()
     }
+  }
+
+  loadContents() {
+    for (let content of this.contents) {
+      content.spawn(this)
+    }
+    this.loading = false
   }
 
   leave(book) {
@@ -328,11 +383,11 @@ class Page{
     }
     this.lines = obj.lines
     if (obj.moveSound === undefined) {
-      obj.moveSound = new Sound("/res/menus/move.wav")
+      obj.moveSound = new Sound("res/menus/move.wav")
     }
     this.moveSound = obj.moveSound
     if (obj.activateSound === undefined) {
-      obj.activateSound = new Sound("/res/menus/activate.wav")
+      obj.activateSound = new Sound("res/menus/activate.wav")
     }
     this.activateSound = obj.activateSound
     if (obj.dismissible === undefined) {
@@ -475,7 +530,7 @@ class Book{
   }
 
   setVolume(v) {
-    const volumeSound = new Sound("/res/volume.wav")
+    const volumeSound = new Sound("res/volume.wav")
     gain.gain.value = v
     volumeSound.play()
     this.message(`${Math.floor(gain.gain.value * 100)}%.`)
@@ -503,6 +558,11 @@ class Book{
       return text(this)
     }
     return text
+  }
+
+  setPlayerPosition(position) {
+    this.player.position = position
+    audio.listener.positionX.value = position
   }
 }
 

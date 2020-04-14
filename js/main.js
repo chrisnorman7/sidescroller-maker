@@ -231,7 +231,9 @@ keyboardArea.onkeydown = (e) => {
           lines.push(
             new Line(
               obj.title, (b) => {
-                page.contents.push(new LevelObject(obj, book.player.position))
+                const content = new LevelObject(obj, book.player.position)
+                page.contents.push(content)
+                content.spawn(page)
                 b.pop()
               }
             )
