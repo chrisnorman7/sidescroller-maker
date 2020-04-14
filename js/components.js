@@ -15,6 +15,16 @@ function startAudio() {
 
 this.startAudio = startAudio
 
+function getBuffer(url, done) {
+  let xhr = new XMLHttpRequest()
+  xhr.open("GET", url)
+  xhr.responseType = "arraybuffer"
+  xhr.onload = () => {
+    audio.decodeAudioData(xhr.response).then(done)
+  }
+  xhr.send()
+}
+
 class Sound {
   constructor(url, loop) {
     this.buffer = null
@@ -25,20 +35,6 @@ class Sound {
       loop = false
     }
     this.loop = loop
-  }
-
-  getBuffer() {
-    let xhr = new XMLHttpRequest()
-    xhr.open("GET", this.url)
-    xhr.responseType = "arraybuffer"
-    xhr.onload = () => {
-      audio.decodeAudioData(xhr.response).then(
-        (buffer) => {
-          this.playBuffer(buffer)
-        }
-      )
-    }
-    xhr.send()
   }
 
   playBuffer(buffer) {
@@ -60,7 +56,7 @@ class Sound {
 
   play() {
     if (this.buffer === null) {
-      this.getBuffer()
+      getBuffer(this.url, (buffer) => this.playBuffer(buffer))
     } else {
       this.playBuffer()
     }
@@ -107,13 +103,13 @@ class Level {
   constructor() {
     this.isLevel = true
     this.title = "Untitled Level"
-    this.size = 200
-    this.speed = 100
     this.numericProperties = {
       size: "The width of the level",
       speed: "How often (in milliseconds) the player can move",
       convolverVolume: "The volume of the impulse response"
     }
+    this.size = 200
+    this.speed = 100
     this.urls = {
       beforeSceneUrl: "The scene to play before the level starts",
       afterSceneUrl: "The scene to play after the level has been completed successfully",
@@ -142,8 +138,24 @@ class Level {
   static fromJson(data) {
     const level = new this()
     level.title = data.title || level.title
-    level.size = data.size || level.size
-    level.speed = data.speed || level.speed
+    for (let name in this.numericProperties) {
+      level[name] = data[name] || level[name]
+    }
+    for (let name in this.urls) {
+      level[name] = data[name] || level[name]
+    }
+    return level
+  }
+
+  toJson() {
+    const data = {title: this.title}
+    for (let name in this.numericProperties) {
+      data[name] = this[name]
+    }
+    for (let name in this.urls) {
+      data[name] = this[name]
+    }
+    return data
   }
 
   jump(book) {
@@ -164,17 +176,22 @@ class Level {
       book.player.lastMoved = time
       let position = book.player.position + direction
       if (position < 0 || position > this.size) {
-        if (this.wall !== null) {
-          this.wall.play()
+        if (this.wallUrl !== null) {
+          this.playSound(this.wallUrl, this.wall)
         }
       } else {
         book.player.position = position
-        if (this.footstep !== null) {
-          this.footstep.play()
+        if (this.footstepUrl !== null) {
+          this.playSound(this.footstepUrl, this.footstep)
         }
       }
+    }
   }
-}
+
+  playSound(url, sound) {
+    sound.url = url
+    return sound.play()
+  }
 
   play(book) {
     book.push(this)
