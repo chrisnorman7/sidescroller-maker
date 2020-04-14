@@ -101,6 +101,7 @@ this.Game = Game
 
 class Level {
   constructor() {
+    this.loading = false
     this.isLevel = true
     this.title = "Untitled Level"
     this.numericProperties = {
@@ -133,15 +134,17 @@ class Level {
     this.wall = new Sound(this.wallUrl, false)
     this.convolverUrl = null
     this.convolverVolume = 0.5
+    this.convolver = null
+    this.convolverGain = null
   }
 
   static fromJson(data) {
     const level = new this()
     level.title = data.title || level.title
-    for (let name in this.numericProperties) {
+    for (let name in level.numericProperties) {
       level[name] = data[name] || level[name]
     }
-    for (let name in this.urls) {
+    for (let name in level.urls) {
       level[name] = data[name] || level[name]
     }
     return level
@@ -159,6 +162,9 @@ class Level {
   }
 
   jump(book) {
+    if (this.loading) {
+      return
+    }
     book.message("Jumping.")
   }
 
@@ -171,6 +177,9 @@ class Level {
   }
 
   move(book, direction) {
+    if (this.loading) {
+      return
+    }
     const time = new Date().getTime()
     if ((time - book.player.lastMoved) > this.speed) {
       book.player.lastMoved = time
@@ -196,6 +205,30 @@ class Level {
   play(book) {
     book.push(this)
     book.player.position = 0
+    if (this.convolverUrl !== null) {
+      this.loading = true
+      getBuffer(this.convolverUrl, (buffer) => {
+        this.convolver = audio.createConvolver()
+        this.convolver.buffer = buffer
+        gain.connect(this.convolver)
+        this.convolverGain = audio.createGain()
+        this.convolverGain.gain.value = this.convolverVolume
+        this.convolver.connect(this.convolverGain)
+        this.convolverGain.connect(audio.destination)
+        this.loading = false
+      })
+    }
+  }
+
+  leave(book) {
+    book.pop()
+    if (this.convolver !== null) {
+      gain.disconnect(this.convolver)
+      this.convolverGain.disconnect()
+      this.convolver.disconnect()
+      this.convolverGain = null
+      this.convolver = null
+    }
   }
 }
 

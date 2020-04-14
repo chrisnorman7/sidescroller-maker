@@ -165,8 +165,9 @@ window.onload = () => {
 keyboardArea.onkeydown = (e) => {
   if (e.key == "Escape") {
     e.stopPropagation()
-    if (book.getPage().isLevel) {
-      book.pop()
+    const page = book.getPage()
+    if (page.isLevel) {
+      page.leave(book)
     } else {
       book.message("You can't escape from here.")
     }
