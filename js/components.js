@@ -182,7 +182,6 @@ class LevelObject {
 
   silence() {
     if (this.sound !== null) {
-      this.sound.stop()
       this.panner.disconnect()
       this.sound.source.disconnect()
     }
