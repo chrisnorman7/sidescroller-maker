@@ -36,7 +36,7 @@ function EditLevelMenu(b, level) {
     const description = level.urls[name]
     lines.push(
       new Line(
-        () => `${description} (${level[name] === null ? "not set" : level[name]}`, () => {
+        () => `${description} (${level[name] === null ? "not set" : level[name]})`, () => {
           const url = prompt("Enter a URL", level[name] || "")
           if (url) {
             level[name] = url
