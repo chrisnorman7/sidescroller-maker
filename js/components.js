@@ -72,18 +72,30 @@ class Game {
     this.reset()
   }
 
-  static fromJson(obj) {
+  static fromJson(data) {
     const g = new this()
-    g.  title = obj["title"] || g.title
+    g.  title = data.title || g.title
+    g.volumeChangeAmount = data.volumeChangeAmount || g.volumeChangeAmount
+    for (let levelData of data.levels) {
+      g.levels.push(Level.fromJson(levelData))
+    }
     return g
   }
 
   toJson() {
-    const data = {title: this.title, levels: []}
+    const data = {
+      volumeChangeAmount: this.volumeChangeAmount,
+      title: this.title,
+      levels: []
+    }
+    for (let level of this.levels) {
+      data.levels.push(level.toJson())
+    }
     return data
   }
 
   reset() {
+    this.volumeChangeAmount = 0.05
     this.title = "Untitled Game"
     this.levels = []
   }
@@ -97,13 +109,41 @@ class Level {
     this.title = "Untitled Level"
     this.size = 200
     this.speed = 100
-    this.beforeScene = null
-    this.afterScene = null
-    this.music = null
-    this.ambience = null
-    this.footstep = new Sound("/res/footsteps/stone.wav")
-    this.wall = new Sound("/res/wall.wav")
-    this.convolver = null
+    this.numericProperties = {
+      size: "The width of the level",
+      speed: "How often (in milliseconds) the player can move",
+      convolverVolume: "The volume of the impulse response"
+    }
+    this.urls = {
+      beforeSceneUrl: "The scene to play before the level starts",
+      afterSceneUrl: "The scene to play after the level has been completed successfully",
+      musicUrl: "The background music to play throughout the scene",
+      ambienceUrl: "The background of the level",
+      footstepUrl: "The sound made when the player walks",
+      wallUrl: "The sound heard when the player hits a wall",
+      convolverUrl: "The impulse response to use for level fx"
+    }
+    this.beforeSceneUrl = null
+    this.beforeScene = new Sound(this.beforeSceneUrl, false)
+    this.afterSceneUrl = null
+    this.afterScene = new Sound(this.afterSceneUrl, false)
+    this.musicUrl = null
+    this.music = new Sound(this.musicUrl, true)
+    this.ambienceUrl = null
+    this.ambience = new Sound(this.ambienceUrl, true)
+    this.footstepUrl = "/res/footsteps/stone.wav"
+    this.footstep = new Sound(this.footstepUrl, false)
+    this.wallUrl = "/res/wall.wav"
+    this.wall = new Sound(this.wallUrl, false)
+    this.convolverUrl = null
+    this.convolverVolume = 0.5
+  }
+
+  static fromJson(data) {
+    const level = new this()
+    level.title = data.title || level.title
+    level.size = data.size || level.size
+    level.speed = data.speed || level.speed
   }
 
   jump(book) {
@@ -219,7 +259,6 @@ class Book{
   constructor() {
     this.pages = []
     this.player = new Player()
-    this.volumeChangeAmount = 0.1
     this.hotkeys = {
       "ArrowUp": () => this.moveUp(),
       "ArrowDown": () => this.moveDown(),
@@ -337,11 +376,11 @@ class Book{
   }
 
   volumeUp() {
-    this.setVolume(Math.min(1.0, gain.gain.value + this.volumeChangeAmount))
+    this.setVolume(Math.min(1.0, gain.gain.value + this.game.volumeChangeAmount))
   }
 
   volumeDown() {
-    this.setVolume(Math.max(0.0, gain.gain.value - this.volumeChangeAmount))
+    this.setVolume(Math.max(0.0, gain.gain.value - this.game.volumeChangeAmount))
   }
 
   onkeydown(e) {

@@ -1,4 +1,4 @@
-/* globals book, buffers, Game, gameJson, keyboardArea, Level, levelNumericPropertyNames, levelSounds, Line, mainDiv, message, Page, Sound, startAudio, startButton, startDiv */
+/* globals book, Game, gameJson, keyboardArea, Level, Line, mainDiv, message, Page, startAudio, startButton, startDiv */
 
 function EditLevelMenu(b, level) {
   const lines = [
@@ -17,11 +17,12 @@ function EditLevelMenu(b, level) {
       }
     ),
   ]
-  for (let name of levelNumericPropertyNames) {
+  for (let name in level.numericProperties) {
+    const description = level.numericProperties[name]
     lines.push(
       new Line(
-        () => `Edit ${name} (${level[name]})`, (b) => {
-          let value = Number(prompt(`Enter new ${name}`, level[name])) || level[name]
+        () => `${description} (${level[name]})`, (b) => {
+          let value = Number(prompt("Enter new value", level[name])) || level[name]
           if (isNaN(value)) {
             b.message("Invalid number.")
           } else {
@@ -31,23 +32,14 @@ function EditLevelMenu(b, level) {
       )
     )
   }
-  for (let name in levelSounds) {
-    let description = levelSounds[name]
-    // Let's save some old details, but the title won't reflect changes if we don't get them every time.
-    let oldSound = level[name]
-    let oldUrl = null
-    let loop = undefined
-    if (oldSound !== null) {
-      oldUrl = oldSound.url
-      loop = oldSound.loop
-    }
+  for (let name in level.urls) {
+    const description = level.urls[name]
     lines.push(
       new Line(
-        () => `${description} (${level[name] === null ? "not set" : level[name].url}`, () => {
-          const url = prompt("Enter a URL", oldUrl || "")
+        () => `${description} (${level[name] === null ? "not set" : level[name]}`, () => {
+          const url = prompt("Enter a URL", level[name] || "")
           if (url) {
-            level[name] = new Sound(url, loop)
-            delete buffers[oldUrl]
+            level[name] = url
           } else {
             level[name] = null
           }
@@ -121,6 +113,16 @@ startButton.onclick = () => {
           new Line(
             "Levels", b => {
               b.push(LevelsMenu())
+            }
+          ),
+          new Line(
+            "Set Volume Change Amount", (b) => {
+              const value = Number(prompt("Enter new value", b.game.volumeChangeAmount), 2)
+              if (isNaN(value)) {
+                b.message("Invalid value.")
+              } else {
+                b.game.volumeChangeAmount = Number(value, 2) || b.game.volumeChangeAmount
+              }
             }
           ),
           new Line(
