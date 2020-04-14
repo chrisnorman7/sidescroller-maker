@@ -1,3 +1,5 @@
+const audioDivider = 10
+
 let audio = null
 let gain = null
 window.AudioContext = window.AudioContext || window.webkitAudioContext
@@ -7,6 +9,7 @@ const buffers = {}
 function startAudio() {
   audio = new AudioContext()
   audio.listener.setOrientation(0, 0, -1, 0, 1, 0)
+  audio.listener.positionZ.value = -1
   gain = audio.createGain()
   gain.gain.value = 0.5
   gain.connect(audio.destination)
@@ -154,24 +157,13 @@ class LevelObject {
 
   spawn(level) {
     if (this.object.soundUrl !== null) {
-      this.panner = audio.createPanner(
-        {
-          positionX: this.position,
-          maxDistance: 15,
-          panningModel: "HRTF",
-          distanceModel: "linear",
-          orientationX: 0.0,
-          orientationY: 0.0,
-          orientationZ: -1.0,
-          rolloffFactor: 10,
-          coneInnerAngle: 40,
-          coneOuterAngle: 50,
-          coneOuterGain: 0.4,
-        }
-      )
+      this.panner = audio.createPanner()
+      this.panner.maxDistance = 10
+      this.panner.rolloffFactor = 6
       this.panner.connect(level.convolver || gain)
       this.sound = new Sound(this.object.soundUrl, true, this.panner)
       this.sound.play()
+      this.move(this.position)
     }
   }
 
@@ -191,7 +183,7 @@ class LevelObject {
   move(position) {
     this.position = position
     if (this.sound !== null) {
-      this.panner.positionX = position
+      this.panner.positionX.value = position / audioDivider
     }
   }
 }
@@ -569,7 +561,7 @@ class Book{
 
   setPlayerPosition(position) {
     this.player.position = position
-    audio.listener.positionX.value = position
+    audio.listener.positionX.value = position / audioDivider
   }
 }
 
