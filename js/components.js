@@ -177,6 +177,10 @@ class LevelObject {
   destroy(level) {
     const index = level.contents.indexOf(this)
     level.contents.splice(index, 1)
+    this.silence()
+  }
+
+  silence() {
     if (this.sound !== null) {
       this.sound.stop()
       this.panner.disconnect()
@@ -339,6 +343,9 @@ class Level {
       this.convolver.disconnect()
       this.convolverGain = null
       this.convolver = null
+    }
+    for (let content of this.contents) {
+      content.silence()
     }
   }
 }
