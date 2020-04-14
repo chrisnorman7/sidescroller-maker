@@ -94,10 +94,39 @@ class Game {
     this.volumeChangeAmount = 0.05
     this.title = "Untitled Game"
     this.levels = []
+    this.objects = []
   }
 }
 
 this.Game = Game
+
+class Object {
+  constructor() {
+    this.soundUrl = "/res/object.wav"
+    this.sound = new Sound(this.soundUrl, true)
+  }
+
+  static fromJson(data) {
+    const o = new this()
+    o.soundUrl = data.soundUrl || o.soundUrl
+    return o
+  }
+
+  toJson() {
+    return {soundUrl: this.soundUrl}
+  }
+}
+
+this.Object = Object
+
+class LevelObject {
+  constructor(obj, position) {
+    this.object = obj
+    this.position = position
+  }
+}
+
+this.LevelObject = LevelObject
 
 class Level {
   constructor() {
