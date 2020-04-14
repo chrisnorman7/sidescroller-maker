@@ -72,8 +72,11 @@ class Game {
     const g = new this()
     g.  title = data.title || g.title
     g.volumeChangeAmount = data.volumeChangeAmount || g.volumeChangeAmount
+    for (let objectData of data.objects) {
+      g.objects.push(Object.fromJson(objectData))
+    }
     for (let levelData of data.levels) {
-      g.levels.push(Level.fromJson(levelData))
+      g.levels.push(Level.fromJson(levelData, g))
     }
     return g
   }
@@ -82,10 +85,14 @@ class Game {
     const data = {
       volumeChangeAmount: this.volumeChangeAmount,
       title: this.title,
-      levels: []
+      levels: [],
+      objects: []
     }
     for (let level of this.levels) {
-      data.levels.push(level.toJson())
+      data.levels.push(level.toJson(this))
+    }
+    for (let object of this.objects) {
+      data.objects.push(object.toJson())
     }
     return data
   }
@@ -102,18 +109,20 @@ this.Game = Game
 
 class Object {
   constructor() {
+    this.title = null
     this.soundUrl = "/res/object.wav"
     this.sound = new Sound(this.soundUrl, true)
   }
 
   static fromJson(data) {
     const o = new this()
+    o.title = data.title || o.title
     o.soundUrl = data.soundUrl || o.soundUrl
     return o
   }
 
   toJson() {
-    return {soundUrl: this.soundUrl}
+    return {soundUrl: this.soundUrl, title: this.title}
   }
 }
 
@@ -124,6 +133,17 @@ class LevelObject {
     this.object = obj
     this.position = position
   }
+
+  static fromJson(data, game) {
+    let c = new this()
+    c.object = game.objects[data.objectIndex]
+    c.position = data.position
+    return c
+  }
+
+  toJson(game) {
+    return {objectIndex: game.objects.indexOf(this.object), position: this.position}
+  }
 }
 
 this.LevelObject = LevelObject
@@ -132,6 +152,7 @@ class Level {
   constructor() {
     this.loading = false
     this.isLevel = true
+    this.contents = []
     this.title = "Untitled Level"
     this.numericProperties = {
       size: "The width of the level",
@@ -167,7 +188,7 @@ class Level {
     this.convolverGain = null
   }
 
-  static fromJson(data) {
+  static fromJson(data, game) {
     const level = new this()
     level.title = data.title || level.title
     for (let name in level.numericProperties) {
@@ -176,16 +197,22 @@ class Level {
     for (let name in level.urls) {
       level[name] = data[name] || level[name]
     }
+    for (let contentData of data.contents) {
+      level.contents.push(LevelObject.fromJson(contentData, game))
+    }
     return level
   }
 
-  toJson() {
-    const data = {title: this.title}
+  toJson(game) {
+    const data = {title: this.title, contents: []}
     for (let name in this.numericProperties) {
       data[name] = this[name]
     }
     for (let name in this.urls) {
       data[name] = this[name]
+    }
+    for (let content of this.contents) {
+      data.contents.push(content.toJson(game))
     }
     return data
   }

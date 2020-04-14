@@ -1,4 +1,4 @@
-/* globals book, Game, gameJson, keyboardArea, Level, Line, mainDiv, message, Page, startAudio, startButton, startDiv */
+/* globals book, Game, gameJson, keyboardArea, Level, LevelObject, Line, mainDiv, message, Page, startAudio, startButton, startDiv */
 
 function EditLevelMenu(b, level) {
   const lines = [
@@ -56,7 +56,7 @@ function EditLevelMenu(b, level) {
           for (let i = 0; i < 2; i++) {
             b.pop()
           }
-          b.push(LevelsMenu())
+          b.push(LevelsMenu(b))
         }
       }
     )
@@ -69,17 +69,17 @@ function EditLevelMenu(b, level) {
   )
 }
 
-function LevelsMenu() {
+function LevelsMenu(b) {
   const lines = [
     new Line(
       "Add Level", (b) => {
         b.game.levels.push(new Level())
         b.pop()
-        b.push(LevelsMenu())
+        b.push(LevelsMenu(b))
       }
     )
   ]
-  for (let level of book.game.levels) {
+  for (let level of b.game.levels) {
     lines.push(
       new Line(
         () => level.title, (b) => b.push(EditLevelMenu(b, level))
@@ -89,6 +89,57 @@ function LevelsMenu() {
   return new Page(
     {
       title: (b) => `Levels (${b.game.levels.length})`,
+      lines: lines
+    }
+  )
+}
+
+function EditObjectMenu(b, obj) {
+  const lines = [
+    new Line(
+      "Rename", () => {
+        obj.title = prompt("New title", obj.title) || obj.title
+      }
+    ),
+    new Line(
+      () => `Sound URL (${obj.soundUrl})`, () => {
+        obj.soundUrl = prompt("New URL", obj.soundUrl) || null
+      }
+    )
+  ]
+  return new Page(
+    {
+      title: () => `Edit ${obj.title}`,
+      lines: lines
+    }
+  )
+}
+
+function ObjectsMenu(b) {
+  const lines = [
+    new Line(
+      "Add Object", (b) => {
+        const title = prompt("Enter the name for the new object") || ""
+        if (title) {
+          const obj = new Object()
+          obj.title = title
+          b.game.objects.push(obj)
+          b.pop()
+          b.push(ObjectsMenu(b))
+        }
+      }
+    ),
+  ]
+  for (let obj of b.game.objects) {
+    lines.push(
+      new Line(
+        () => obj.title, (b) => b.push(EditObjectMenu(b, obj))
+      )
+    )
+  }
+  return new Page(
+    {
+      title: (b) => `Objects (${b.game.objects.length})`,
       lines: lines
     }
   )
@@ -112,7 +163,12 @@ startButton.onclick = () => {
           ),
           new Line(
             "Levels", b => {
-              b.push(LevelsMenu())
+              b.push(LevelsMenu(b))
+            }
+          ),
+          new Line(
+            "Objects", (b) => {
+              b.push(ObjectsMenu(b))
             }
           ),
           new Line(
@@ -136,12 +192,8 @@ startButton.onclick = () => {
           new Line(
             "Load Game JSON", (b) => {
               if (confirm("Are you sure you want to reset your game and load from JSON?")) {
-                try {
-                  let obj = JSON.parse(gameJson.value)
-                  b.game = Game.fromJson(obj)
-                } catch(e) {
-                  b.message(e)
-                }
+                let obj = JSON.parse(gameJson.value)
+                b.game = Game.fromJson(obj)
               }
             }
           ),
@@ -163,16 +215,44 @@ window.onload = () => {
 }
 
 keyboardArea.onkeydown = (e) => {
-  if (e.key == "Escape") {
-    e.stopPropagation()
-    const page = book.getPage()
-    if (page.isLevel) {
-      page.leave(book)
+  try {
+    if (e.key == "Escape") {
+      const page = book.getPage()
+      if (page.isLevel) {
+        page.leave(book)
+      } else {
+        book.message("You can't escape from here.")
+      }
+    } else if (e.key == "o") {
+      const page = book.getPage()
+      if (page.isLevel) {
+        const lines = []
+        for (let obj of book.game.objects) {
+          lines.push(
+            new Line(
+              obj.title, (b) => {
+                page.contents.push(new LevelObject(obj, book.player.position))
+                b.pop()
+              }
+            )
+          )
+        }
+        book.push(
+          new Page(
+            {
+              title: "Add Object",
+              lines: lines
+            }
+          )
+        )
+      }
     } else {
-      book.message("You can't escape from here.")
+      return book.onkeydown(e)
     }
-  } else {
-    return book.onkeydown(e)
+    e.stopPropagation()
+  } catch(e) {
+    book.message(e)
+    throw(e)
   }
 }
 
