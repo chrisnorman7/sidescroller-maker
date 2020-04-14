@@ -39,6 +39,7 @@ class Sound {
     if (output === undefined) {
       output = gain
     }
+    this.source = null
     this.output = output
   }
 
@@ -50,12 +51,12 @@ class Sound {
       buffers[this.url] = buffer
     }
     if (!this.stop) {
-      const source = audio.createBufferSource()
-      source.onended = this.onended
-      source.loop = this.loop
-      source.buffer = buffer
-      source.connect(this.output)
-      source.start(0)
+      this.source = audio.createBufferSource()
+      this.source.onended = this.onended
+      this.source.loop = this.loop
+      this.source.buffer = buffer
+      this.source.connect(this.output)
+      this.source.start(0)
     }
   }
 
