@@ -326,12 +326,6 @@ class Level {
         if (this.footstepUrl !== null) {
           this.footstep.play(this.footstepUrl)
         }
-        for (let content of this.contents) {
-          if (content.position == position) {
-            this.trip.play(this.tripUrl)
-            book.message(content.object.title)
-          }
-        }
       }
     }
   }
@@ -802,8 +796,15 @@ class Book{
   }
 
   setPlayerPosition(position) {
+    const level = this.getPage()
     this.player.position = position
     audio.listener.positionX.value = position / audioDivider
+    for (let content of level.contents) {
+      if (content.position == position) {
+        level.trip.play(this.tripUrl)
+        this.message(content.object.title)
+      }
+    }
   }
 }
 
