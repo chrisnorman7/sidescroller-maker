@@ -166,7 +166,9 @@ class Object {
   }
 }
 
-this.Object = Object
+const fists = new Object()
+fists.title = "Fists"
+fists.type = objectTypes.weapon
 
 class LevelObject {
   constructor(obj, position) {
@@ -243,7 +245,8 @@ class Level {
       footstepUrl: "The sound made when the player walks",
       wallUrl: "The sound heard when the player hits a wall",
       tripUrl: "The sound that plays when a player trips over an object",
-      convolverUrl: "The impulse response to use for level fx"
+      convolverUrl: "The impulse response to use for level fx",
+      noWeaponUrl: "The sound which is played when a weapons slot is empty"
     }
     this.beforeSceneUrl = null
     this.beforeScene = new Sound(this.beforeSceneUrl, false)
@@ -263,6 +266,8 @@ class Level {
     this.convolverVolume = 0.5
     this.convolver = null
     this.convolverGain = null
+    this.noWeaponUrl = "res/noweapon.wav"
+    this.noWeapon = new Sound(this.noWeaponUrl)
   }
 
   static fromJson(data, game) {
@@ -545,6 +550,7 @@ class Player {
     this.health = 100
     this.lastMoved = 0
     this.carrying = []
+    this.weapon = null
   }
 }
 
@@ -567,6 +573,11 @@ class Book{
       "]": () => this.volumeUp(),
       "i": () => this.inventory(),
       "d": () => this.drop(),
+    }
+    for (let i = 0; i < 10; i++) {
+      this.hotkeys[i.toString()] = () => {
+        this.selectWeapon(i)
+      }
     }
     this.game = new Game()
   }
@@ -803,6 +814,30 @@ class Book{
       if (content.position == position) {
         level.trip.play(this.tripUrl)
         this.message(content.object.title)
+      }
+    }
+  }
+
+  selectWeapon(i) {
+    const page = this.getPage()
+    if (page.isLevel) {
+      let index = Number(i, 0)
+      if (i == 0) {
+        index = 9
+      } else {
+        index -= 1
+      }
+      const weapons = [fists]
+      for (let obj in this.player.carrying) {
+        if (obj.type == objectTypes.weapon) {
+          weapons.push(obj)
+        }
+      }
+      const weapon = weapons[index]
+      if (weapon === undefined) {
+        page.noWeapon.play(page.noWeaponUrl)
+      } else {
+        this.message(weapon.title)
       }
     }
   }

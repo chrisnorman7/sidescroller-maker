@@ -440,6 +440,11 @@ window.onload = () => {
 }
 
 keyboardArea.onkeydown = (e) => {
+  for (let modifier of ["Alt", "AltGraph", "CapsLock", "Control", "Fn", "FnLock", "Hyper", "Meta", "NumLock", "ScrollLock", "Shift", "Super", "Symbol", "SymbolLock"]) {
+    if (e.getModifierState(modifier)) {
+      return
+    }
+  }
   try {
     const page = book.getPage()
     if (e.key == "Escape" && page.isLevel) {
