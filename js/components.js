@@ -664,7 +664,7 @@ class Book{
       for (let content of page.contents) {
         if (content.position == this.player.position) {
           const obj = content.object
-          if (obj.type == objectTypes.object) {
+          if ([objectTypes.object, objectTypes.weapon].includes(obj.type)) {
             content.destroy(page)
             this.player.carrying.push(obj)
             new Sound(content.object.takeUrl, false, page.convolver || gain).play()
