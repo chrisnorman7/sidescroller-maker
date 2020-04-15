@@ -135,7 +135,12 @@ class Object {
     this.title = null
     this.type = objectTypes.object
     this.isWeapon = false
+    this.urls = {
+      soundUrl: "The sound constantly played by this object",
+      takeUrl: "The sound played when picking up this object"
+    }
     this.soundUrl = "res/object.wav"
+    this.takeUrl = "res/take.wav"
   }
 
   static fromJson(data) {

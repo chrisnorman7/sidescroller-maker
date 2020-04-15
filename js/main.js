@@ -138,7 +138,7 @@ function EditLevelMenu(b, level) {
     const description = level.urls[name]
     lines.push(
       new Line(
-        () => `${description} (${level[name] === null ? "not set" : level[name]})`, () => {
+        () => `${description} (${level[name] === null ? "not set" : level[name]})`, (b) => {
           getText(
             {
               book: b,
@@ -233,21 +233,6 @@ function EditObjectMenu(b, obj) {
       }
     ),
     new Line(
-      () => `Sound URL (${obj.soundUrl})`, () => {
-        getText(
-          {
-            book: b,
-            prompt: "New URL",
-            value: obj.soundUrl,
-            onok: (url, bk) => {
-              obj.soundUrl = url || null
-              bk.showFocus()
-            }
-          }
-        )
-      }
-    ),
-    new Line(
       () => `Set Type (${obj.type})`, (b) => {
         const lines = []
         for (let name in objectTypes) {
@@ -272,6 +257,30 @@ function EditObjectMenu(b, obj) {
       }
     ),
   ]
+  for (let name in obj.urls) {
+    const description = obj.urls[name]
+    lines.push(
+      new Line(
+        () => `${description} (${obj[name] === null ? "not set" : obj[name]})`, (b) => {
+          getText(
+            {
+              book: b,
+              prompt: "Enter a URL",
+              value: obj[name] || "",
+              onok: (url, bk) => {
+                if (url) {
+                  obj[name] = url
+                } else {
+                  obj[name] = null
+                }
+                bk.showFocus()
+              }
+            }
+          )
+        }
+      )
+    )
+  }
   return new Page(
     {
       title: () => `Edit ${obj.title}`,
