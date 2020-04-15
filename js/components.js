@@ -688,7 +688,7 @@ class Book{
     const key = e.key
     const func = this.hotkeys[key]
     if (func !== undefined) {
-      e.stopPropagation()
+      e.preventDefault()
       func()
     }
   }
