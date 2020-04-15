@@ -560,10 +560,12 @@ class Book{
       "ArrowDown": () => this.moveDown(),
       " ": () => this.activate(),
       "ArrowRight": () => this.moveOrActivate(),
-      "Enter": () => this.activate(),
+      "Enter": () => this.takeOrActivate(),
       "ArrowLeft": () => this.cancel(),
+      "Escape": () => this.cancel(),
       "[": () => this.volumeDown(),
       "]": () => this.volumeUp(),
+      "i": () => this.inventory(),
     }
     this.game = new Game()
   }
@@ -649,6 +651,22 @@ class Book{
     this.showFocus()
   }
 
+  takeOrActivate() {
+    const page = this.getPage()
+    if (page.isLevel) {
+      for (let content of page.contents) {
+        if (content.position == this.player.position) {
+          content.destroy(page)
+          this.player.carrying.push(content.object)
+          new Sound(content.object.takeUrl, false, page.convolver || gain).play()
+          this.message(`Taken: ${content.object.title}.`)
+        }
+      }
+    } else {
+      this.activate()
+    }
+  }
+
   moveOrActivate() {
     const page = this.getPage()
     if (page.isLevel) {
@@ -696,6 +714,33 @@ class Book{
 
   volumeDown() {
     this.setVolume(Math.max(0.0, gain.gain.value - this.game.volumeChangeAmount))
+  }
+
+  inventory() {
+    const page = this.getPage()
+    if (page.isLevel) {
+      const lines = []
+      for (let obj of this.player.carrying) {
+        lines.push(
+          new Line(
+            obj.title, (b) => {
+              obj.use(b)
+              b.pop()
+            }
+          )
+        )
+      }
+      this.push(
+        new Page(
+          {
+            title: "Inventory",
+            lines: lines
+          }
+        )
+      )
+    } else {
+      this.message("You aren't carrying anything.")
+    }
   }
 
   onkeydown(e) {

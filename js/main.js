@@ -382,14 +382,6 @@ startButton.onclick = () => {
             }
           ),
           new Line(
-            "Copy Game JSON", (b) => {
-              gameJson.value = JSON.stringify(b.game.toJson())
-              gameJson.select()
-              gameJson.setSelectionRange(0, -1)
-              document.execCommand("copy")
-            }
-          ),
-          new Line(
             "Load Game JSON", (b) => {
               b.push(
                 new ConfirmPage(
@@ -404,6 +396,14 @@ startButton.onclick = () => {
                   }
                 )
               )
+            }
+          ),
+          new Line(
+            "Copy Game JSON", (b) => {
+              gameJson.value = JSON.stringify(b.game.toJson())
+              gameJson.select()
+              gameJson.setSelectionRange(0, -1)
+              document.execCommand("copy")
             }
           ),
           new Line(
@@ -441,38 +441,31 @@ window.onload = () => {
 
 keyboardArea.onkeydown = (e) => {
   try {
-    if (e.key == "Escape") {
-      const page = book.getPage()
-      if (page.isLevel) {
-        page.leave(book)
-      } else {
-        book.message("You can't escape from here.")
-      }
-    } else if (e.key == "o") {
-      const page = book.getPage()
-      if (page.isLevel) {
-        const lines = []
-        for (let obj of book.game.objects) {
-          lines.push(
-            new Line(
-              obj.title, (b) => {
-                const content = new LevelObject(obj, book.player.position)
-                page.contents.push(content)
-                content.spawn(page)
-                b.pop()
-              }
-            )
-          )
-        }
-        book.push(
-          new Page(
-            {
-              title: "Add Object",
-              lines: lines
+    const page = book.getPage()
+    if (e.key == "Escape" && page.isLevel) {
+      page.leave(book)
+    } else if (e.key == "o" && page.isLevel) {
+      const lines = []
+      for (let obj of book.game.objects) {
+        lines.push(
+          new Line(
+            obj.title, (b) => {
+              const content = new LevelObject(obj, book.player.position)
+              page.contents.push(content)
+              content.spawn(page)
+              b.pop()
             }
           )
         )
       }
+      book.push(
+        new Page(
+          {
+            title: "Add Object",
+            lines: lines
+          }
+        )
+      )
     } else {
       book.onkeydown(e)
     }
