@@ -1,4 +1,4 @@
-/* globals book, ConfirmPage, Game, gameJson, keyboardArea, Level, LevelObject, Line, mainDiv, message, ObjectTypes, Page, startAudio, startButton, startDiv */
+/* globals book, ConfirmPage, Game, gameJson, keyboardArea, Level, LevelObject, Line, mainDiv, message, ObjectTypes, Page, startAudio, startButton, startDiv, TtsPage */
 
 function EditLevelMenu(b, level) {
   const lines = [
@@ -254,6 +254,11 @@ startButton.onclick = () => {
                   }
                 )
               )
+            }
+          ),
+          new Line(
+            "Configure TTS", (b) => {
+              b.push(TtsPage())
             }
           ),
         ]

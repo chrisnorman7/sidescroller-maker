@@ -1,5 +1,9 @@
 const audioDivider = 10
 
+const tts = window.speechSynthesis
+let ttsVoice = null
+let ttsRate =1 
+
 let audio = null
 let gain = null
 window.AudioContext = window.AudioContext || window.webkitAudioContext
@@ -304,6 +308,11 @@ class Level {
         if (this.footstepUrl !== null) {
           this.playSound(this.footstepUrl, this.footstep)
         }
+        for (let content of this.contents) {
+          if (content.position == position) {
+            book.message(content.object.title)
+          }
+        }
       }
     }
   }
@@ -442,6 +451,82 @@ function ConfirmPage(obj) {
   )
 }
 
+function VoicesPage() {
+  const lines = []
+  const voices = tts.getVoices().sort(
+    (a, b) => {
+      const aname = a.name.toUpperCase()
+      const bname = b.name.toUpperCase()
+      if ( aname < bname ) {
+        return -1
+      } else if ( aname == bname ) {
+        return 0
+      } else {
+        return 1
+      }
+    }
+  )
+  for (let voice of voices) {
+    lines.push(
+      new Line(
+        () => `${(voice === ttsVoice) ? "* " : ""}${voice.name}${voice.default ? " (Default)" : ""}`, (b) => {
+          ttsVoice = voice
+          b.pop()
+        }
+      )
+    )
+  }
+  return new Page(
+    {
+      title: "Available Voices",
+      lines: lines
+    }
+  )
+}
+
+function RatePage() {
+  const lines = []
+  for (let i = -1; i < 21; i++) {
+    lines.push(
+      new Line(
+        `${(i == ttsRate) ? "* " : ""}${i}`, (b) => {
+          ttsRate = i
+          b.pop()
+        }
+      )
+    )
+  }
+  return new Page(
+    {
+      title: "Voice Rate",
+      lines: lines
+    }
+  )
+}
+
+function TtsPage() {
+  const lines = [
+    new Line(
+      "Change Voice", (b) => {
+        b.push(VoicesPage())
+      }
+    ),
+    new Line(
+      "Change Rate", (b) => {
+        b.push(RatePage())
+      }
+    ),
+  ]
+  return new Page(
+    {
+      title: "Configure TTS",
+      lines: lines
+    }
+  )
+}
+
+this.TtsPage = TtsPage
+
 this.ConfirmPage = ConfirmPage
 
 this.Page = Page
@@ -458,6 +543,7 @@ class Book{
   // Got the idea from the Navigator class in Flutter.
 
   constructor() {
+    this.message = null
     this.pages = []
     this.player = new Player()
     this.hotkeys = {
@@ -470,8 +556,17 @@ class Book{
       "[": () => this.volumeDown(),
       "]": () => this.volumeUp(),
     }
-    this.message = null
     this.game = new Game()
+  }
+
+  speak(text, interrupt) {
+    if (interrupt) {
+      tts.cancel()
+    }
+    const u = new SpeechSynthesisUtterance(text)
+    u.voice = ttsVoice
+    u.rate = ttsRate
+    tts.speak(u)
   }
 
   push(page) {
@@ -484,6 +579,7 @@ class Book{
     if (this.pages.length > 0) {
       const page = this.pages.pop() // Pop the next one too, so we can push it again.
       this.push(page)
+      this.showFocus()
     }
   }
 
@@ -506,7 +602,7 @@ class Book{
     const page = this.getPage()
     const line = page.getLine()
     page.moveSound.play()
-    this.message(this.getText(line.title))
+    this.message(this.getText(line.title), true)
   }
 
   moveUp() {
@@ -522,7 +618,7 @@ class Book{
       }
       page.focus --
       if (page.focus == -1) {
-        this.message(this.getText(page.title))
+        this.message(this.getText(page.title), true)
       } else {
         this.showFocus()
       }
