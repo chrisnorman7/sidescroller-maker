@@ -67,7 +67,10 @@ class Sound {
     }
   }
 
-  play() {
+  play(url) {
+    if (url !== undefined) {
+      this.url = url
+    }
     if (this.buffer === null) {
       getBuffer(this.url, (buffer) => this.playBuffer(buffer))
     } else {
@@ -227,6 +230,7 @@ class Level {
       ambienceUrl: "The background of the level",
       footstepUrl: "The sound made when the player walks",
       wallUrl: "The sound heard when the player hits a wall",
+      tripUrl: "The sound that plays when a player trips over an object",
       convolverUrl: "The impulse response to use for level fx"
     }
     this.beforeSceneUrl = null
@@ -241,6 +245,8 @@ class Level {
     this.footstep = new Sound(this.footstepUrl, false)
     this.wallUrl = "res/wall.wav"
     this.wall = new Sound(this.wallUrl, false)
+    this.tripUrl = "res/trip.wav"
+    this.trip = new Sound(this.tripUrl)
     this.convolverUrl = null
     this.convolverVolume = 0.5
     this.convolver = null
@@ -301,25 +307,21 @@ class Level {
       let position = book.player.position + direction
       if (position < 0 || position > this.size) {
         if (this.wallUrl !== null) {
-          this.playSound(this.wallUrl, this.wall)
+          this.wall.play(this.wallUrl)
         }
       } else {
         book.setPlayerPosition(position)
         if (this.footstepUrl !== null) {
-          this.playSound(this.footstepUrl, this.footstep)
+          this.footstep.play(this.footstepUrl)
         }
         for (let content of this.contents) {
           if (content.position == position) {
+            this.trip.play(this.tripUrl)
             book.message(content.object.title)
           }
         }
       }
     }
-  }
-
-  playSound(url, sound) {
-    sound.url = url
-    return sound.play()
   }
 
   play(book) {
@@ -600,9 +602,11 @@ class Book{
 
   showFocus() {
     const page = this.getPage()
-    const line = page.getLine()
-    page.moveSound.play()
-    this.message(this.getText(line.title), true)
+    if (!page.isLevel) {
+      const line = page.getLine()
+      page.moveSound.play()
+      this.message(this.getText(line.title), true)
+    }
   }
 
   moveUp() {
