@@ -2,7 +2,7 @@ const audioDivider = 10
 
 const tts = window.speechSynthesis
 let ttsVoice = null
-let ttsRate =1 
+let ttsRate =1
 
 let audio = null
 let gain = null
@@ -552,7 +552,7 @@ class Book{
       "ArrowUp": () => this.moveUp(),
       "ArrowDown": () => this.moveDown(),
       " ": () => this.activate(),
-      "ArrowRight": () => this.activate(),
+      "ArrowRight": () => this.moveOrActivate(),
       "Enter": () => this.activate(),
       "ArrowLeft": () => this.cancel(),
       "[": () => this.volumeDown(),
@@ -642,12 +642,19 @@ class Book{
     this.showFocus()
   }
 
+  moveOrActivate() {
+    const page = this.getPage()
+    if (page.isLevel) {
+      page.right(this)
+    } else {
+      this.activate()
+    }
+  }
+
   activate() {
     const page = this.getPage()
-    if (page === null) {
+    if (page === null || page.isLevel) {
       return // Can"t do anything with no page.
-    } else if (page.isLevel) {
-      page.right(this)
     } else {
       const line = page.getLine()
       if (line === null) {
