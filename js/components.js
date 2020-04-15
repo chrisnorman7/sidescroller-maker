@@ -123,7 +123,7 @@ class Game {
 
 this.Game = Game
 
-const ObjectTypes = {
+const objectTypes = {
   object: "An object which can be picked up by the player",
   aggressiveMonster: "A monster which will attack the player",
   peacefulMonster: "A monster which will ignore the player",
@@ -133,7 +133,8 @@ const ObjectTypes = {
 class Object {
   constructor() {
     this.title = null
-    this.type = ObjectTypes.object
+    this.type = objectTypes.object
+    this.isWeapon = false
     this.soundUrl = "res/object.wav"
   }
 
@@ -538,6 +539,7 @@ class Player {
     this.position = null
     this.health = 100
     this.lastMoved = 0
+    this.carrying = []
   }
 }
 

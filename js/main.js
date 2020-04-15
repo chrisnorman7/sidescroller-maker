@@ -1,4 +1,4 @@
-/* globals Book, ConfirmPage, Game, Level, LevelObject, Line, ObjectTypes, Page, startAudio, TtsPage */
+/* globals Book, ConfirmPage, Game, Level, LevelObject, Line, objectTypes, Page, startAudio, TtsPage */
 
 const startDiv = document.querySelector("#startDiv")
 const mainDiv = document.querySelector("#main")
@@ -250,8 +250,8 @@ function EditObjectMenu(b, obj) {
     new Line(
       () => `Set Type (${obj.type})`, (b) => {
         const lines = []
-        for (let name in ObjectTypes) {
-          const description = ObjectTypes[name]
+        for (let name in objectTypes) {
+          const description = objectTypes[name]
           lines.push(
             new Line(
               description, (b) => {
