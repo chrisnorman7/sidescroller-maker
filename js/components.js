@@ -416,6 +416,34 @@ class Page{
   }
 }
 
+function ConfirmPage(obj) {
+  // Pass an object obj, with the following keys:
+  //
+  // title: The title of the resulting page. Defaults to "Are you sure?".
+  // okTitle: The title of the "OK" button. Defaults to "OK".
+  // cancelTitle: The title of the "cancel" button. Defaults to "Cancel".
+  // onok: The function to be run when the OK button is pressed.
+  // oncancel: The function to be run when the cancel button is pressed.
+  const lines = [
+    new Line(
+      obj.okTitle || "OK",
+      obj.onok || ((b) => b.pop())
+    ),
+    new Line(
+      obj.cancelTitle || "Cancel",
+      obj.oncancel || ((b) => b.pop())
+    )
+  ]
+  return new Page(
+    {
+      title: obj.title || "Are you sure?",
+      lines: lines
+    }
+  )
+}
+
+this.ConfirmPage = ConfirmPage
+
 this.Page = Page
 
 class Player {

@@ -1,4 +1,4 @@
-/* globals book, Game, gameJson, keyboardArea, Level, LevelObject, Line, mainDiv, message, ObjectTypes, Page, startAudio, startButton, startDiv */
+/* globals book, ConfirmPage, Game, gameJson, keyboardArea, Level, LevelObject, Line, mainDiv, message, ObjectTypes, Page, startAudio, startButton, startDiv */
 
 function EditLevelMenu(b, level) {
   const lines = [
@@ -50,14 +50,24 @@ function EditLevelMenu(b, level) {
   lines.push(
     new Line(
       "Delete", (b) => {
-        if (confirm(`Are you sure you want to delete "${level.title}"?`)) {
-          const index = b.game.levels.indexOf(level)
-          b.game.levels.splice(index, 1)
-          for (let i = 0; i < 2; i++) {
-            b.pop()
-          }
-          b.push(LevelsMenu(b))
-        }
+        b.push(
+          ConfirmPage(
+            {
+              title: `Are you sure you want to delete "${level.title}"?`,
+              okTitle: "Yes",
+              cancelTitle: "No",
+              onok: (b) => {
+                const index = b.game.levels.indexOf(level)
+                b.game.levels.splice(index, 1)
+                for (let i = 0; i < 2; i++) {
+                  b.pop()
+                }
+                b.push(LevelsMenu(b))
+                b.message("Level deleted.")
+              }
+            }
+          )
+        )
       }
     )
   )
@@ -215,17 +225,35 @@ startButton.onclick = () => {
           ),
           new Line(
             "Load Game JSON", (b) => {
-              if (confirm("Are you sure you want to reset your game and load from JSON?")) {
-                let obj = JSON.parse(gameJson.value)
-                b.game = Game.fromJson(obj)
-              }
+              b.push(
+                new ConfirmPage(
+                  {
+                    title: "Are you sure you want to reset your game and load from JSON?",
+                    onok: (b) => {
+                      b.pop()
+                      let obj = JSON.parse(gameJson.value)
+                      b.game = Game.fromJson(obj)
+                      b.message("Game loaded.")
+                    }
+                  }
+                )
+              )
             }
           ),
           new Line(
             "Reset Game", (b) => {
-              if (confirm("Are you sure you want to reset the game?")) {
-                b.game.reset()
-              }
+              b.push(
+                new ConfirmPage(
+                  {
+                    title: "Are you sure you want to reset the game?",
+                    onok: (b) => {
+                      b.game.reset()
+                      b.pop()
+                      b.message("Game reset.")
+                    }
+                  }
+                )
+              )
             }
           ),
         ]
