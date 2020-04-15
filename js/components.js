@@ -137,10 +137,13 @@ class Object {
     this.isWeapon = false
     this.urls = {
       soundUrl: "The sound constantly played by this object",
-      takeUrl: "The sound played when picking up this object"
+      takeUrl: "The sound played when picking up this object",
+      dropUrl: "The sound that is played when this object is dropped"
     }
     this.soundUrl = "res/object.wav"
     this.takeUrl = "res/take.wav"
+    this.take = new Sound(this.takeUrl)
+    this.dropUrl = "res/drop.wav"
   }
 
   static fromJson(data) {
@@ -163,6 +166,9 @@ class Object {
     const content = new LevelObject(this, position)
     level.contents.push(content)
     content.spawn()
+    if (this.dropUrl !== null) {
+      content.drop.play(this.dropUrl)
+    }
   }
 }
 
@@ -176,6 +182,7 @@ class LevelObject {
     this.position = position
     this.panner = null
     this.sound = null
+    this.drop = null
   }
 
   static fromJson(data, game) {
@@ -190,15 +197,17 @@ class LevelObject {
   }
 
   spawn() {
-    if (this.object.soundUrl !== null) {
-      this.panner = audio.createPanner()
-      this.panner.maxDistance = 10
-      this.panner.rolloffFactor = 6
-      this.panner.connect(gain)
-      this.sound = new Sound(this.object.soundUrl, true, this.panner)
+    const obj = this.object
+    this.panner = audio.createPanner()
+    this.panner.maxDistance = 10
+    this.panner.rolloffFactor = 6
+    this.panner.connect(gain)
+    if (obj.soundUrl !== null) {
+      this.sound = new Sound(obj.soundUrl, true, this.panner)
       this.sound.play()
-      this.move(this.position)
     }
+    this.move(this.position)
+    this.drop = new Sound(this.dropUrl, false, this.panner)
   }
 
   destroy(level) {
@@ -670,9 +679,11 @@ class Book{
         if (content.position == this.player.position) {
           const obj = content.object
           if ([objectTypes.object, objectTypes.weapon].includes(obj.type)) {
-            content.destroy(page)
             this.player.carrying.push(obj)
-            new Sound(content.object.takeUrl, false, page.convolver || gain).play()
+            if (obj.takeUrl !== null) {
+              obj.take.play(obj.takeUrl)
+            }
+            content.destroy(page)
             this.message(`Taken: ${content.object.title}.`)
           } else {
             this.message(`You cannot take ${obj.title}.`)
