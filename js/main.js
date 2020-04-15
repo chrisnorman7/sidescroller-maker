@@ -113,7 +113,7 @@ function EditLevelMenu(b, level) {
     const description = level.numericProperties[name]
     lines.push(
       new Line(
-        () => `${description} (${level[name]})`, () => {
+        () => `${description} (${level[name]})`, (b) => {
           getText(
             {
               book: b,
@@ -257,6 +257,31 @@ function EditObjectMenu(b, obj) {
       }
     ),
   ]
+  for (let name in obj.numericProperties) {
+    const description = obj.numericProperties[name]
+    lines.push(
+      new Line(
+        () => `${description} (${obj[name]})`, (b) => {
+          getText(
+            {
+              book: b,
+              prompt: "Enter new value",
+              value: obj[name],
+              onok: (value, bk) => {
+                value = Number(value) || obj[name]
+                if (isNaN(value)) {
+                  bk.message("Invalid number.")
+                } else {
+                  obj[name] = value
+                }
+                bk.showFocus()
+              }
+            }
+          )
+        }
+      )
+    )
+  }
   for (let name in obj.urls) {
     const description = obj.urls[name]
     lines.push(

@@ -140,26 +140,41 @@ class Object {
       takeUrl: "The sound played when picking up this object",
       dropUrl: "The sound that is played when this object is dropped"
     }
-    this.soundUrl = "res/object.wav"
     this.takeUrl = "res/take.wav"
     this.take = new Sound(this.takeUrl)
+    this.soundUrl = "res/object.wav"
     this.dropUrl = "res/drop.wav"
+    this.numericProperties = {
+      damage: "The amount of damage dealt by this weapon",
+      health: "The initial health of this object"
+    }
+    this.damage = 2
+    this.health = 1
   }
 
   static fromJson(data) {
     const o = new this()
     o.title = data.title || o.title
     o.type = data.type || o.type
-    o.soundUrl = data.soundUrl || o.soundUrl
+    for (let d of [o.urls, o.numericProperties]) {
+      for (let name in d) {
+        o[name] = data[name] || o[name]
+      }
+    }
     return o
   }
 
   toJson() {
-    return {
+    const data = {
       title: this.title,
       type: this.type,
-      soundUrl: this.soundUrl,
     }
+    for (let d of [this.urls, this.numericProperties]) {
+      for (let name in d) {
+        data[name] = this[name]
+      }
+    }
+    return data
   }
 
   drop(level, position) {
@@ -180,15 +195,15 @@ class LevelObject {
   constructor(obj, position) {
     this.object = obj
     this.position = position
+    this.health = obj.health
     this.panner = null
     this.sound = null
     this.drop = null
   }
 
   static fromJson(data, game) {
-    let c = new this()
-    c.object = game.objects[data.objectIndex]
-    c.position = data.position
+    const obj = game.objects[data.objectIndex]
+    let c = new this(obj, data.position)
     return c
   }
 
