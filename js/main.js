@@ -1,4 +1,4 @@
-/* globals book, Game, gameJson, keyboardArea, Level, LevelObject, Line, mainDiv, message, Page, startAudio, startButton, startDiv */
+/* globals book, Game, gameJson, keyboardArea, Level, LevelObject, Line, mainDiv, message, ObjectTypes, Page, startAudio, startButton, startDiv */
 
 function EditLevelMenu(b, level) {
   const lines = [
@@ -105,7 +105,31 @@ function EditObjectMenu(b, obj) {
       () => `Sound URL (${obj.soundUrl})`, () => {
         obj.soundUrl = prompt("New URL", obj.soundUrl) || null
       }
-    )
+    ),
+    new Line(
+      () => `Set Type (${obj.type})`, (b) => {
+        const lines = []
+        for (let name in ObjectTypes) {
+          const description = ObjectTypes[name]
+          lines.push(
+            new Line(
+              description, (b) => {
+                obj.type = description
+                b.pop()
+              }
+            )
+          )
+        }
+        b.push(
+          new Page(
+            {
+              title: "Set Object Type",
+              lines: lines
+            }
+          )
+        )
+      }
+    ),
   ]
   return new Page(
     {
@@ -167,7 +191,7 @@ startButton.onclick = () => {
             }
           ),
           new Line(
-            "Objects", (b) => {
+            "Objects and Monsters", (b) => {
               b.push(ObjectsMenu(b))
             }
           ),

@@ -116,21 +116,34 @@ class Game {
 
 this.Game = Game
 
+const ObjectTypes = {
+  object: "An object which can be picked up by the player",
+  aggressiveMonster: "A monster which will attack the player",
+  peacefulMonster: "A monster which will ignore the player",
+  weapon: "A weapon which can be wielded"
+}
+
 class Object {
   constructor() {
     this.title = null
+    this.type = ObjectTypes.object
     this.soundUrl = "res/object.wav"
   }
 
   static fromJson(data) {
     const o = new this()
     o.title = data.title || o.title
+    o.type = data.type || o.type
     o.soundUrl = data.soundUrl || o.soundUrl
     return o
   }
 
   toJson() {
-    return {soundUrl: this.soundUrl, title: this.title}
+    return {
+      title: this.title,
+      type: this.type,
+      soundUrl: this.soundUrl,
+    }
   }
 }
 
