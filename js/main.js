@@ -1,4 +1,4 @@
-/* globals Book, ConfirmPage, Game, Level, LevelObject, Line, objectTypes, Page, startAudio, TtsPage */
+/* globals Book, ConfirmPage, Game, Level, Line, objectTypes, Page, startAudio, TtsPage */
 
 const startDiv = document.querySelector("#startDiv")
 const mainDiv = document.querySelector("#main")
@@ -450,9 +450,7 @@ keyboardArea.onkeydown = (e) => {
         lines.push(
           new Line(
             obj.title, (b) => {
-              const content = new LevelObject(obj, book.player.position)
-              page.contents.push(content)
-              content.spawn(page)
+              obj.drop(page, b.player.position)
               b.pop()
             }
           )

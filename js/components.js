@@ -158,6 +158,12 @@ class Object {
       soundUrl: this.soundUrl,
     }
   }
+
+  drop(level, position) {
+    const content = new LevelObject(this, position)
+    level.contents.push(content)
+    content.spawn(level)
+  }
 }
 
 this.Object = Object
@@ -566,6 +572,7 @@ class Book{
       "[": () => this.volumeDown(),
       "]": () => this.volumeUp(),
       "i": () => this.inventory(),
+      "d": () => this.drop(),
     }
     this.game = new Game()
   }
@@ -740,6 +747,36 @@ class Book{
       )
     } else {
       this.message("You aren't carrying anything.")
+    }
+  }
+
+  drop() {
+    const page = this.getPage()
+    if (page.isLevel) {
+      if (this.player.carrying.length) {
+        const lines = []
+        for (let obj of this.player.carrying) {
+          lines.push(
+            new Line(
+              obj.title, (b) => {
+                b.pop()
+                this.message(`Dropped: ${obj.title}.`)
+                obj.drop(page, b.player.position)
+              }
+            )
+          )
+        }
+        this.push(
+          new Page(
+            {
+              title: "Drop something",
+              lines: lines
+            }
+          )
+        )
+      } else {
+        this.message("You have nothing to drop.")
+      }
     }
   }
 
