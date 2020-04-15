@@ -663,10 +663,15 @@ class Book{
     if (page.isLevel) {
       for (let content of page.contents) {
         if (content.position == this.player.position) {
-          content.destroy(page)
-          this.player.carrying.push(content.object)
-          new Sound(content.object.takeUrl, false, page.convolver || gain).play()
-          this.message(`Taken: ${content.object.title}.`)
+          const obj = content.object
+          if (obj.type == objectTypes.object) {
+            content.destroy(page)
+            this.player.carrying.push(obj)
+            new Sound(content.object.takeUrl, false, page.convolver || gain).play()
+            this.message(`Taken: ${content.object.title}.`)
+          } else {
+            this.message(`You cannot take ${obj.title}.`)
+          }
         }
       }
     } else {
@@ -769,7 +774,7 @@ class Book{
         this.push(
           new Page(
             {
-              title: "Drop something",
+              title: "Choose something to drop",
               lines: lines
             }
           )
