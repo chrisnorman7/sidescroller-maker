@@ -162,7 +162,7 @@ class Object {
   drop(level, position) {
     const content = new LevelObject(this, position)
     level.contents.push(content)
-    content.spawn(level)
+    content.spawn()
   }
 }
 
@@ -187,12 +187,12 @@ class LevelObject {
     return {objectIndex: game.objects.indexOf(this.object), position: this.position}
   }
 
-  spawn(level) {
+  spawn() {
     if (this.object.soundUrl !== null) {
       this.panner = audio.createPanner()
       this.panner.maxDistance = 10
       this.panner.rolloffFactor = 6
-      this.panner.connect(level.convolver || gain)
+      this.panner.connect(gain)
       this.sound = new Sound(this.object.soundUrl, true, this.panner)
       this.sound.play()
       this.move(this.position)
@@ -358,7 +358,7 @@ class Level {
 
   loadContents() {
     for (let content of this.contents) {
-      content.spawn(this)
+      content.spawn()
     }
     this.loading = false
   }
