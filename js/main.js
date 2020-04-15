@@ -6,7 +6,7 @@ const keyboardArea = document.querySelector("#keyboardArea")
 const gameJson = document.querySelector("#gameJson")
 const startButton = document.querySelector("#startButton")
 const message = document.querySelector("#message")
-const book = new Book()
+let book = null
 
 const stringForm = document.querySelector("#stringForm")
 const stringPrompt = document.querySelector("#stringPrompt")
@@ -356,6 +356,10 @@ startButton.onclick = () => {
   startDiv.hidden = true
   mainDiv.hidden = false
   keyboardArea.focus()
+  book = new Book()
+  book.message = (text) => {
+    message.innerText = text
+  }
   book.push(
     new Page(
       {
@@ -501,8 +505,4 @@ keyboardArea.onkeydown = (e) => {
     book.message(e)
     throw(e)
   }
-}
-
-book.message = (text) => {
-  message.innerText = text
 }

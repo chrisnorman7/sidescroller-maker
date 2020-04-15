@@ -10,6 +10,10 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext
 
 const buffers = {}
 
+function distanceBetween(a, b) {
+  return Math.max(a, b) - Math.min(a, b)
+}
+
 function startAudio() {
   audio = new AudioContext()
   audio.listener.setOrientation(0, 0, -1, 0, 1, 0)
@@ -19,6 +23,9 @@ function startAudio() {
   gain.connect(audio.destination)
   const music = new Sound("res/music/start.wav")
   music.play()
+  fists = new Object()
+  fists.title = "Fists"
+  fists.type = objectTypes.weapon
 }
 
 this.startAudio = startAudio
@@ -134,21 +141,27 @@ class Object {
   constructor() {
     this.title = null
     this.type = objectTypes.object
-    this.isWeapon = false
     this.urls = {
       soundUrl: "The sound constantly played by this object",
       takeUrl: "The sound played when picking up this object",
-      dropUrl: "The sound that is played when this object is dropped"
+      dropUrl: "The sound that is played when this object is dropped",
+      hitUrl: "The sound that is heard when this object is hit",
+      useUrl: "The sound that is played when this object is used or fired",
     }
     this.takeUrl = "res/take.wav"
     this.take = new Sound(this.takeUrl)
     this.soundUrl = "res/object.wav"
     this.dropUrl = "res/drop.wav"
+    this.hitUrl = "res/hit.wav"
+    this.useUrl = "res/weapons/punch.wav"
+    this.use = new Sound(this.useUrl)
     this.numericProperties = {
       damage: "The amount of damage dealt by this weapon",
+      range: "The range of this weapon",
       health: "The initial health of this object"
     }
     this.damage = 2
+    this.range = 1
     this.health = 1
   }
 
@@ -187,9 +200,7 @@ class Object {
   }
 }
 
-const fists = new Object()
-fists.title = "Fists"
-fists.type = objectTypes.weapon
+let fists = null
 
 class LevelObject {
   constructor(obj, position) {
@@ -223,6 +234,7 @@ class LevelObject {
     }
     this.move(this.position)
     this.drop = new Sound(this.dropUrl, false, this.panner)
+    this.hit = new Sound(obj.hitUrl, false, this.panner)
   }
 
   destroy(level) {
@@ -321,6 +333,18 @@ class Level {
       data.contents.push(content.toJson(game))
     }
     return data
+  }
+
+  nearestObject(position) {
+    let distance = null
+    let obj = null
+    for (let content of this.contents) {
+      const newDistance = distanceBetween(position, content.position)
+      if (distance === null || newDistance < distance) {
+        obj = content
+      }
+    }
+    return obj
   }
 
   jump(book) {
@@ -574,7 +598,7 @@ class Player {
     this.health = 100
     this.lastMoved = 0
     this.carrying = []
-    this.weapon = null
+    this.weapon = fists
   }
 }
 
@@ -588,7 +612,7 @@ class Book{
     this.hotkeys = {
       "ArrowUp": () => this.moveUp(),
       "ArrowDown": () => this.moveDown(),
-      " ": () => this.activate(),
+      " ": () => this.shootOrActivate(),
       "ArrowRight": () => this.moveOrActivate(),
       "Enter": () => this.takeOrActivate(),
       "ArrowLeft": () => this.cancel(),
@@ -863,8 +887,33 @@ class Book{
       if (weapon === undefined) {
         page.noWeapon.play(page.noWeaponUrl)
       } else {
+        this.player.weapon = weapon
         this.message(weapon.title)
       }
+    }
+  }
+
+  shootOrActivate() {
+    const page = this.getPage()
+    if (page.isLevel) {
+      const weapon = this.player.weapon
+      const content = page.nearestObject(this.player.position)
+      if (content !== null) {
+        const obj = content.object
+        const distance = distanceBetween(content.position, this.player.position)
+        if (distance <= weapon.range) {
+          weapon.use.play(weapon.useUrl)
+          if (obj.hitUrl !== null) {
+            content.hit.play(obj.hitUrl)
+            obj.health -= weapon.damage
+            if (obj.health < 0) {
+              content.destroy(page)
+            }
+          }
+        }
+      }
+    } else {
+      this.activate()
     }
   }
 }
