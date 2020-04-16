@@ -377,17 +377,13 @@ class Level {
     let distance = null
     let obj = null
     for (let content of this.contents) {
-      if (
-        (direction == LevelDirections.forward && content.position < position) ||
-        (direction == LevelDirections.backwards && content.position > position)
-      ) {
-        continue
+      if ((direction == LevelDirections.forwards && content.position >= position) || (direction == LevelDirections.backwards && content.position <= position)) {
+        const newDistance = distanceBetween(position, content.position)
+        if (distance === null || newDistance < distance) {
+          obj = content
+        }
+        distance = newDistance
       }
-      const newDistance = distanceBetween(position, content.position)
-      if (distance === null || newDistance < distance) {
-        obj = content
-      }
-      distance = newDistance
     }
     return obj
   }
@@ -400,11 +396,11 @@ class Level {
   }
 
   left(book) {
-    this.move(book, -1)
+    this.move(book, LevelDirections.backwards)
   }
 
   right(book) {
-    this.move(book, 1)
+    this.move(book, LevelDirections.forwards)
   }
 
   move(book, direction) {
@@ -421,6 +417,7 @@ class Level {
         }
       } else {
         book.setPlayerPosition(position)
+        book.player.facing = direction
         if (this.footstepUrl !== null) {
           this.footstep.play(this.footstepUrl)
         }
@@ -646,6 +643,7 @@ class Player {
   constructor() {
     this.position = null
     this.level = null
+    this.facing = LevelDirections.either
     this.health = 100
     this.lastMoved = 0
     this.carrying = []
@@ -672,6 +670,8 @@ class Book{
       "]": () => this.volumeUp(),
       "i": () => this.inventory(),
       "d": () => this.drop(),
+      "f": () => this.showFacing(),
+      "p": () => this.showPosition(),
     }
     for (let i = 0; i < 10; i++) {
       this.hotkeys[i.toString()] = () => {
@@ -894,6 +894,31 @@ class Book{
     }
   }
 
+  showFacing() {
+    const player = this.player
+    if (player.level === null) {
+      return
+    }
+    let direction = null
+    if (player.facing == LevelDirections.backwards) {
+      direction = "backwards"
+    } else if (player.facing == LevelDirections.forwards) {
+      direction = "forwards"
+    } else if (player.facing == LevelDirections.either) {
+      direction = "both ways at once"
+    } else {
+      direction = "the wrong way"
+    }
+    this.message(`You are facing ${direction}.`)
+  }
+
+  showPosition() {
+    if (this.player.level === null) {
+      return
+    }
+    this.message(`Position: ${this.player.position}.`)
+  }
+
   onkeydown(e) {
     const key = e.key
     const func = this.hotkeys[key]
@@ -958,7 +983,7 @@ class Book{
       return this.activate()
     }
     const weapon = this.player.weapon
-    const content = level.nearestObject(this.player.position)
+    const content = level.nearestObject(this.player.position, this.player.facing)
     if (content !== null) {
       const obj = content.object
       const distance = distanceBetween(content.position, this.player.position)
