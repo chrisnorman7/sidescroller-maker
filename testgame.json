@@ -77,6 +77,22 @@
       "range": 1,
       "health": 1,
       "targetPosition": 10
+    },
+    {
+      "title": "a small toad",
+      "type": "A monster which will ignore the player",
+      "targetLevelIndex": null,
+      "soundUrl": null,
+      "takeUrl": "res/objects/take.wav",
+      "dropUrl": "res/objects/drop.wav",
+      "hitUrl": "res/objects/hit.wav",
+      "useUrl": "res/weapons/punch.wav",
+      "cantUseUrl": "res/objects/cantuse.wav",
+      "dieUrl": "res/objects/die.wav",
+      "damage": 2,
+      "range": 1,
+      "health": 1,
+      "targetPosition": 0
     }
   ]
 }
