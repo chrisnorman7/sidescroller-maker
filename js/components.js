@@ -201,7 +201,10 @@ class Object {
     o.targetLevelIndex = data.targetLevelIndex
     for (let d of [o.urls, o.numericProperties]) {
       for (let name in d) {
-        o[name] = data[name] || o[name]
+        if (data[name] === undefined) {
+          data[name] = o[name]
+        }
+        o[name] = data[name]
       }
     }
     return o
@@ -263,11 +266,11 @@ class LevelObject {
     this.panner.maxDistance = 10
     this.panner.rolloffFactor = 6
     this.panner.connect(gain)
+    this.move(this.position)
     if (obj.soundUrl !== null) {
       this.sound = new Sound(obj.soundUrl, true, this.panner)
       this.sound.play()
     }
-    this.move(this.position)
     this.drop = new Sound(this.dropUrl, false, this.panner)
     this.hit = new Sound(obj.hitUrl, false, this.panner)
     this.dieSound = new Sound(obj.dieUrl, false, this.panner)
@@ -367,7 +370,10 @@ class Level {
     level.title = data.title || level.title
     for (let d of [level.urls, level.numericProperties]) {
       for (let name in d) {
-        level[name] = data[name] || level[name]
+        if (data[name] === undefined) {
+          data[name] = level[name]
+        }
+        level[name] = data[name]
       }
     }
     for (let contentData of data.contents) {
