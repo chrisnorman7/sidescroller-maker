@@ -434,6 +434,31 @@ function GameMenu(game) {
       )
     )
   }
+  for (let name in game.numericProperties) {
+    const description = game.numericProperties[name]
+    lines.push(
+      new Line(
+        () => `${description} (${game[name]})`, (b) => {
+          getText(
+            {
+              book: b,
+              prompt: "Enter new value",
+              value: game[name],
+              onok: (value, bk) => {
+                value = Number(value, 2) || game[name]
+                if (isNaN(value)) {
+                  bk.message("Invalid number.")
+                } else {
+                  game[name] = value
+                }
+                bk.showFocus()
+              }
+            }
+          )
+        }
+      )
+    )
+  }
   return new Page(
     {
       title: "Game Menu",
