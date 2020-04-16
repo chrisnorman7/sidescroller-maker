@@ -459,6 +459,7 @@ startButton.onclick = () => {
               gameJson.select()
               gameJson.setSelectionRange(0, -1)
               document.execCommand("copy")
+              keyboardArea.focus()
             }
           ),
           new Line(
