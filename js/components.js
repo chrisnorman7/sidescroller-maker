@@ -324,8 +324,8 @@ class Level {
     this.speed = 100
     this.urls = {
       beforeSceneUrl: "Scene to play before the level starts",
-      musicUrl: "Background music to play throughout the level",
-      ambienceUrl: "Background sound of the level",
+      musicUrl: "Background music",
+      ambienceUrl: "Level Ambiance",
       footstepUrl: "Footstep sound",
       wallUrl: "Wall sound",
       turnUrl: "Turning sound",
