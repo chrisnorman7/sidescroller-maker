@@ -13,7 +13,7 @@
       "size": 200,
       "speed": 100,
       "convolverVolume": 0.5,
-      "beforeSceneUrl": null,
+      "beforeSceneUrl": "res/level/beforescene.wav",
       "musicUrl": null,
       "ambianceUrl": "res/level/amb/forest.wav",
       "footstepUrl": "res/footsteps/stone.wav",

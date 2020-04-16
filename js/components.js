@@ -448,10 +448,19 @@ class Level {
     }
   }
 
-  play(book) {
+  finalise(book) {
     book.push(this)
     book.player.level = this
-    book.setPlayerPosition(0)
+    this.ambiance.play(this.ambianceUrl)
+    this.loadContents()
+    book.setPlayerPosition(this.initialPosition)
+  }
+
+  play(book, initialPosition) {
+    if (initialPosition === undefined) {
+      initialPosition = 0
+    }
+    this.initialPosition = initialPosition
     if (this.convolverUrl !== null) {
       this.loading = true
       getBuffer(this.convolverUrl, (buffer) => {
@@ -462,12 +471,13 @@ class Level {
         this.convolverGain.gain.value = this.convolverVolume
         this.convolver.connect(this.convolverGain)
         this.convolverGain.connect(audio.destination)
-        this.loadContents()
       })
-    } else {
-      this.loadContents()
     }
-    this.ambiance.play(this.ambianceUrl)
+    if (this.beforeSceneUrl === null) {
+      this.finalise(book)
+    } else {
+      book.playScene(this.beforeSceneUrl, (b) => this.finalise(b))
+    }
   }
 
   loadContents() {
@@ -691,12 +701,13 @@ class Scene {
   }
 
   done() {
-    if (!this.completed) {
-      this.sound.source.disconnect()
-      this.book.scene = null
-      this.onfinish(this.book)
-      this.completed = true
+    if (this.completed) {
+      return
     }
+    this.completed = true
+    this.book.scene = null
+    this.sound.source.disconnect()
+    this.onfinish(this.book)
   }
 }
 
@@ -831,8 +842,7 @@ class Book{
           } else {
             level.leave(this)
             this.playScene(obj.useUrl, (b) => {
-              obj.targetLevel.play(b)
-              b.setPlayerPosition(obj.targetPosition)
+              obj.targetLevel.play(b, obj.targetPosition)
             })
           }
         } else {
