@@ -59,7 +59,8 @@
       "dieUrl": "res/objects/die.wav",
       "damage": 2,
       "range": 1,
-      "health": 1
+      "health": 1,
+      "targetPosition": 25
     },
     {
       "title": "stone stairway going down",
@@ -74,7 +75,8 @@
       "dieUrl": "res/objects/die.wav",
       "damage": 2,
       "range": 1,
-      "health": 1
+      "health": 1,
+      "targetPosition": 10
     }
   ]
 }

@@ -185,11 +185,13 @@ class Object {
     this.numericProperties = {
       damage: "The amount of damage dealt by this weapon",
       range: "The range of this weapon",
-      health: "The initial health of this object"
+      health: "The initial health of this object",
+      targetPosition: "The position the player should be in after using this exit",
     }
     this.damage = 2
     this.range = 1
     this.health = 1
+    this.targetPosition = 0
   }
 
   static fromJson(data) {
@@ -804,8 +806,10 @@ class Book{
           if (obj.targetLevel === null) {
             obj.cantUse.play(obj.cantUseUrl)
           } else {
+            obj.use.play(obj.useUrl)
             level.leave(this)
             obj.targetLevel.play(this)
+            this.setPlayerPosition(obj.targetPosition)
           }
         } else {
           this.message(`You cannot take ${obj.title}.`)
