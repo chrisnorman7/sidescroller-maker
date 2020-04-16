@@ -678,10 +678,33 @@ class Player {
   }
 }
 
+class Scene {
+  constructor(book, url, onfinish) {
+    this.completed = false
+    this.book = book
+    this.url = url
+    this.sound = new Sound(this.url)
+    this.sound.onended = () => {
+      this.done()
+    }
+    this.onfinish = onfinish
+  }
+
+  done() {
+    if (!this.completed) {
+      this.sound.source.disconnect()
+      this.book.scene = null
+      this.onfinish(this.book)
+      this.completed = true
+    }
+  }
+}
+
 class Book{
   // Got the idea from the Navigator class in Flutter.
 
   constructor() {
+    this.scene = null
     this.message = null
     this.pages = []
     this.player = new Player()
@@ -806,10 +829,11 @@ class Book{
           if (obj.targetLevel === null) {
             obj.cantUse.play(obj.cantUseUrl)
           } else {
-            obj.use.play(obj.useUrl)
             level.leave(this)
-            obj.targetLevel.play(this)
-            this.setPlayerPosition(obj.targetPosition)
+            this.playScene(obj.useUrl, (b) => {
+              obj.targetLevel.play(b)
+              b.setPlayerPosition(obj.targetPosition)
+            })
           }
         } else {
           this.message(`You cannot take ${obj.title}.`)
@@ -955,6 +979,12 @@ class Book{
 
   onkeydown(e) {
     const key = e.key
+    if (this.scene !== null) {
+      if (e.key == "Enter") {
+        this.scene.done()
+      }
+      return
+    }
     const func = this.hotkeys[key]
     if (func !== undefined) {
       e.preventDefault()
@@ -1005,6 +1035,11 @@ class Book{
       this.player.weapon = weapon
       this.message(weapon.title)
     }
+  }
+
+  playScene(url, onfinish) {
+    this.scene = new Scene(this, url, onfinish)
+    this.scene.sound.play()
   }
 
   shootOrActivate() {
