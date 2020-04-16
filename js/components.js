@@ -800,8 +800,8 @@ class Book{
         } else {
           this.message(`You cannot take ${obj.title}.`)
         }
+        break // Take one object at a time.
       }
-      break // Take one object at a time.
     }
   }
 
