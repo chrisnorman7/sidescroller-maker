@@ -294,9 +294,7 @@ class LevelObject {
 
   move(position) {
     this.position = position
-    if (this.sound !== null) {
-      this.panner.positionX.value = position / audioDivider
-    }
+    this.panner.positionX.value = position / audioDivider
   }
 
   die() {
