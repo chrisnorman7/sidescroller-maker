@@ -309,20 +309,18 @@ class Level {
     this.size = 200
     this.speed = 100
     this.urls = {
-      beforeSceneUrl: "The scene to play before the level starts",
-      afterSceneUrl: "The scene to play after the level has been completed successfully",
-      musicUrl: "The background music to play throughout the scene",
-      ambienceUrl: "The background of the level",
-      footstepUrl: "The sound made when the player walks",
-      wallUrl: "The sound heard when the player hits a wall",
-      tripUrl: "The sound that plays when a player trips over an object",
-      convolverUrl: "The impulse response to use for level fx",
-      noWeaponUrl: "The sound which is played when a weapons slot is empty"
+      beforeSceneUrl: "Scene to play before the level starts",
+      musicUrl: "Background music to play throughout the level",
+      ambienceUrl: "Background sound of the level",
+      footstepUrl: "Footstep sound",
+      wallUrl: "Wall sound",
+      turnUrl: "Turning sound",
+      tripUrl: "Object discovery sound",
+      convolverUrl: "Impulse response",
+      noWeaponUrl: "Empty weapons slot"
     }
     this.beforeSceneUrl = null
     this.beforeScene = new Sound(this.beforeSceneUrl, false)
-    this.afterSceneUrl = null
-    this.afterScene = new Sound(this.afterSceneUrl, false)
     this.musicUrl = null
     this.music = new Sound(this.musicUrl, true)
     this.ambienceUrl = null
@@ -331,6 +329,8 @@ class Level {
     this.footstep = new Sound(this.footstepUrl, false)
     this.wallUrl = "res/wall.wav"
     this.wall = new Sound(this.wallUrl, false)
+    this.turnUrl = "res/turn.wav"
+    this.turn = new Sound(this.turnUrl)
     this.tripUrl = "res/trip.wav"
     this.trip = new Sound(this.tripUrl)
     this.convolverUrl = null
@@ -407,17 +407,23 @@ class Level {
     if (this.loading) {
       return
     }
+    const player = book.player
     const time = new Date().getTime()
-    if ((time - book.player.lastMoved) > this.speed) {
-      book.player.lastMoved = time
-      let position = book.player.position + direction
+    if ((time - player.lastMoved) > this.speed) {
+      player.lastMoved = time
+      let position = player.position + direction
       if (position < 0 || position > this.size) {
         if (this.wallUrl !== null) {
           this.wall.play(this.wallUrl)
         }
       } else {
         book.setPlayerPosition(position)
-        book.player.facing = direction
+        if (direction != player.facing) {
+          if (player.facing != LevelDirections.either && this.turnUrl !== null) {
+            this.turn.play(this.turnUrl)
+          }
+          player.facing = direction
+        }
         if (this.footstepUrl !== null) {
           this.footstep.play(this.footstepUrl)
         }
