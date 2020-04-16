@@ -169,14 +169,14 @@ class Object {
       useUrl: "The sound that is played when this object is used or fired",
       dieUrl: "The sound played when this object is killed or destroyed",
     }
-    this.takeUrl = "res/take.wav"
+    this.takeUrl = "res/objects/take.wav"
     this.take = new Sound(this.takeUrl)
-    this.soundUrl = "res/object.wav"
-    this.dropUrl = "res/drop.wav"
-    this.hitUrl = "res/hit.wav"
+    this.soundUrl = "res/objects/object.wav"
+    this.dropUrl = "res/objects/drop.wav"
+    this.hitUrl = "res/objects/hit.wav"
     this.useUrl = "res/weapons/punch.wav"
     this.use = new Sound(this.useUrl)
-    this.dieUrl = "res/die.wav"
+    this.dieUrl = "res/objects/die.wav"
     this.numericProperties = {
       damage: "The amount of damage dealt by this weapon",
       range: "The range of this weapon",
@@ -341,17 +341,17 @@ class Level {
     this.ambience = new Sound(this.ambienceUrl, true)
     this.footstepUrl = "res/footsteps/stone.wav"
     this.footstep = new Sound(this.footstepUrl, false)
-    this.wallUrl = "res/wall.wav"
+    this.wallUrl = "res/level/wall.wav"
     this.wall = new Sound(this.wallUrl, false)
-    this.turnUrl = "res/turn.wav"
+    this.turnUrl = "res/level/turn.wav"
     this.turn = new Sound(this.turnUrl)
-    this.tripUrl = "res/trip.wav"
+    this.tripUrl = "res/level/trip.wav"
     this.trip = new Sound(this.tripUrl)
     this.convolverUrl = null
     this.convolverVolume = 0.5
     this.convolver = null
     this.convolverGain = null
-    this.noWeaponUrl = "res/noweapon.wav"
+    this.noWeaponUrl = "res/level/noweapon.wav"
     this.noWeapon = new Sound(this.noWeaponUrl)
   }
 
@@ -797,6 +797,9 @@ class Book{
           }
           content.destroy()
           this.message(`Taken: ${content.object.title}.`)
+        } else if (obj.type == objectTypes.exit) {
+          if (obj.targetLevel === null) {
+          }
         } else {
           this.message(`You cannot take ${obj.title}.`)
         }
@@ -840,7 +843,7 @@ class Book{
   }
 
   setVolume(v) {
-    const volumeSound = new Sound("res/volume.wav")
+    const volumeSound = new Sound("res/menus/volume.wav")
     gain.gain.value = v
     volumeSound.play()
     this.message(`${Math.floor(gain.gain.value * 100)}%.`)
