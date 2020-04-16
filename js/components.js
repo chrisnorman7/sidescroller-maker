@@ -42,13 +42,23 @@ function startAudio() {
 this.startAudio = startAudio
 
 function getBuffer(url, done) {
-  let xhr = new XMLHttpRequest()
-  xhr.open("GET", url)
-  xhr.responseType = "arraybuffer"
-  xhr.onload = () => {
-    audio.decodeAudioData(xhr.response).then(done)
+  if (typeof(url) != "string") {
+    throw(`Must provide URL as a string. (${url})`)
   }
-  xhr.send()
+  const buffer = buffers[url]
+  if (buffer === undefined) {
+    let xhr = new XMLHttpRequest()
+    xhr.open("GET", url)
+    xhr.responseType = "arraybuffer"
+    xhr.onload = () => {
+      audio.decodeAudioData(xhr.response).then(done, (e) => {
+        console.log(`Error decoding "${url}": ${e}`)
+      })
+    }
+    xhr.send()
+  } else {
+    done(buffer)
+  }
 }
 
 class Sound {
@@ -70,6 +80,9 @@ class Sound {
 
   playBuffer(buffer) {
     if (buffer === undefined) {
+      if (this.url === undefined) {
+        throw("An undefined URL was provided for a sound with an already-undefined url.")
+      }
       buffer = this.buffer
     } else {
       this.buffer = buffer
@@ -87,8 +100,15 @@ class Sound {
 
   play(url) {
     if (url === null) {
+      if (this.source !== null) {
+        this.source.disconnect()
+      }
+      this.source = null
       return
     } else if (url !== undefined) {
+      if (url != this.url) {
+        this.buffer = null
+      }
       this.url = url
     }
     if (this.buffer === null) {
@@ -346,7 +366,7 @@ class Level {
     this.musicUrl = null
     this.music = new Sound(this.musicUrl, true)
     this.ambianceUrl = null
-    this.ambiance = new Sound(this.ambienceUrl, true)
+    this.ambiance = new Sound(this.ambianceUrl, true)
     this.footstepUrl = "res/footsteps/stone.wav"
     this.footstep = new Sound(this.footstepUrl, false)
     this.wallUrl = "res/level/wall.wav"
@@ -534,12 +554,6 @@ class Page{
     // array<Line> lines:
     // A list of Line instances to move through.
     //
-    // Sound moveSound:
-    // A Sound instance which will be played when moving up or down through the menu.
-    //
-    // Sound activateSound:
-    // The sound to play when an item is activates.
-    //
     // bool dismissible:
     // Whether or not this menu can be easily dismissed.
     this.isLevel = false
@@ -552,14 +566,6 @@ class Page{
       obj.lines = []
     }
     this.lines = obj.lines
-    if (obj.moveSound === undefined) {
-      obj.moveSound = new Sound("res/menus/move.wav")
-    }
-    this.moveSound = obj.moveSound
-    if (obj.activateSound === undefined) {
-      obj.activateSound = new Sound("res/menus/activate.wav")
-    }
-    this.activateSound = obj.activateSound
     if (obj.dismissible === undefined) {
       obj.dismissible = true
     }
@@ -719,6 +725,20 @@ class Book{
   // Got the idea from the Navigator class in Flutter.
 
   constructor() {
+    this.urls = {
+      volumeSoundUrl: "Volume change sound",
+      moveSoundUrl: "Menu navigation sound",
+      activateSoundUrl: "Activate sound",
+      musicUrl: "Menu music"
+    }
+    this.volumeSoundUrl = "res/menus/volume.wav"
+    this.volumeSound = new Sound(this.volumeSoundUrl)
+    this.moveSoundUrl = "res/menus/move.wav"
+    this.moveSound = new Sound(this.moveSoundUrl)
+    this.activateSoundUrl = "res/menus/activate.wav"
+    this.activateSound = new Sound(this.activateSoundUrl)
+    this.musicUrl = "res/menus/music.mp3"
+    this.music = null
     this.scene = null
     this.message = null
     this.pages = []
@@ -757,6 +777,17 @@ class Book{
   }
 
   push(page) {
+    if (page.isLevel) {
+      if (this.music !== null) {
+        this.music.source.disconnect()
+        this.music = null
+      }
+    } else {
+      if (this.music === null) {
+        this.music = new Sound(this.musicUrl, true)
+        this.music.play(this.musicUrl)
+      }
+    }
     this.pages.push(page)
     this.message(this.getText(page.title))
   }
@@ -789,7 +820,7 @@ class Book{
     const page = this.getPage()
     if (!page.isLevel) {
       const line = page.getLine()
-      page.moveSound.play()
+      this.moveSound.play(this.moveSoundUrl)
       this.message(this.getText(line.title), true)
     }
   }
@@ -875,7 +906,7 @@ class Book{
       if (line === null) {
         return // They are probably looking at the title.
       }
-      page.activateSound.play()
+      this.activateSound.play(this.activateSoundUrl)
       line.func(this)
     }
   }
@@ -892,9 +923,8 @@ class Book{
   }
 
   setVolume(v) {
-    const volumeSound = new Sound("res/menus/volume.wav")
     gain.gain.value = v
-    volumeSound.play()
+    this.volumeSound.play(this.volumeSoundUrl)
     this.message(`${Math.floor(gain.gain.value * 100)}%.`)
   }
 
