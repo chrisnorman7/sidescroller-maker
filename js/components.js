@@ -14,6 +14,11 @@ const LevelDirections = {
   forwards: 1
 }
 
+function randint(start, end) {
+  const r = Math.random() * end + start
+  return Math.round(r)
+}
+
 const buffers = {}
 
 function distanceBetween(a, b) {
@@ -964,7 +969,7 @@ class Book{
         if (obj.hitUrl !== null) {
           content.hit.play(obj.hitUrl)
         }
-        content.health -= weapon.damage
+        content.health -= randint(0, weapon.damage)
         if (content.health < 0) {
           content.die()
         }
