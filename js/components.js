@@ -152,6 +152,7 @@ class Game {
         obj.targetLevel = g.levels[obj.targetLevelIndex]
       }
     }
+    g.resetVolumes()
     return g
   }
 
@@ -192,12 +193,20 @@ class Game {
     this.numericProperties = {
       volumeChangeAmount: "Volume key sensitivity",
       initialVolume: "Initial volume",
+      initialMusicVolume: "Initial music volume",
     }
     this.volumeChangeAmount = 0.05
     this.initialVolume = 0.5
+    this.initialMusicVolume = 0.25
     this.title = "Untitled Game"
     this.levels = []
     this.objects = []
+    this.resetVolumes()
+  }
+  
+  resetVolumes() {
+    gain.gain.value = this.initialVolume
+    musicGain.gain.value = this.initialMusicVolume
   }
 
   stopMusic() {
