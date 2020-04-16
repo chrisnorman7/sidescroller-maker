@@ -16,17 +16,37 @@
         {
           "objectIndex": 0,
           "position": 20
+        },
+        {
+          "objectIndex": 1,
+          "position": 62
         }
       ],
       "size": 200,
       "speed": 100,
       "convolverVolume": 0.5,
       "beforeSceneUrl": null,
-      "afterSceneUrl": null,
       "musicUrl": null,
       "ambienceUrl": null,
       "footstepUrl": "res/footsteps/stone.wav",
       "wallUrl": "res/wall.wav",
+      "turnUrl": "res/turn.wav",
+      "tripUrl": "res/trip.wav",
+      "convolverUrl": null,
+      "noWeaponUrl": "res/noweapon.wav"
+    },
+    {
+      "title": "Level 2",
+      "contents": [],
+      "size": 200,
+      "speed": 100,
+      "convolverVolume": 0.5,
+      "beforeSceneUrl": null,
+      "musicUrl": null,
+      "ambienceUrl": null,
+      "footstepUrl": "res/footsteps/stone.wav",
+      "wallUrl": "res/wall.wav",
+      "turnUrl": "res/turn.wav",
       "tripUrl": "res/trip.wav",
       "convolverUrl": null,
       "noWeaponUrl": "res/noweapon.wav"
@@ -36,6 +56,7 @@
     {
       "title": "a small toad",
       "type": "A monster which will ignore the player",
+      "targetLevelIndex": null,
       "soundUrl": "res/object.wav",
       "takeUrl": "res/take.wav",
       "dropUrl": "res/drop.wav",
@@ -45,6 +66,20 @@
       "damage": 2,
       "range": 1,
       "health": 10
+    },
+    {
+      "title": "stone stairway",
+      "type": "An exit to another level",
+      "targetLevelIndex": 1,
+      "soundUrl": "res/object.wav",
+      "takeUrl": "res/take.wav",
+      "dropUrl": "res/drop.wav",
+      "hitUrl": "res/hit.wav",
+      "useUrl": "res/weapons/punch.wav",
+      "dieUrl": "res/die.wav",
+      "damage": 2,
+      "range": 1,
+      "health": 1
     }
   ]
 }

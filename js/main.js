@@ -256,6 +256,30 @@ function EditObjectMenu(b, obj) {
         )
       }
     ),
+    new Line(
+      () => `Target Level (${obj.targetLevel === null ? "not set" : obj.targetLevel.title})`, (b) => {
+        const lines = []
+        for (let level of b.game.levels) {
+          lines.push(
+            new Line(
+              level.title, (b) => {
+                obj.targetLevel = level
+                b.pop()
+                b.message("Level set.")
+              }
+            )
+          )
+        }
+        b.push(
+          new Page(
+            {
+              title: "Set exit destination",
+              lines: lines
+            }
+          )
+        )
+      }
+    ),
   ]
   for (let name in obj.numericProperties) {
     const description = obj.numericProperties[name]

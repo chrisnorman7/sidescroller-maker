@@ -113,6 +113,11 @@ class Game {
       const level = Level.fromJson(levelData, g)
       g.levels.push(level)
     }
+    for (let obj of g.objects) {
+      if (obj.targetLevelIndex !== null) {
+        obj.targetLevel = g.levels[obj.targetLevelIndex]
+      }
+    }
     return g
   }
 
@@ -127,7 +132,7 @@ class Game {
       data.levels.push(level.toJson(this))
     }
     for (let object of this.objects) {
-      data.objects.push(object.toJson())
+      data.objects.push(object.toJson(this))
     }
     return data
   }
@@ -146,12 +151,15 @@ const objectTypes = {
   object: "An object which can be picked up by the player",
   aggressiveMonster: "A monster which will attack the player",
   peacefulMonster: "A monster which will ignore the player",
-  weapon: "A weapon which can be wielded"
+  weapon: "A weapon which can be wielded",
+  exit: "An exit to another level"
 }
 
 class Object {
   constructor() {
     this.title = null
+    this.targetLevel = null
+    this.targetLevelIndex = null
     this.type = objectTypes.object
     this.urls = {
       soundUrl: "The sound constantly played by this object",
@@ -183,6 +191,7 @@ class Object {
     const o = new this()
     o.title = data.title || o.title
     o.type = data.type || o.type
+    o.targetLevelIndex = data.targetLevelIndex
     for (let d of [o.urls, o.numericProperties]) {
       for (let name in d) {
         o[name] = data[name] || o[name]
@@ -191,10 +200,15 @@ class Object {
     return o
   }
 
-  toJson() {
+  toJson(game) {
     const data = {
       title: this.title,
       type: this.type,
+    }
+    if (this.targetLevel === null) {
+      data.targetLevelIndex = null
+    } else {
+      data.targetLevelIndex = game.levels.indexOf(this.targetLevel)
     }
     for (let d of [this.urls, this.numericProperties]) {
       for (let name in d) {
