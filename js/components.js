@@ -132,7 +132,7 @@ class Game {
     const g = new this()
     g.  title = data.title || g.title
     g.volumeChangeAmount = data.volumeChangeAmount || g.volumeChangeAmount
-    for (let d of [this.urls, this.numericValues]) {
+    for (let d of [g.urls, g.numericProperties]) {
       for (let name in d) {
         const value = data[name]
         if (value !== undefined) {

@@ -108,5 +108,5 @@
   "musicUrl": "res/menus/music.mp3",
   "volumeChangeAmount": 0.05,
   "initialVolume": 0.5,
-  "initialMusicVolume": 0.25
+  "initialMusicVolume": 0.1
 }
