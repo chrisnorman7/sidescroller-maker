@@ -86,7 +86,9 @@ class Sound {
   }
 
   play(url) {
-    if (url !== undefined) {
+    if (url === null) {
+      return
+    } else if (url !== undefined) {
       this.url = url
     }
     if (this.buffer === null) {
@@ -167,6 +169,7 @@ class Object {
       dropUrl: "The sound that is played when this object is dropped",
       hitUrl: "The sound that is heard when this object is hit",
       useUrl: "The sound that is played when this object is used or fired",
+      cantUseUrl: "The sound to be played when this object can't be used",
       dieUrl: "The sound played when this object is killed or destroyed",
     }
     this.takeUrl = "res/objects/take.wav"
@@ -176,6 +179,8 @@ class Object {
     this.hitUrl = "res/objects/hit.wav"
     this.useUrl = "res/weapons/punch.wav"
     this.use = new Sound(this.useUrl)
+    this.cantUseUrl = "res/objects/cantuse.wav"
+    this.cantUse = new Sound(this.cantUseUrl)
     this.dieUrl = "res/objects/die.wav"
     this.numericProperties = {
       damage: "The amount of damage dealt by this weapon",
@@ -222,9 +227,7 @@ class Object {
     const content = new LevelObject(level, this, position)
     level.contents.push(content)
     content.spawn()
-    if (this.dropUrl !== null) {
-      content.drop.play(this.dropUrl)
-    }
+    content.drop.play(this.dropUrl)
   }
 }
 
@@ -295,14 +298,16 @@ class LevelObject {
     this.silence(false)
     const index = this.level.contents.indexOf(this)
     this.level.contents.splice(index, 1)
-    this.level.deadObjects.push(this)
-    this.die.onended = () => {
-      const index = this.level.deadObjects.indexOf(this)
-      if (index != -1) {
-        this.level.deadObjects.splice(index, 1)
+    if (this.object.dieUrl !== null) {
+      this.level.deadObjects.push(this)
+      this.die.onended = () => {
+        const index = this.level.deadObjects.indexOf(this)
+        if (index != -1) {
+          this.level.deadObjects.splice(index, 1)
+        }
       }
+      this.dieSound.play(this.object.dieUrl)
     }
-    this.dieSound.play(this.object.dieUrl)
   }
 }
 
@@ -325,7 +330,7 @@ class Level {
     this.urls = {
       beforeSceneUrl: "Scene to play before the level starts",
       musicUrl: "Background music",
-      ambienceUrl: "Level Ambiance",
+      ambianceUrl: "Level Ambiance",
       footstepUrl: "Footstep sound",
       wallUrl: "Wall sound",
       turnUrl: "Turning sound",
@@ -337,8 +342,8 @@ class Level {
     this.beforeScene = new Sound(this.beforeSceneUrl, false)
     this.musicUrl = null
     this.music = new Sound(this.musicUrl, true)
-    this.ambienceUrl = null
-    this.ambience = new Sound(this.ambienceUrl, true)
+    this.ambianceUrl = null
+    this.ambiance = new Sound(this.ambienceUrl, true)
     this.footstepUrl = "res/footsteps/stone.wav"
     this.footstep = new Sound(this.footstepUrl, false)
     this.wallUrl = "res/level/wall.wav"
@@ -427,20 +432,16 @@ class Level {
       player.lastMoved = time
       let position = player.position + direction
       if (position < 0 || position > this.size) {
-        if (this.wallUrl !== null) {
-          this.wall.play(this.wallUrl)
-        }
+        this.wall.play(this.wallUrl)
       } else {
         book.setPlayerPosition(position)
         if (direction != player.facing) {
-          if (player.facing != LevelDirections.either && this.turnUrl !== null) {
+          if (player.facing != LevelDirections.either) {
             this.turn.play(this.turnUrl)
           }
           player.facing = direction
         }
-        if (this.footstepUrl !== null) {
-          this.footstep.play(this.footstepUrl)
-        }
+        this.footstep.play(this.footstepUrl)
       }
     }
   }
@@ -464,6 +465,7 @@ class Level {
     } else {
       this.loadContents()
     }
+    this.ambiance.play(this.ambianceUrl)
   }
 
   loadContents() {
@@ -488,6 +490,9 @@ class Level {
     }
     for (let corpse of this.deadObjects) {
       corpse.destroy()
+    }
+    if (this.ambiance.source !== null) {
+      this.ambiance.source.disconnect()
     }
   }
 }
@@ -792,13 +797,15 @@ class Book{
         const obj = content.object
         if ([objectTypes.object, objectTypes.weapon].includes(obj.type)) {
           this.player.carrying.push(obj)
-          if (obj.takeUrl !== null) {
-            obj.take.play(obj.takeUrl)
-          }
+          obj.take.play(obj.takeUrl)
           content.destroy()
           this.message(`Taken: ${content.object.title}.`)
         } else if (obj.type == objectTypes.exit) {
           if (obj.targetLevel === null) {
+            obj.cantUse.play(obj.cantUseUrl)
+          } else {
+            level.leave(this)
+            obj.targetLevel.play(this)
           }
         } else {
           this.message(`You cannot take ${obj.title}.`)
@@ -964,9 +971,7 @@ class Book{
     audio.listener.positionX.value = position / audioDivider
     for (let content of level.contents) {
       if (content.position == position) {
-        if (level.tripUrl !== null) {
-          level.trip.play(level.tripUrl)
-        }
+        level.trip.play(level.tripUrl)
         this.message(content.object.title)
       }
     }
@@ -991,9 +996,7 @@ class Book{
     }
     const weapon = weapons[index]
     if (weapon === undefined) {
-      if (level.noWeaponUrl !== null) {
-        level.noWeapon.play(level.noWeaponUrl)
-      }
+      level.noWeapon.play(level.noWeaponUrl)
     } else {
       this.player.weapon = weapon
       this.message(weapon.title)
@@ -1011,12 +1014,8 @@ class Book{
       const obj = content.object
       const distance = distanceBetween(content.position, this.player.position)
       if (distance <= weapon.range) {
-        if (weapon.useUrl !== null) {
-          weapon.use.play(weapon.useUrl)
-        }
-        if (obj.hitUrl !== null) {
-          content.hit.play(obj.hitUrl)
-        }
+        weapon.use.play(weapon.useUrl)
+        content.hit.play(obj.hitUrl)
         content.health -= randint(0, weapon.damage)
         if (content.health < 0) {
           content.die()
