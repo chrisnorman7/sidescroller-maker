@@ -8,6 +8,12 @@ let audio = null
 let gain = null
 window.AudioContext = window.AudioContext || window.webkitAudioContext
 
+const LevelDirections = {
+  backwards: -1,
+  either: 0,
+  forwards: 1
+}
+
 const buffers = {}
 
 function distanceBetween(a, b) {
@@ -99,7 +105,8 @@ class Game {
       g.objects.push(Object.fromJson(objectData))
     }
     for (let levelData of data.levels) {
-      g.levels.push(Level.fromJson(levelData, g))
+      const level = Level.fromJson(levelData, g)
+      g.levels.push(level)
     }
     return g
   }
@@ -147,6 +154,7 @@ class Object {
       dropUrl: "The sound that is played when this object is dropped",
       hitUrl: "The sound that is heard when this object is hit",
       useUrl: "The sound that is played when this object is used or fired",
+      dieUrl: "The sound played when this object is killed or destroyed",
     }
     this.takeUrl = "res/take.wav"
     this.take = new Sound(this.takeUrl)
@@ -155,6 +163,7 @@ class Object {
     this.hitUrl = "res/hit.wav"
     this.useUrl = "res/weapons/punch.wav"
     this.use = new Sound(this.useUrl)
+    this.dieUrl = "res/die.wav"
     this.numericProperties = {
       damage: "The amount of damage dealt by this weapon",
       range: "The range of this weapon",
@@ -191,7 +200,7 @@ class Object {
   }
 
   drop(level, position) {
-    const content = new LevelObject(this, position)
+    const content = new LevelObject(level, this, position)
     level.contents.push(content)
     content.spawn()
     if (this.dropUrl !== null) {
@@ -203,18 +212,20 @@ class Object {
 let fists = null
 
 class LevelObject {
-  constructor(obj, position) {
+  constructor(level, obj, position) {
+    this.level = level
     this.object = obj
     this.position = position
     this.health = obj.health
     this.panner = null
     this.sound = null
     this.drop = null
+    this.dieSound = null
   }
 
-  static fromJson(data, game) {
+  static fromJson(level, data, game) {
     const obj = game.objects[data.objectIndex]
-    let c = new this(obj, data.position)
+    let c = new this(level, obj, data.position)
     return c
   }
 
@@ -235,17 +246,21 @@ class LevelObject {
     this.move(this.position)
     this.drop = new Sound(this.dropUrl, false, this.panner)
     this.hit = new Sound(obj.hitUrl, false, this.panner)
+    this.dieSound = new Sound(obj.dieUrl, false, this.panner)
   }
 
-  destroy(level) {
-    const index = level.contents.indexOf(this)
-    level.contents.splice(index, 1)
-    this.silence()
+  destroy() {
+    const index = this.level.contents.indexOf(this)
+    this.level.contents.splice(index, 1)
+    this.silence(true)
   }
 
-  silence() {
-    if (this.sound !== null) {
+  silence(disconnectPanner) {
+    if (disconnectPanner) {
       this.panner.disconnect()
+    }
+    if (this.sound !== null) {
+      this.sound.stop = true
       this.sound.source.disconnect()
     }
   }
@@ -256,6 +271,20 @@ class LevelObject {
       this.panner.positionX.value = position / audioDivider
     }
   }
+
+  die() {
+    this.silence(false)
+    const index = this.level.contents.indexOf(this)
+    this.level.contents.splice(index, 1)
+    this.level.deadObjects.push(this)
+    this.die.onended = () => {
+      const index = this.level.deadObjects.indexOf(this)
+      if (index != -1) {
+        this.level.deadObjects.splice(index, 1)
+      }
+    }
+    this.dieSound.play(this.object.dieUrl)
+  }
 }
 
 this.LevelObject = LevelObject
@@ -264,6 +293,7 @@ class Level {
   constructor() {
     this.loading = false
     this.isLevel = true
+    this.deadObjects = []
     this.contents = []
     this.title = "Untitled Level"
     this.numericProperties = {
@@ -309,14 +339,14 @@ class Level {
   static fromJson(data, game) {
     const level = new this()
     level.title = data.title || level.title
-    for (let name in level.numericProperties) {
-      level[name] = data[name] || level[name]
-    }
-    for (let name in level.urls) {
-      level[name] = data[name] || level[name]
+    for (let d of [level.urls, level.numericProperties]) {
+      for (let name in d) {
+        level[name] = data[name] || level[name]
+      }
     }
     for (let contentData of data.contents) {
-      level.contents.push(LevelObject.fromJson(contentData, game))
+      const content = LevelObject.fromJson(level, contentData, game)
+      level.contents.push(content)
     }
     return level
   }
@@ -335,14 +365,24 @@ class Level {
     return data
   }
 
-  nearestObject(position) {
+  nearestObject(position, direction) {
+    if (direction === undefined) {
+      direction = LevelDirections.either
+    }
     let distance = null
     let obj = null
     for (let content of this.contents) {
+      if (
+        (direction == LevelDirections.forward && content.position < position) ||
+        (direction == LevelDirections.backwards && content.position > position)
+      ) {
+        continue
+      }
       const newDistance = distanceBetween(position, content.position)
       if (distance === null || newDistance < distance) {
         obj = content
       }
+      distance = newDistance
     }
     return obj
   }
@@ -385,6 +425,7 @@ class Level {
 
   play(book) {
     book.push(this)
+    book.player.level = this
     book.setPlayerPosition(0)
     if (this.convolverUrl !== null) {
       this.loading = true
@@ -412,6 +453,7 @@ class Level {
 
   leave(book) {
     book.pop()
+    book.player.level = null
     if (this.convolver !== null) {
       gain.disconnect(this.convolver)
       this.convolverGain.disconnect()
@@ -420,7 +462,10 @@ class Level {
       this.convolver = null
     }
     for (let content of this.contents) {
-      content.silence()
+      content.silence(true)
+    }
+    for (let corpse of this.deadObjects) {
+      corpse.destroy()
     }
   }
 }
@@ -595,6 +640,7 @@ this.Page = Page
 class Player {
   constructor() {
     this.position = null
+    this.level = null
     this.health = 100
     this.lastMoved = 0
     this.carrying = []
@@ -712,25 +758,25 @@ class Book{
   }
 
   takeOrActivate() {
-    const page = this.getPage()
-    if (page.isLevel) {
-      for (let content of page.contents) {
-        if (content.position == this.player.position) {
-          const obj = content.object
-          if ([objectTypes.object, objectTypes.weapon].includes(obj.type)) {
-            this.player.carrying.push(obj)
-            if (obj.takeUrl !== null) {
-              obj.take.play(obj.takeUrl)
-            }
-            content.destroy(page)
-            this.message(`Taken: ${content.object.title}.`)
-          } else {
-            this.message(`You cannot take ${obj.title}.`)
+    const level = this.getPage()
+    if (!level.isLevel) {
+      return this.activate()
+    }
+    for (let content of level.contents) {
+      if (content.position == this.player.position) {
+        const obj = content.object
+        if ([objectTypes.object, objectTypes.weapon].includes(obj.type)) {
+          this.player.carrying.push(obj)
+          if (obj.takeUrl !== null) {
+            obj.take.play(obj.takeUrl)
           }
+          content.destroy()
+          this.message(`Taken: ${content.object.title}.`)
+        } else {
+          this.message(`You cannot take ${obj.title}.`)
         }
       }
-    } else {
-      this.activate()
+      break // Take one object at a time.
     }
   }
 
@@ -745,7 +791,7 @@ class Book{
 
   activate() {
     const page = this.getPage()
-    if (page === null || page.isLevel) {
+    if (page === null) {
       return // Can"t do anything with no page.
     } else {
       const line = page.getLine()
@@ -784,8 +830,10 @@ class Book{
   }
 
   inventory() {
-    const page = this.getPage()
-    if (page.isLevel) {
+    if (this.player.level === null) {
+      return
+    }
+    if (this.player.carrying.length) {
       const lines = []
       for (let obj of this.player.carrying) {
         lines.push(
@@ -811,32 +859,33 @@ class Book{
   }
 
   drop() {
-    const page = this.getPage()
-    if (page.isLevel) {
-      if (this.player.carrying.length) {
-        const lines = []
-        for (let obj of this.player.carrying) {
-          lines.push(
-            new Line(
-              obj.title, (b) => {
-                b.pop()
-                this.message(`Dropped: ${obj.title}.`)
-                obj.drop(page, b.player.position)
-              }
-            )
-          )
-        }
-        this.push(
-          new Page(
-            {
-              title: "Choose something to drop",
-              lines: lines
+    const level = this.player.level
+    if (level === null) {
+      return
+    }
+    if (this.player.carrying.length) {
+      const lines = []
+      for (let obj of this.player.carrying) {
+        lines.push(
+          new Line(
+            obj.title, (b) => {
+              b.pop()
+              this.message(`Dropped: ${obj.title}.`)
+              obj.drop(level, b.player.position)
             }
           )
         )
-      } else {
-        this.message("You have nothing to drop.")
       }
+      this.push(
+        new Page(
+          {
+            title: "Choose something to drop",
+            lines: lines
+          }
+        )
+      )
+    } else {
+      this.message("You have nothing to drop.")
     }
   }
 
@@ -857,63 +906,69 @@ class Book{
   }
 
   setPlayerPosition(position) {
-    const level = this.getPage()
+    const level = this.player.level
     this.player.position = position
     audio.listener.positionX.value = position / audioDivider
     for (let content of level.contents) {
       if (content.position == position) {
-        level.trip.play(this.tripUrl)
+        if (level.tripUrl !== null) {
+          level.trip.play(level.tripUrl)
+        }
         this.message(content.object.title)
       }
     }
   }
 
   selectWeapon(i) {
-    const page = this.getPage()
-    if (page.isLevel) {
-      let index = Number(i, 0)
-      if (i == 0) {
-        index = 9
-      } else {
-        index -= 1
+    const level = this.player.level
+    if (level === null) {
+      return
+    }
+    let index = Number(i, 0)
+    if (i == 0) {
+      index = 9
+    } else {
+      index -= 1
+    }
+    const weapons = [fists]
+    for (let obj in this.player.carrying) {
+      if (obj.type == objectTypes.weapon) {
+        weapons.push(obj)
       }
-      const weapons = [fists]
-      for (let obj in this.player.carrying) {
-        if (obj.type == objectTypes.weapon) {
-          weapons.push(obj)
-        }
+    }
+    const weapon = weapons[index]
+    if (weapon === undefined) {
+      if (level.noWeaponUrl !== null) {
+        level.noWeapon.play(level.noWeaponUrl)
       }
-      const weapon = weapons[index]
-      if (weapon === undefined) {
-        page.noWeapon.play(page.noWeaponUrl)
-      } else {
-        this.player.weapon = weapon
-        this.message(weapon.title)
-      }
+    } else {
+      this.player.weapon = weapon
+      this.message(weapon.title)
     }
   }
 
   shootOrActivate() {
-    const page = this.getPage()
-    if (page.isLevel) {
-      const weapon = this.player.weapon
-      const content = page.nearestObject(this.player.position)
-      if (content !== null) {
-        const obj = content.object
-        const distance = distanceBetween(content.position, this.player.position)
-        if (distance <= weapon.range) {
+    const level = this.player.level
+    if (level === null) {
+      return this.activate()
+    }
+    const weapon = this.player.weapon
+    const content = level.nearestObject(this.player.position)
+    if (content !== null) {
+      const obj = content.object
+      const distance = distanceBetween(content.position, this.player.position)
+      if (distance <= weapon.range) {
+        if (weapon.useUrl !== null) {
           weapon.use.play(weapon.useUrl)
-          if (obj.hitUrl !== null) {
-            content.hit.play(obj.hitUrl)
-            obj.health -= weapon.damage
-            if (obj.health < 0) {
-              content.destroy(page)
-            }
-          }
+        }
+        if (obj.hitUrl !== null) {
+          content.hit.play(obj.hitUrl)
+        }
+        content.health -= weapon.damage
+        if (content.health < 0) {
+          content.die()
         }
       }
-    } else {
-      this.activate()
     }
   }
 }
