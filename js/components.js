@@ -6,6 +6,7 @@ let ttsRate =1
 
 let audio = null
 let gain = null
+let musicGain = null
 window.AudioContext = window.AudioContext || window.webkitAudioContext
 
 const LevelDirections = {
@@ -30,8 +31,11 @@ function startAudio() {
   audio.listener.setOrientation(0, 0, -1, 0, 1, 0)
   audio.listener.positionZ.value = -1
   gain = audio.createGain()
-  gain.gain.value = 0.5
-  gain.connect(audio.destination)
+  musicGain = audio.createGain()
+  for (let g of [gain, musicGain]) {
+    g.gain.value = 0.5
+    g.connect(audio.destination)
+  }
   const music = new Sound("res/music/start.wav")
   music.play()
   fists = new Object()
@@ -160,6 +164,19 @@ class Game {
   }
 
   reset() {
+    this.urls = {
+      volumeSoundUrl: "Volume change sound",
+      moveSoundUrl: "Menu navigation sound",
+      activateSoundUrl: "Activate sound",
+      musicUrl: "Menu music"
+    }
+    this.volumeSoundUrl = "res/menus/volume.wav"
+    this.moveSoundUrl = "res/menus/move.wav"
+    this.moveSound = new Sound(this.moveSoundUrl)
+    this.activateSoundUrl = "res/menus/activate.wav"
+    this.activateSound = new Sound(this.activateSoundUrl)
+    this.musicUrl = "res/menus/music.mp3"
+    this.music = null
     this.volumeChangeAmount = 0.05
     this.title = "Untitled Game"
     this.levels = []
@@ -726,20 +743,6 @@ class Book{
 
   constructor() {
     this.levelInPages = false
-    this.urls = {
-      volumeSoundUrl: "Volume change sound",
-      moveSoundUrl: "Menu navigation sound",
-      activateSoundUrl: "Activate sound",
-      musicUrl: "Menu music"
-    }
-    this.volumeSoundUrl = "res/menus/volume.wav"
-    this.volumeSound = new Sound(this.volumeSoundUrl)
-    this.moveSoundUrl = "res/menus/move.wav"
-    this.moveSound = new Sound(this.moveSoundUrl)
-    this.activateSoundUrl = "res/menus/activate.wav"
-    this.activateSound = new Sound(this.activateSoundUrl)
-    this.musicUrl = "res/menus/music.mp3"
-    this.music = null
     this.scene = null
     this.message = null
     this.pages = []
@@ -752,8 +755,10 @@ class Book{
       "Enter": () => this.takeOrActivate(),
       "ArrowLeft": () => this.cancel(),
       "Escape": () => this.cancel(),
-      "[": () => this.volumeDown(),
-      "]": () => this.volumeUp(),
+      "[": () => this.volumeDown(gain),
+      "]": () => this.volumeUp(gain),
+      "-": () => this.volumeDown(musicGain),
+      "=": () => this.volumeUp(musicGain),
       "i": () => this.inventory(),
       "d": () => this.drop(),
       "f": () => this.showFacing(),
@@ -779,15 +784,15 @@ class Book{
 
   push(page) {
     if (page.isLevel) {
-      if (this.music !== null) {
+      if (this.game.music !== null) {
         this.levelInPages = true
-        this.music.source.disconnect()
-        this.music = null
+        this.game.music.source.disconnect()
+        this.game.music = null
       }
     } else {
-      if (this.music === null && !this.levelInPages) {
-        this.music = new Sound(this.musicUrl, true)
-        this.music.play(this.musicUrl)
+      if (this.game.music === null && !this.levelInPages) {
+        this.game.music = new Sound(this.game.musicUrl, true, musicGain)
+        this.game.music.play(this.game.musicUrl)
       }
     }
     this.pages.push(page)
@@ -825,7 +830,7 @@ class Book{
     const page = this.getPage()
     if (!page.isLevel) {
       const line = page.getLine()
-      this.moveSound.play(this.moveSoundUrl)
+      this.game.moveSound.play(this.game.moveSoundUrl)
       this.message(this.getText(line.title), true)
     }
   }
@@ -911,7 +916,7 @@ class Book{
       if (line === null) {
         return // They are probably looking at the title.
       }
-      this.activateSound.play(this.activateSoundUrl)
+      this.game.activateSound.play(this.game.activateSoundUrl)
       line.func(this)
     }
   }
@@ -927,18 +932,24 @@ class Book{
     }
   }
 
-  setVolume(v) {
-    gain.gain.value = v
-    this.volumeSound.play(this.volumeSoundUrl)
-    this.message(`${Math.floor(gain.gain.value * 100)}%.`)
+  setVolume(v, output) {
+    output.gain.value = v
+    new Sound(this.game.volumeSoundUrl, false, output).play()
+    this.message(`${Math.round(output.gain.value * 100)}%.`)
   }
 
-  volumeUp() {
-    this.setVolume(Math.min(1.0, gain.gain.value + this.game.volumeChangeAmount))
+  volumeUp(output) {
+    if (output === undefined) {
+      output = gain
+    }
+    this.setVolume(Math.min(1.0, output.gain.value + this.game.volumeChangeAmount), output)
   }
 
-  volumeDown() {
-    this.setVolume(Math.max(0.0, gain.gain.value - this.game.volumeChangeAmount))
+  volumeDown(output) {
+    if (output === undefined) {
+      output = gain
+    }
+    this.setVolume(Math.max(0.0, output.gain.value - this.game.volumeChangeAmount), output)
   }
 
   inventory() {

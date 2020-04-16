@@ -375,6 +375,84 @@ function ObjectsMenu(b) {
   )
 }
 
+function GameMenu(game) {
+  const lines = [
+    new Line(
+      "Rename", (b) => {
+        getText(
+          {
+            book: b,
+            prompt: "Enter a new name",
+            value: game.title,
+            onok: (text) => {
+              game.title = text || game.title
+            }
+          }
+        )
+      }
+    ),
+    new Line(
+      "Volume Change Amount", (b) => {
+        getText(
+          {
+            book: b,
+            prompt: "Enter new value",
+            value: game.volumeChangeAmount,
+            onok: (value, bk) => {
+              value = Number(value, 2)
+              bk.showFocus()
+              if (isNaN(value)) {
+                bk.message("Invalid value.")
+              } else {
+                game.volumeChangeAmount = Number(value, 2) || game.volumeChangeAmount
+              }
+            }
+          }
+        )
+      }
+    ),
+  ]
+  for (let name in game.urls) {
+    const description = game.urls[name]
+    lines.push(
+      new Line(
+        () => `${description} (${game[name] === null ? "Not set" : game[name]})`, (b) => {
+          getText(
+            {
+              book: b,
+              prompt: "Enter a new URL",
+              value: game[name],
+              onok: (value, bk) => {
+                game[name] = value || null
+                if (name == "musicUrl") {
+                  if (game.music !== null) {
+                    game.music.source.disconnect()
+                    game.music = null
+                  }
+                  bk.push(
+                    new Page(
+                      {
+                        title: "Dummy page"
+                      }
+                    )
+                  )
+                  bk.pop()
+                }
+              }
+            }
+          )
+        }
+      )
+    )
+  }
+  return new Page(
+    {
+      title: "Game Menu",
+      lines: lines
+    }
+  )
+}
+
 startButton.onclick = () => {
   startAudio()
   startDiv.hidden = true
@@ -391,20 +469,6 @@ startButton.onclick = () => {
         dismissible: false,
         lines: [
           new Line(
-            "Set Game Name", (b) => {
-              getText(
-                {
-                  book: b,
-                  prompt: "Enter a new name",
-                  value: b.game.title,
-                  onok: (text, bk) => {
-                    bk.game.title = text || bk.game.title
-                  }
-                }
-              )
-            }
-          ),
-          new Line(
             "Levels", b => {
               b.push(LevelsMenu(b))
             }
@@ -415,23 +479,8 @@ startButton.onclick = () => {
             }
           ),
           new Line(
-            "Set Volume Change Amount", (b) => {
-              getText(
-                {
-                  book: b,
-                  prompt: "Enter new value",
-                  value: b.game.volumeChangeAmount,
-                  onok: (value, bk) => {
-                    value = Number(value, 2)
-                    bk.showFocus()
-                    if (isNaN(value)) {
-                      bk.message("Invalid value.")
-                    } else {
-                      bk.game.volumeChangeAmount = Number(value, 2) || b.game.volumeChangeAmount
-                    }
-                  }
-                }
-              )
+            "Configure Game", (b) => {
+              b.push(GameMenu(b.game))
             }
           ),
           new Line(
