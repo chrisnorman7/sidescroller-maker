@@ -429,7 +429,9 @@ startButton.onclick = () => {
           ),
           new Line(
             "Copy Game JSON", (b) => {
-              gameJson.value = JSON.stringify(b.game.toJson())
+              const data = b.game.toJson()
+              const json = JSON.stringify(data, undefined, 2)
+              gameJson.value = json
               gameJson.select()
               gameJson.setSelectionRange(0, -1)
               document.execCommand("copy")
