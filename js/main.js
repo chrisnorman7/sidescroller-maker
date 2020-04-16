@@ -425,18 +425,7 @@ function GameMenu(game) {
               onok: (value, bk) => {
                 game[name] = value || null
                 if (name == "musicUrl") {
-                  if (game.music !== null) {
-                    game.music.source.disconnect()
-                    game.music = null
-                  }
-                  bk.push(
-                    new Page(
-                      {
-                        title: "Dummy page"
-                      }
-                    )
-                  )
-                  bk.pop()
+                  game.reloadMusic(bk)
                 }
               }
             }
@@ -492,7 +481,9 @@ startButton.onclick = () => {
                     onok: (b) => {
                       b.pop()
                       let obj = JSON.parse(gameJson.value)
+                      b.game.stopMusic()
                       b.game = Game.fromJson(obj)
+                      b.game.reloadMusic(b)
                       b.message("Game loaded.")
                     }
                   }

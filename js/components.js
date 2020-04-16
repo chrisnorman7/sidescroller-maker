@@ -132,6 +132,14 @@ class Game {
     const g = new this()
     g.  title = data.title || g.title
     g.volumeChangeAmount = data.volumeChangeAmount || g.volumeChangeAmount
+    for (let d of [this.urls, this.numericValues]) {
+      for (let name in d) {
+        const value = data[name]
+        if (value !== undefined) {
+          g[name] = data[name]
+        }
+      }
+    }
     for (let objectData of data.objects) {
       g.objects.push(Object.fromJson(objectData))
     }
@@ -149,10 +157,14 @@ class Game {
 
   toJson() {
     const data = {
-      volumeChangeAmount: this.volumeChangeAmount,
       title: this.title,
       levels: [],
       objects: []
+    }
+    for (let d of [this.urls, this.numericProperties]) {
+      for (let name in d) {
+        data[name] = this[name]
+      }
     }
     for (let level of this.levels) {
       data.levels.push(level.toJson(this))
@@ -177,10 +189,36 @@ class Game {
     this.activateSound = new Sound(this.activateSoundUrl)
     this.musicUrl = "res/menus/music.mp3"
     this.music = null
+    this.numericProperties = {
+      volumeChangeAmount: "Volume key sensitivity",
+      initialVolume: "Initial volume",
+    }
     this.volumeChangeAmount = 0.05
+    this.initialVolume = 0.5
     this.title = "Untitled Game"
     this.levels = []
     this.objects = []
+  }
+
+  stopMusic() {
+    if (this.music !== null) {
+      if (this.music.source !== null) {
+        this.music.source.disconnect()
+      }
+      this.music = null
+    }
+  }
+
+  reloadMusic(book) {
+    this.stopMusic()
+    book.push(
+      new Page(
+        {
+          title: "Reloading game music..."
+        }
+      )
+    )
+    book.pop()
   }
 }
 
@@ -784,11 +822,8 @@ class Book{
 
   push(page) {
     if (page.isLevel) {
-      if (this.game.music !== null) {
-        this.levelInPages = true
-        this.game.music.source.disconnect()
-        this.game.music = null
-      }
+      this.levelInPages = true
+      this.game.stopMusic()
     } else {
       if (this.game.music === null && !this.levelInPages) {
         this.game.music = new Sound(this.game.musicUrl, true, musicGain)
@@ -934,7 +969,9 @@ class Book{
 
   setVolume(v, output) {
     output.gain.value = v
-    new Sound(this.game.volumeSoundUrl, false, output).play()
+    if (this.game.volumeSoundUrl !== null) {
+      new Sound(this.game.volumeSoundUrl, false, output).play()
+    }
     this.message(`${Math.round(output.gain.value * 100)}%.`)
   }
 

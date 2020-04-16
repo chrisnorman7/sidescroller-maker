@@ -1,5 +1,4 @@
 {
-  "volumeChangeAmount": 0.05,
   "title": "Untitled Game",
   "levels": [
     {
@@ -102,5 +101,11 @@
       "health": 1,
       "targetPosition": 0
     }
-  ]
+  ],
+  "volumeSoundUrl": "res/menus/volume.wav",
+  "moveSoundUrl": "res/menus/move.wav",
+  "activateSoundUrl": "res/menus/activate.wav",
+  "musicUrl": "res/menus/music.mp3",
+  "volumeChangeAmount": 0.05,
+  "initialVolume": 0.5
 }
