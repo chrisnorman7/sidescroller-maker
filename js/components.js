@@ -725,6 +725,7 @@ class Book{
   // Got the idea from the Navigator class in Flutter.
 
   constructor() {
+    this.levelInPages = false
     this.urls = {
       volumeSoundUrl: "Volume change sound",
       moveSoundUrl: "Menu navigation sound",
@@ -779,11 +780,12 @@ class Book{
   push(page) {
     if (page.isLevel) {
       if (this.music !== null) {
+        this.levelInPages = true
         this.music.source.disconnect()
         this.music = null
       }
     } else {
-      if (this.music === null) {
+      if (this.music === null && !this.levelInPages) {
         this.music = new Sound(this.musicUrl, true)
         this.music.play(this.musicUrl)
       }
@@ -793,7 +795,10 @@ class Book{
   }
 
   pop() {
-    this.pages.pop() // Remove the last page from the list.
+    const oldPage = this.pages.pop() // Remove the last page from the list.
+    if (oldPage.isLevel) {
+      this.levelInPages = false
+    }
     if (this.pages.length > 0) {
       const page = this.pages.pop() // Pop the next one too, so we can push it again.
       this.push(page)
