@@ -280,6 +280,7 @@ class Object {
     this.health = 1
     this.targetPosition = 0
     this.contains = []
+    this.containedObjectIndices = []
   }
 
   static fromJson(data) {
@@ -989,7 +990,6 @@ class Book{
     if (this.pages.length > 0) {
       const page = this.pages.pop() // Pop the next one too, so we can push it again.
       this.push(page)
-      this.showFocus()
     }
     return oldPage
   }

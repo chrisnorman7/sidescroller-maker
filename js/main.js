@@ -120,13 +120,12 @@ function EditLevelMenu(b, level) {
               prompt: "Enter new value",
               value: level[name],
               onok: (value, bk) => {
-                value = Number(value) || level[name]
+                value = Number(value)
                 if (isNaN(value)) {
                   bk.message("Invalid number.")
                 } else {
                   level[name] = value
                 }
-                bk.showFocus()
               }
             }
           )
@@ -282,7 +281,33 @@ function EditObjectMenu(b, obj) {
     ),
     new Line(
       () => `Contained Objects (${obj.contains.length})`, (b) => {
-        b.push(ContainedObjectsMenu(obj))
+        b.push(
+          ObjectsMenu(
+            obj.contains,
+            (b, onadd) => {
+              const objectLines = []
+              for (let o of b.game.objects) {
+                objectLines.push(
+                  new Line(
+                    o.title, (b) => {
+                      obj.contains.push(o)
+                      b.pop()
+                      onadd()
+                    }
+                  )
+                )
+              }
+              b.push(
+                new Page(
+                  {
+                    title: "Select Object",
+                    lines: objectLines
+                  }
+                )
+              )
+            },
+          )
+        )
       }
     ),
   ]
@@ -297,13 +322,12 @@ function EditObjectMenu(b, obj) {
               prompt: "Enter new value",
               value: obj[name],
               onok: (value, bk) => {
-                value = Number(value) || obj[name]
+                value = Number(value)
                 if (isNaN(value)) {
                   bk.message("Invalid number.")
                 } else {
                   obj[name] = value
                 }
-                bk.showFocus()
               }
             }
           )
@@ -441,13 +465,12 @@ function GameMenu(game) {
               prompt: "Enter new value",
               value: game[name],
               onok: (value, bk) => {
-                value = Number(value, 2) || game[name]
+                value = Number(value, 2)
                 if (isNaN(value)) {
                   bk.message("Invalid number.")
                 } else {
                   game[name] = value
                 }
-                bk.showFocus()
               }
             }
           )
