@@ -402,6 +402,7 @@ this.LevelObject = LevelObject
 
 class Level {
   constructor() {
+    this.focus = -1 // Just to fool Book.showFocus
     this.loading = false
     this.isLevel = true
     this.deadObjects = []
