@@ -152,7 +152,7 @@ class Game {
         obj.targetLevel = g.levels[obj.targetLevelIndex]
       }
       for (let index of obj.containedObjectIndices) {
-        obj.contained.push(g.objects[index])
+        obj.contains.push(g.objects[index])
       }
     }
     g.resetVolumes()
@@ -296,7 +296,7 @@ class Object {
         o[name] = data[name]
       }
     }
-    this.containedObjectIndices = data.contains
+    o.containedObjectIndices = data.contains
     return o
   }
 
