@@ -1,5 +1,11 @@
-/* globals Book, ConfirmPage, Game, Level, Line, objectTypes, Page, startAudio, TtsPage */
+/* globals Book, ConfirmPage, englishList, gain, Game, Level, LevelDirections, Line, musicGain, objectTypes, Page, startAudio, TtsPage */
 
+let lastError = null
+window.addEventListener("error", (e) => {
+  lastError = e
+})
+
+const issueLink = document.querySelector("#issueLink")
 const startDiv = document.querySelector("#startDiv")
 const mainDiv = document.querySelector("#main")
 const keyboardArea = document.querySelector("#keyboardArea")
@@ -588,6 +594,12 @@ startButton.onclick = () => {
               b.push(TtsPage())
             }
           ),
+          new Line(
+            "Throw an Error", (b) => {
+              b.pop()
+              throw(Error("Error intentionally thrown by user."))
+            }
+          ),
         ]
       }
     )
@@ -597,6 +609,119 @@ startButton.onclick = () => {
 window.onload = () => {
   for (let e of [mainDiv, stringForm, textForm]) {
     e.hidden = true
+  }
+  const issueUrl = issueLink.href
+  issueLink.onclick = (e) => {
+    e.target.href = issueUrl // Fallback in case something breaks
+    let title = null
+    let body = ""
+    try {
+      let json = "No game loaded"
+      let player = null
+      let game = null
+      if (book === null) {
+        title = "before start button has been clicked"
+      } else {
+        game = book.game
+        player = book.player
+        if (game == null || game === undefined) {
+          title = "with a null game"
+        } else {
+          json = JSON.stringify(game.toJson(), undefined, 2)
+          const page = book.getPage()
+          if (page === null || page === undefined) {
+            title = "with no page pushed"
+          } else {
+            let type = null
+            let lineTitle = null
+            if (page.isLevel) {
+              type = "level"
+              let facing = null
+              if (player.facing == LevelDirections.forwards) {
+                facing = "forwards"
+              } else if (player.facing == LevelDirections.backwards) {
+                facing = "backwards"
+              } else if (player.facing == LevelDirections.either) {
+                facing = "either way"
+              } else {
+                facing = player.facing.toString()
+              }
+              lineTitle = `at position ${book.player.position}, facing ${facing}`
+            } else {
+              const line = page.getLine()
+              type = "page"
+              if (line === null) {
+                lineTitle = "not focussed on any particular line"
+              } else {
+                lineTitle = `focussed on a line called "${book.getText(line.title)}"`
+              }
+            }
+            title = `with a ${book.pages.length} deep ${type} called "${book.getText(page.title)}", ${lineTitle}`
+          }
+        }
+      }
+      let soundVolume = null
+      if (gain === null || gain === undefined) {
+        soundVolume = "Sound output not present"
+      } else {
+        soundVolume = gain.gain.value.toFixed(2)
+      }
+      let musicVolume = null
+      if (musicGain === null || musicGain === undefined) {
+        musicVolume = "Music output not present"
+      } else {
+        musicVolume = musicGain.gain.value.toFixed(2)
+        if (game.music !== null && game.music.source !== null) {
+          musicVolume += " (music present)"
+        } else {
+          musicVolume += " (music not present)"
+        }
+      }
+      let lastErrorData = null
+      if (lastError !== null) {
+        lastErrorData = {
+          message: lastError.message,
+          // Code copied from https://stackoverflow.com/questions/11550790/remove-hostname-and-port-from-url-using-regular-expression:
+          filename: lastError.filename.replace (/^[a-z]{4,5}:\/{2}[a-z]{1,}:[0-9]{1,4}.(.*)/, '$1'),
+          line: lastError.lineno,
+          column: lastError.colno,
+          type: lastError.type,
+          srcElement: lastError.srcElement.toString()
+        }
+      }
+      const stats = {
+        "Sound volume": soundVolume,
+        "Music volume": musicVolume,
+        "Languages": englishList(navigator.languages),
+        "Platform": navigator.platform || "Unknown",
+        "Last error thrown": JSON.stringify(lastErrorData, undefined, 2)
+      }
+      if (player !== null) {
+        stats["Player health"] = player.health
+        stats["Player carrying"] = englishList(
+          Array.from(
+            player.carrying,
+            (e) => e.title
+          )
+        )
+        let weaponTitle = "Not present"
+        if (player.weapons !== null) {
+          weaponTitle = player.weapon.title
+        }
+        stats["Weapon"] = weaponTitle
+      }
+      for (let key in stats) {
+        const value = stats[key]
+        body += `\n${key}: ${value}`
+      }
+      body += `\n\nSteps to reproduce:\n1. \n2. \n3. \n\nGame JSON:\n${json}`
+      title = `Problem ${title}`
+    } catch(e) {
+      throw(e)
+      title = "Issue while running onclick handler"
+      body = `Error: ${e.message}`
+    }
+    e.target.href = `${issueUrl}?title=${encodeURI(title)}&body=${encodeURI(body)}`
   }
 }
 
