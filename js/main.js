@@ -280,6 +280,11 @@ function EditObjectMenu(b, obj) {
         )
       }
     ),
+    new Line(
+      () => `Contained Objects (${obj.contains.length})`, (b) => {
+        b.push(ContainedObjectsMenu(obj))
+      }
+    ),
   ]
   for (let name in obj.numericProperties) {
     const description = obj.numericProperties[name]
@@ -338,38 +343,29 @@ function EditObjectMenu(b, obj) {
   )
 }
 
-function ObjectsMenu(b) {
+function ObjectsMenu(initialObjects, addObject, editObject) {
   const lines = [
     new Line(
       "Add Object", (b) => {
-        getText(
-          {
-            book: b,
-            prompt: "Enter the name for the new object",
-            onok: (title, bk) => {
-              if (title) {
-                const obj = new Object()
-                obj.title = title
-                bk.game.objects.push(obj)
-                bk.pop()
-                bk.push(ObjectsMenu(bk))
-              }
-            }
-          }
-        )
+        addObject(b, () => {
+          b.pop()
+          const page = ObjectsMenu(initialObjects, addObject, editObject)
+          page.focus = initialObjects.length
+          b.push(page)
+        })
       }
-    ),
+    )
   ]
-  for (let obj of b.game.objects) {
+  for (let obj of initialObjects) {
     lines.push(
       new Line(
-        () => obj.title, (b) => b.push(EditObjectMenu(b, obj))
+        () => obj.title, (b) => editObject(b, obj)
       )
     )
   }
   return new Page(
     {
-      title: (b) => `Objects (${b.game.objects.length})`,
+      title: () => `Objects (${initialObjects.length})`,
       lines: lines
     }
   )
@@ -489,7 +485,27 @@ startButton.onclick = () => {
           ),
           new Line(
             "Objects and Monsters", (b) => {
-              b.push(ObjectsMenu(b))
+              b.push(
+                ObjectsMenu(
+                  b.game.objects, (b, onadd) => {
+                    getText(
+                      {
+                        book: b,
+                        prompt: "Enter the name for the new object",
+                        onok: (title, bk) => {
+                          if (title) {
+                            const obj = new Object()
+                            obj.title = title
+                            bk.game.objects.push(obj)
+                            onadd()
+                          }
+                        }
+                      }
+                    )
+                  },
+                  (b, obj) => b.push(EditObjectMenu(b, obj))
+                )
+              )
             }
           ),
           new Line(

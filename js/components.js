@@ -151,6 +151,9 @@ class Game {
       if (obj.targetLevelIndex !== null) {
         obj.targetLevel = g.levels[obj.targetLevelIndex]
       }
+      for (let index of obj.containedObjectIndices) {
+        obj.contained.push(g.objects[index])
+      }
     }
     g.resetVolumes()
     return g
@@ -292,6 +295,7 @@ class Object {
         o[name] = data[name]
       }
     }
+    this.containedObjectIndices = data.contains
     return o
   }
 
@@ -299,6 +303,7 @@ class Object {
     const data = {
       title: this.title,
       type: this.type,
+      contains: []
     }
     if (this.targetLevel === null) {
       data.targetLevelIndex = null
@@ -309,6 +314,9 @@ class Object {
       for (let name in d) {
         data[name] = this[name]
       }
+    }
+    for (let containedObject of this.contains) {
+      data.contains.push(game.objects.indexOf(containedObject))
     }
     return data
   }
@@ -983,6 +991,7 @@ class Book{
       this.push(page)
       this.showFocus()
     }
+    return oldPage
   }
 
   getPage() {
