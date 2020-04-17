@@ -1,5 +1,7 @@
 /* globals Book, ConfirmPage, englishList, gain, Game, Level, LevelDirections, Line, musicGain, objectTypes, Page, startAudio, TtsPage */
 
+// Regexp copied from https://stackoverflow.com/questions/11550790/remove-hostname-and-port-from-url-using-regular-expression:
+const urlRegexp = /^[a-z]{4,5}:\/{2}[a-z]+:?[0-9]{0,4}[^/]+\/([^$]+)$/
 let lastError = null
 window.addEventListener("error", (e) => {
   lastError = e
@@ -681,8 +683,7 @@ window.onload = () => {
       if (lastError !== null) {
         lastErrorData = {
           message: lastError.message,
-          // Code copied from https://stackoverflow.com/questions/11550790/remove-hostname-and-port-from-url-using-regular-expression:
-          filename: lastError.filename.replace (/^[a-z]{4,5}:\/{2}[a-z]{1,}:[0-9]{1,4}.(.*)/, '$1'),
+          filename: lastError.filename.replace (urlRegexp, "$1"),
           line: lastError.lineno,
           column: lastError.colno,
           type: lastError.type,
@@ -717,7 +718,6 @@ window.onload = () => {
       body += `\n\nSteps to reproduce:\n1. \n2. \n3. \n\nGame JSON:\n${json}`
       title = `Problem ${title}`
     } catch(e) {
-      throw(e)
       title = "Issue while running onclick handler"
       body = `Error: ${e.message}`
     }
