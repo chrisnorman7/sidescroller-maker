@@ -395,17 +395,22 @@ class LevelObject {
 
   die() {
     this.silence(false)
+    const obj = this.object
+    const level = this.level
     const index = this.level.contents.indexOf(this)
-    this.level.contents.splice(index, 1)
-    if (this.object.dieUrl !== null) {
-      this.level.deadObjects.push(this)
+    level.contents.splice(index, 1)
+    if (obj.dieUrl !== null) {
+      level.deadObjects.push(this)
       this.die.onended = () => {
-        const index = this.level.deadObjects.indexOf(this)
+        const index = level.deadObjects.indexOf(this)
         if (index != -1) {
-          this.level.deadObjects.splice(index, 1)
+          level.deadObjects.splice(index, 1)
         }
       }
       this.dieSound.play(this.object.dieUrl)
+    }
+    for (let containedObject of obj.contains) {
+      containedObject.drop(level, this.position)
     }
   }
 }
@@ -1254,6 +1259,7 @@ class Book{
         level.trip.play(level.tripUrl)
         this.message(content.object.title)
       }
+      break // Only show one object.
     }
   }
 
