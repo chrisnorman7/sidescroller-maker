@@ -644,6 +644,8 @@ class Page{
   }
 }
 
+this.Page = Page
+
 function ConfirmPage(obj) {
   // Pass an object obj, with the following keys:
   //
@@ -669,6 +671,8 @@ function ConfirmPage(obj) {
     }
   )
 }
+
+this.ConfirmPage = ConfirmPage
 
 function VoicesPage() {
   const lines = []
@@ -746,9 +750,35 @@ function TtsPage() {
 
 this.TtsPage = TtsPage
 
-this.ConfirmPage = ConfirmPage
-
-this.Page = Page
+function HotkeysPage(book) {
+  const hotkeyConvertions = {
+    " ": "Spacebar"
+  }
+  const lines = []
+  const page = book.getPage()
+  for (let key in book.hotkeys) {
+    const hotkey = book.hotkeys[key]
+    let keyString = key
+    if (keyString in hotkeyConvertions) {
+      keyString = hotkeyConvertions[keyString]
+    }
+    lines.push(
+      new Line(
+        `${keyString}: ${hotkey.getDescription(page)}`,
+        (b) => {
+          b.pop()
+          hotkey.func()
+        }
+      )
+    )
+  }
+  return new Page(
+    {
+      title: "Hotkeys",
+      lines: lines
+    }
+  )
+}
 
 class Player {
   constructor() {
@@ -785,6 +815,21 @@ class Scene {
   }
 }
 
+class Hotkey {
+  constructor(description, func) {
+    // Pass description as either a string, or a function ready to take a Page instance as its only argument, and return a string.
+    this.description = description
+    this.func = func
+  }
+  
+  getDescription(page) {
+    if (typeof(this.description) == "function") {
+      return this.description(page)
+    }
+    return this.description
+  }
+}
+
 class Book{
   // Got the idea from the Navigator class in Flutter.
 
@@ -794,27 +839,108 @@ class Book{
     this.message = null
     this.pages = []
     this.player = new Player()
+    const activateString = "Activate a menu item"
+    const cancelString = "Return to the previous menu"
     this.hotkeys = {
-      "ArrowUp": () => this.moveUp(),
-      "ArrowDown": () => this.moveDown(),
-      " ": () => this.shootOrActivate(),
-      "ArrowRight": () => this.moveOrActivate(),
-      "Enter": () => this.takeOrActivate(),
-      "ArrowLeft": () => this.cancel(),
-      "Escape": () => this.cancel(),
-      "[": () => this.volumeDown(gain),
-      "]": () => this.volumeUp(gain),
-      "-": () => this.volumeDown(musicGain),
-      "=": () => this.volumeUp(musicGain),
-      "i": () => this.inventory(),
-      "d": () => this.drop(),
-      "f": () => this.showFacing(),
-      "p": () => this.showPosition(),
+      "ArrowUp": new Hotkey(
+        (page) => {
+          if (page.isLevel) {
+            return "Jump"
+          }
+          return "Move up in a menu"
+        },
+        () => this.moveUp()
+      ),
+      "ArrowDown": new Hotkey(
+        "Move down in a menu",
+        () => this.moveDown()
+      ),
+      " ": new Hotkey(
+        (page) => {
+          if (page.isLevel) {
+            return "Use a weapon"
+          }
+          return activateString
+        },
+        () => this.shootOrActivate()
+      ),
+      "ArrowRight": new Hotkey(
+        (page) => {
+          if (page.isLevel) {
+            return "Move right"
+          }
+          return activateString
+        },
+        () => this.moveOrActivate()
+      ),
+      "Enter": new Hotkey(
+        (page) => {
+          if (page.isLevel) {
+            return "Take the object at your current location"
+          }
+          return activateString
+        },
+        () => this.takeOrActivate()
+      ),
+      "ArrowLeft": new Hotkey(
+        (page) => {
+          if (page.isLevel) {
+            return "Move left"
+          }
+          return cancelString
+        },
+        () => this.cancel()
+      ),
+      "Escape": new Hotkey(
+        "Return to the previous menu",
+        () => this.cancel()
+      ),
+      "[": new Hotkey(
+        "Decrease sound volume",
+        () => this.volumeDown(gain)
+      ),
+      "]": new Hotkey(
+        "Increase sound volume",
+        () => this.volumeUp(gain)
+      ),
+      "-": new Hotkey(
+        "Decrease music volume",
+        () => this.volumeDown(musicGain)
+      ),
+      "=": new Hotkey(
+        "Increase music volume",
+        () => this.volumeUp(musicGain)
+      ),
+      "i": new Hotkey(
+        "Inventory menu",
+        () => this.inventory()
+      ),
+      "d": new Hotkey(
+        "Drop menu",
+        () => this.drop()
+      ),
+      "f": new Hotkey(
+        "Show which way you are facing",
+        () => this.showFacing()
+      ),
+      "c": new Hotkey(
+        "Show your current coordinate",
+        () => this.showPosition()
+      ),
+      "/": new Hotkey(
+        "Show a list of hotkeys",
+        () => {
+          this.push(HotkeysPage(this))
+        }
+      ),
     }
     for (let i = 0; i < 10; i++) {
-      this.hotkeys[i.toString()] = () => {
-        this.selectWeapon(i)
-      }
+      this.hotkeys[i.toString()] = new Hotkey(
+        `Use the weapon in slot ${i == 0 ? 10 : i}`,
+        () => {
+          this.selectWeapon(i)
+        }
+      )
     }
     this.game = new Game()
   }
@@ -840,7 +966,7 @@ class Book{
       }
     }
     this.pages.push(page)
-    this.message(this.getText(page.title))
+    this.showFocus()
   }
 
   pop() {
@@ -872,7 +998,11 @@ class Book{
 
   showFocus() {
     const page = this.getPage()
-    if (!page.isLevel) {
+    if (page === null) {
+      throw("First push a page.")
+    } else if (page.focus == -1) {
+      this.message(this.getText(page.title))
+    } else if (!page.isLevel) {
       const line = page.getLine()
       this.game.moveSound.play(this.game.moveSoundUrl)
       this.message(this.getText(line.title), true)
@@ -891,11 +1021,7 @@ class Book{
         return // Do nothing.
       }
       page.focus --
-      if (page.focus == -1) {
-        this.message(this.getText(page.title), true)
-      } else {
-        this.showFocus()
-      }
+      this.showFocus()
     }
   }
 
@@ -1091,8 +1217,9 @@ class Book{
       }
       return
     }
-    const func = this.hotkeys[key]
-    if (func !== undefined) {
+    const hotkey = this.hotkeys[key]
+    if (hotkey !== undefined) {
+      const func = hotkey.func
       e.preventDefault()
       func()
     }
