@@ -1,0 +1,12 @@
+Write tick code to make stuff move about.
+Consider different level types (times levels, boss levels, levels with monsters randomly spawning left, right, and centre).
+Figure out exit constraints.
+Make weapons reloadable. Run out of ammo ETC.
+Work out how to handle winning and dying.
+Write load / save code.
+Save sensible stuff to cookies.
+Figure out a way to reset internal game state while testing. Maybe dump level JSON when starting, then adding a "r" key?
+Make sure level music works.
+Make it possible to export created games to HTML.
+Make the start level configurable.
+Make it possible to play the entire game from within the maker.
