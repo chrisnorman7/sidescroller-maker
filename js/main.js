@@ -577,7 +577,7 @@ keyboardArea.onkeydown = (e) => {
         lines.push(
           new Line(
             obj.title, (b) => {
-              obj.drop(page, b.player.position)
+              obj.drop(page, b.player.position, true)
               b.pop()
             }
           )

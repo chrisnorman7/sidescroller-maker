@@ -276,6 +276,7 @@ class Object {
     this.range = 1
     this.health = 1
     this.targetPosition = 0
+    this.contains = []
   }
 
   static fromJson(data) {
@@ -312,11 +313,13 @@ class Object {
     return data
   }
 
-  drop(level, position) {
+  drop(level, position, silent) {
     const content = new LevelObject(level, this, position)
     level.contents.push(content)
     content.spawn()
-    content.drop.play(this.dropUrl)
+    if (!silent) {
+      content.drop.play(this.dropUrl)
+    }
   }
 }
 
