@@ -424,7 +424,7 @@ class LevelObject {
     this.panner.positionX.value = position / audioDivider
   }
 
-  die() {
+  die(book) {
     this.silence(false)
     const obj = this.object
     const level = this.level
@@ -440,8 +440,14 @@ class LevelObject {
       }
       this.dieSound.play(this.object.dieUrl)
     }
+    const titles = []
     for (let containedObject of obj.contains) {
       containedObject.drop(level, this.position)
+      titles.push(containedObject.title)
+    }
+    if (titles.length) {
+      level.trip.play(level.tripUrl)
+      book.message(englishList(titles))
     }
   }
 }
@@ -1343,7 +1349,7 @@ class Book{
         content.hit.play(obj.hitUrl)
         content.health -= randint(0, weapon.damage)
         if (content.health < 0) {
-          content.die()
+          content.die(this)
         }
       }
     }
