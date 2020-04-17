@@ -211,6 +211,7 @@ class Game {
   }
 
   reset() {
+    this.stopMusic()
     this.urls = {
       volumeSoundUrl: "Volume change sound",
       moveSoundUrl: "Menu navigation sound",
@@ -244,7 +245,7 @@ class Game {
   }
 
   stopMusic() {
-    if (this.music !== null) {
+    if (this.music !== null && this.music !== undefined) {
       if (this.music.source !== null) {
         this.music.source.disconnect()
       }
