@@ -10,3 +10,5 @@ Make sure level music works.
 Make it possible to export created games to HTML.
 Make the start level configurable.
 Make it possible to play the entire game from within the maker.
+Implement jumping.
+Implement flying monsters, and levitating objects.
