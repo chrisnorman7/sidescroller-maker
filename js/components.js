@@ -15,6 +15,37 @@ const LevelDirections = {
   forwards: 1
 }
 
+function englishList(l, andString, sepString, emptyString) {
+  if (andString === undefined) {
+    andString = ", and "
+  }
+  if (sepString === undefined) {
+    sepString = ", "
+  }
+  if (emptyString === undefined) {
+    emptyString = "nothing"
+  }
+  if (l.length == 0) {
+    return emptyString
+  }
+  if (l.length == 1) {
+    return l[0]
+  }
+  let string = ""
+  const lastIndex = l.length - 1
+  const penultimateIndex = lastIndex - 1
+  for (let i = 0; i < l.length; i++) {
+    const item = l[i]
+    string += item.toString()
+    if (i == penultimateIndex) {
+      string += andString
+    } else if (i != lastIndex) {
+      string += sepString
+    }
+  }
+  return string
+}
+
 function randint(start, end) {
   const r = Math.random() * end + start
   return Math.round(r)
@@ -1254,12 +1285,15 @@ class Book{
     const level = this.player.level
     this.player.position = position
     audio.listener.positionX.value = position / audioDivider
-    for (let content of level.contents) {
-      if (content.position == position) {
-        level.trip.play(level.tripUrl)
-        this.message(content.object.title)
-      }
-      break // Only show one object.
+    const objects = Array.from(
+      level.contents.filter(
+        (content) => content.position == position
+      ),
+      (item) => item.object.title
+    )
+    if (objects.length) {
+      level.trip.play(level.tripUrl)
+      this.message(englishList(objects))
     }
   }
 
