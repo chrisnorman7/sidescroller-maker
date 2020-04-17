@@ -618,7 +618,6 @@ window.onload = () => {
     let title = null
     let body = ""
     try {
-      let json = "No game loaded"
       let player = null
       let game = null
       if (book === null) {
@@ -629,7 +628,6 @@ window.onload = () => {
         if (game == null || game === undefined) {
           title = "with a null game"
         } else {
-          json = JSON.stringify(game.toJson(), undefined, 2)
           const page = book.getPage()
           if (page === null || page === undefined) {
             title = "with no page pushed"
@@ -715,7 +713,7 @@ window.onload = () => {
         const value = stats[key]
         body += `\n${key}: ${value}`
       }
-      body += `\n\nSteps to reproduce:\n1. \n2. \n3. \n\nGame JSON:\n${json}`
+      body += `\n\nSteps to reproduce:\n1. \n2. \n3. \n`
       title = `Problem ${title}`
     } catch(e) {
       title = "Issue while running onclick handler"
