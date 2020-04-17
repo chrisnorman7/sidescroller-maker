@@ -237,7 +237,7 @@ class Game {
     this.objects = []
     this.resetVolumes()
   }
-  
+
   resetVolumes() {
     gain.gain.value = this.initialVolume
     musicGain.gain.value = this.initialMusicVolume
@@ -876,7 +876,7 @@ class Hotkey {
     this.description = description
     this.func = func
   }
-  
+
   getDescription(page) {
     if (typeof(this.description) == "function") {
       return this.description(page)
@@ -982,6 +982,41 @@ class Book{
         "Show your current coordinate",
         () => this.showPosition()
       ),
+      "x": new Hotkey(
+        "Examine object",
+        () => {
+          const player = this.player
+          const level = player.level
+          if (!level.isLevel) {
+            return
+          }
+          const contents = level.contents.filter(
+            (item) => item.position == player.position
+          )
+          if (contents.length == 1) {
+            return this.examine(contents[0])
+          } else {
+            const lines = []
+            contents.forEach(
+              (content) => {
+                lines.push(
+                  new Line(
+                    content.object.title, (b) => b.examine(content)
+                  )
+                )
+              }
+            )
+            this.push(
+              new Page(
+                {
+                  title: "Examine Object",
+                  lines: lines
+                }
+              )
+            )
+          }
+        }
+      ),
       "/": new Hotkey(
         "Show a list of hotkeys",
         () => {
@@ -998,6 +1033,34 @@ class Book{
       )
     }
     this.game = new Game()
+  }
+
+  examine(content) {
+    const obj = content.object
+    const stats = {
+      Name: obj.title,
+      Type: obj.type,
+      Health: content.health,
+      Damage: obj.damage,
+      Range: obj.range,
+    }
+    const lines = []
+    for (let name in stats) {
+      const value = stats[name]
+      lines.push(
+        new Line(
+          `${name}: ${value}`, (b) => b.pop()
+        )
+      )
+    }
+    this.push(
+      new Page(
+        {
+          title: `Examine ${obj.title}`,
+          lines: lines
+        }
+      )
+    )
   }
 
   speak(text, interrupt) {
