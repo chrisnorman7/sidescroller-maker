@@ -13,3 +13,4 @@ Make it possible to play the entire game from within the maker.
 Implement jumping.
 Implement flying monsters, and levitating objects.
 Think about a points system.
+Implement pausing.
