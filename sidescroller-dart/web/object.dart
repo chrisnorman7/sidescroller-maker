@@ -136,9 +136,7 @@ class GameObject {
     level.contents.add(content);
     content.spawn();
     if (!silent) {
-      content.drop.play(
-        url: dropUrl
-      );
+      content.drop.play(url: dropUrl);
     }
   }
 }

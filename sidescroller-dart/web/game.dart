@@ -148,7 +148,7 @@ class Game {
   void reloadMusic(Book book) {
     stopMusic();
     book.push(
-      page: Page(
+      Page(
         titleString: 'Reloading game music...',
       )
     );

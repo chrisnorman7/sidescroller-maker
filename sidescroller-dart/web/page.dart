@@ -22,11 +22,7 @@ class Page {
   String titleString;
   String Function(Book) titleFunc;
   
-  String getTitle(
-    {
-      Book book
-    }
-  ) {
+  String getTitle(Book book) {
     if (titleString == null) {
       return titleFunc(book);
     }
@@ -116,15 +112,11 @@ Page ttsSettingsPage() {
   final List<Line> lines = <Line>[
     Line(
       titleFunc: (Book b) => 'Change Voice (${textToSpeech.voice == null ? "not set" : textToSpeech.voice.name})',
-      func: (Book b) => b.push(
-        page: voicesPage()
-      )
+      func: (Book b) => b.push(voicesPage())
     ),
     Line(
       titleFunc: (Book b) => 'Change Rate (${textToSpeech.rate})',
-      func: (Book b) => b.push(
-        page: ratePage()
-      )
+      func: (Book b) => b.push(ratePage())
     ),
   ];
   return Page(
@@ -133,11 +125,7 @@ Page ttsSettingsPage() {
   );
 }
 
-Page hotkeysPage(
-  {
-    Book book
-  }
-) {
+Page hotkeysPage(Book book) {
   const Map<String, String> hotkeyConvertions = <String, String>{
     ' ': 'Spacebar',
   };
@@ -150,9 +138,7 @@ Page hotkeysPage(
       }
       lines.add(
         Line(
-          titleFunc: (Book b) => '$keyString: ${hotkey.getTitle(
-            page: b.getPage()
-          )}',
+          titleFunc: (Book b) => '$keyString: ${hotkey.getTitle(b.getPage())}',
           func: (Book b) {
             b.pop();
             hotkey.func(b);

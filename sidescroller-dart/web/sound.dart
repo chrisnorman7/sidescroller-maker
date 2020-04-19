@@ -6,11 +6,7 @@ import 'package:http/http.dart' as http;
 
 import 'constants.dart';
 
-Future<AudioBuffer> getBuffer(
-  {
-    String url,
-  }
-) async {
+Future<AudioBuffer> getBuffer(String url) async {
   if (buffers.containsKey(url) == false){
     final http.Response response = await http.get(url);
     buffers[url] = await audio.decodeAudioData(response.body as ByteBuffer);
@@ -35,7 +31,7 @@ class Sound {
   bool _loop;
   AudioNode _output;
   AudioBuffer _buffer;
-  AudioBufferSourceNode _source;
+  AudioBufferSourceNode source;
   void Function (Event) onEnded;
 
   void playBuffer(
@@ -49,27 +45,27 @@ class Sound {
       _buffer = buffer;
       buffers[_url] = _buffer;
     }
-    _source = audio.createBufferSource();
+    source = audio.createBufferSource();
     if (onEnded != null) {
-      _source.onEnded.listen(onEnded);
+      source.onEnded.listen(onEnded);
     }
-    _source.loop = _loop;
-    _source.buffer = _buffer;
-    _source.connectNode(_output);
-    _source.start(0);
+    source.loop = _loop;
+    source.buffer = _buffer;
+    source.connectNode(_output);
+    source.start(0);
   }
 
   void stop() {
-    if (_source != null) {
-      _source.disconnect();
-      _source = null;
+    if (source != null) {
+      source.disconnect();
+      source = null;
     }
   }
 
   Future<void> play(
-    {
-      String url
-    }
+      {
+        String url
+      }
   ) async {
     if (url!= _url) {
       stop();
@@ -79,9 +75,7 @@ class Sound {
       _buffer = null;
     }
     _url = url;
-    _buffer ??= await getBuffer(
-      url: url
-    );
+    _buffer ??= await getBuffer(url);
     playBuffer(
       buffer: _buffer
     );

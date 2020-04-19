@@ -69,16 +69,14 @@ class LevelObject {
     panner.maxDistance = 10;
     panner.rolloffFactor = 6;
     panner.connectNode(gain);
-    move(
-      position: position
-    );
+    move(position);
     if (obj.soundUrl != null) {
       sound = Sound(
         url:obj.soundUrl,
         loop: true,
         output: panner
       );
-      sound.play();
+      sound.play(url: obj.soundUrl);
     }
     drop = Sound(
       url: obj.dropUrl,
@@ -115,20 +113,12 @@ class LevelObject {
     }
   }
 
-  void move(
-    {
-      int position
-    }
-  ) {
+  void move(int position) {
     this.position = position;
     panner.positionX.value = position / audioDivider;
   }
 
-  void die(
-    {
-      Book book
-    }
-  ) {
+  void die(Book book) {
     silence();
     level.contents.remove(this);
     if (object.dieUrl != null) {
@@ -139,9 +129,7 @@ class LevelObject {
           level.deadObjects.remove(this);
         }
       };
-      dieSound.play(
-        url:  object.dieUrl
-      );
+      dieSound.play(url: object.dieUrl);
     }
     final List<String> titles = <String>[];
     for (final GameObject containedObject in object.contains) {
@@ -152,11 +140,9 @@ class LevelObject {
       titles.add(containedObject.title);
     }
     if (titles.isNotEmpty) {
-      level.trip.play(
-        url: level.tripUrl
-      );
+      level.trip.play(url: level.tripUrl);
       book.message(
-        text: englishList(
+        englishList(
           items: titles
         )
         );
@@ -330,35 +316,21 @@ class Level extends Page {
     return obj;
   }
 
-  void jump(
-    {
-      Book book
-    }
-  ) {
+  void jump(Book book) {
     if (loading) {
       return;
     }
-    book.message(
-      text: 'Jumping.'
-    );
+    book.message('Jumping.');
   }
 
-  void left(
-    {
-      Book book
-    }
-  ) {
+  void left(Book book) {
     move(
       book: book,
       direction: LevelDirections.backwards
     );
   }
 
-  void right(
-    {
-      Book book
-    }
-  ) {
+  void right(Book book) {
     move(
       book: book,
       direction: LevelDirections.forwards
@@ -380,24 +352,16 @@ class Level extends Page {
       player.lastMoved = time;
       final int position = player.position + levelDirectionConvertions[direction];
       if (position < 0 || position > size) {
-        wall.play(
-          url: wallUrl
-        );
+        wall.play(url: wallUrl);
       } else {
-        book.setPlayerPosition(
-          position: position
-        );
+        book.setPlayerPosition(position);
         if (direction != player.facing) {
           if (player.facing != LevelDirections.either) {
-            turn.play(
-              url: turnUrl
-            );
+            turn.play(url: turnUrl);
           }
           player.facing = direction;
         }
-        footstep.play(
-          url: footstepUrl
-        );
+        footstep.play(url: footstepUrl);
       }
     }
   }
@@ -408,16 +372,11 @@ class Level extends Page {
       int position,
     }
   ) {
-    book.push(
-      page: this
-    );
-    ambiance.play(
-      url: ambianceUrl
-    );
+    book.push(this);
+    ambiance.play(url: ambianceUrl
+);
     loadContents();
-    book.setPlayerPosition(
-      position: position
-    );
+    book.setPlayerPosition(position);
   }
 
   Future<void> play(
@@ -430,9 +389,7 @@ class Level extends Page {
     book.player.level = this;
     if (convolverUrl != null) {
       loading = true;
-      final AudioBuffer buffer = await getBuffer(
-        url: convolverUrl
-      );
+      final AudioBuffer buffer = await getBuffer(convolverUrl);
       convolver = audio.createConvolver();
       convolver.buffer = buffer;
       gain.connectNode(convolver);
@@ -464,11 +421,7 @@ class Level extends Page {
     loading = false;
   }
 
-  void leave(
-    {
-      Book book
-    }
-    ) {
+  void leave(Book book) {
     book.player.level = null;
     book.pop();
     if (convolver != null) {

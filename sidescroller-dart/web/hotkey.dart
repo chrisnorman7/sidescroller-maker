@@ -14,11 +14,7 @@ class Hotkey {
   String Function(Page) titleFunc;
   void Function(Book) func;
 
-  String getTitle(
-    {
-      Page page,
-    }
-  ) {
+  String getTitle(Page page,) {
     if (titleString == null) {
       return titleFunc(page);
     }

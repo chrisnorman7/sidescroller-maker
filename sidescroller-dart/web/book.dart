@@ -124,23 +124,19 @@ class Book{
             (LevelObject item) => item.position == player.position
           ).toList();
           if (contents.isNotEmpty) {
-            return examine(
-              content: contents[0]
-            );
+            return examine(contents[0]);
           } else {
             const List<Line> lines = <Line>[];
             for (final LevelObject content in contents) {
               lines.add(
                 Line(
                   titleString: content.object.title,
-                  func: (Book b) => b.examine(
-                    content: content
-                  )
+                  func: (Book b) => b.examine(content)
                 )
               );
             }
             push(
-              page: Page(
+              Page(
                 titleString: 'Examine Object',
                 lines: lines,
               )
@@ -151,11 +147,7 @@ class Book{
       '/': Hotkey(
         titleString: 'Show a list of hotkeys',
         func: (Book b) {
-          push(
-            page: hotkeysPage(
-              book: this
-            )
-          );
+          push(hotkeysPage(this));
         },
       ),
     };
@@ -163,9 +155,7 @@ class Book{
       hotkeys[i.toString()] = Hotkey(
         titleString: 'Use the weapon in slot ${i == 0 ? 10 : i}',
         func: (Book b) {
-          selectWeapon(
-            index: i
-          );
+          selectWeapon(i);
         },
       );
     }
@@ -175,15 +165,11 @@ class Book{
   Game game;
   bool levelInPages = false;
   Scene scene;
-  void Function({String text}) message;
+  void Function(String) message;
   List<Page> pages = <Page>[];
   Player player = Player();
 
-  void examine(
-    {
-      LevelObject content
-    }
-  ) {
+  void examine(LevelObject content) {
     final GameObject obj = content.object;
     final Map<String, String> stats = <String, String>{
       'Name': obj.title,
@@ -204,7 +190,7 @@ class Book{
       }
     );
     push(
-      page: Page(
+      Page(
         titleString: 'Examine ${obj.title}',
         lines: lines,
       )
@@ -227,11 +213,7 @@ class Book{
     return u;
   }
 
-  void push(
-    {
-      Page page
-    }
-  ) {
+  void push(Page page) {
     if (page.isLevel) {
       levelInPages = true;
       game.stopMusic();
@@ -242,9 +224,7 @@ class Book{
           loop: true,
           output: musicGain
         );
-        game.music.play(
-          url: game.musicUrl
-        );
+        game.music.play(url: game.musicUrl);
       }
     }
     pages.add(page);
@@ -258,9 +238,7 @@ class Book{
     }
     if (pages.isNotEmpty) {
       final Page page = pages.removeLast(); // Pop the next one too, so we can push it again.
-      push(
-        page: page
-      );
+      push(page);
     }
     return oldPage;
   }
@@ -285,21 +263,11 @@ class Book{
     if (page == null) {
       throw 'First push a page.';
     } else if (page.focus == -1) {
-      message(
-        text: page.getTitle(
-          book: this
-        ),
-      );
+      message(page.getTitle(this));
     } else if (!page.isLevel) {
       final Line line = page.getLine();
-      game.moveSound.play(
-        url: game.moveSoundUrl
-      );
-      message(
-        text: line.getTitle(
-          book: this
-        )
-      );
+      game.moveSound.play(url: game.moveSoundUrl);
+      message(line.getTitle(this));
     }
   }
 
@@ -308,9 +276,7 @@ class Book{
     if (page == null) {
       return; // There"s probably no pages.
     } else if (page.isLevel) {
-      player.level.jump(
-        book: this
-      );
+      player.level.jump(this);
     } else {
       final int focus = getFocus();
       if (focus == -1) {
@@ -344,22 +310,14 @@ class Book{
         final GameObject obj = content.object;
         if (<ObjectTypes>[ObjectTypes.object, ObjectTypes.weapon].contains(obj.type)) {
           player.carrying.add(obj);
-          obj.take.play(
-            url: obj.takeUrl
-          );
+          obj.take.play(url: obj.takeUrl);
           content.destroy();
-          message(
-            text: '${obj.title} taken.'
-          );
+          message('${obj.title} taken.');
         } else if (obj.type == ObjectTypes.exit) {
           if (obj.targetLevel == null) {
-            obj.cantUse.play(
-              url: obj.cantUseUrl,
-            );
+            obj.cantUse.play(url: obj.cantUseUrl,);
           } else {
-            level.leave(
-              book: this
-            );
+            level.leave(this);
             playScene(
               url: obj.useUrl,
               onfinish: (Book b) {
@@ -371,9 +329,7 @@ class Book{
             );
           }
         } else {
-          message(
-            text: 'You cannot take ${obj.title}.'
-          );
+          message('You cannot take ${obj.title}.');
         }
         break; // Take one object at a time.
       }
@@ -384,9 +340,7 @@ class Book{
     final Page page = getPage();
     if (page.isLevel) {
       final Level level = player.level;
-      level.right(
-        book: this
-      );
+      level.right(this);
     } else {
       activate();
     }
@@ -401,9 +355,7 @@ class Book{
       if (line == null) {
         return; // They are probably looking at the title.
       }
-      game.activateSound.play(
-        url: game.activateSoundUrl
-      );
+      game.activateSound.play(url: game.activateSoundUrl);
       line.func(this);
     }
   }
@@ -414,9 +366,7 @@ class Book{
       return; // No page, or the page can"t be dismissed that easily.
     } else if (page.isLevel) {
       final Level level = player.level;
-      level.left(
-        book: this
-      );
+      level.left(this);
     } else {
       pop();
     }
@@ -433,11 +383,9 @@ class Book{
       Sound(
         url: game.volumeSoundUrl,
         output: output
-      ).play();
+      ).play(url: game.volumeSoundUrl);
     }
-    message(
-      text: '${(output.gain.value * 100).round()}%.'
-    );
+    message('${(output.gain.value * 100).round()}%.');
   }
 
   void volumeUp(
@@ -475,24 +423,20 @@ class Book{
           Line(
             titleString: obj.title,
             func: (Book b) {
-              b.message(
-                text: 'Using ${obj.title}.'
-              );
+              b.message('Using ${obj.title}.');
               b.pop();
             },
           )
         );
       }
       push(
-        page: Page(
+        Page(
           titleString: 'Inventory',
           lines: lines,
         )
       );
     } else {
-      message(
-        text: "You aren't carrying anything."
-      );
+      message("You aren't carrying anything.");
     }
   }
 
@@ -509,9 +453,7 @@ class Book{
             titleString: obj.title,
             func: (Book b) {
               b.pop();
-              message(
-                text: '${obj.title} dropped.'
-              );
+              message('${obj.title} dropped.');
               obj.drop(
                 level: level,
                 position: b.player.position
@@ -521,15 +463,13 @@ class Book{
         );
       }
       push(
-        page: Page(
+        Page(
           titleString: 'Choose something to drop',
           lines: lines,
         )
       );
     } else {
-      message(
-        text: 'You have nothing to drop.'
-      );
+      message('You have nothing to drop.');
     }
   }
 
@@ -547,18 +487,14 @@ class Book{
     } else {
       direction = 'the wrong way';
     }
-    message(
-      text: 'You are facing $direction.'
-    );
+    message('You are facing $direction.');
   }
 
   void showPosition() {
     if (player.level == null) {
       return;
     }
-    message(
-      text: 'Position: ${player.position}.'
-    );
+    message('Position: ${player.position}.');
   }
 
   void onkeydown(KeyboardEvent e) {
@@ -577,11 +513,7 @@ class Book{
     }
   }
 
-  void setPlayerPosition(
-    {
-      int position
-    }
-  ) {
+  void setPlayerPosition(int position) {
     final Level level = player.level;
     player.position = position;
     audio.listener.positionX.value = position / audioDivider;
@@ -593,22 +525,16 @@ class Book{
       for (final LevelObject content in contents) {
         objectTitles.add(content.object.title);
       }
-      level.trip.play(
-        url: level.tripUrl
-      );
+      level.trip.play(url: level.tripUrl);
       message(
-        text: englishList(
+        englishList(
           items: objectTitles,
         )
       );
     }
   }
 
-  void selectWeapon(
-    {
-      int index
-    }
-  ) {
+  void selectWeapon(int index) {
     final Level level = player.level;
     if (level == null) {
       return;
@@ -626,14 +552,10 @@ class Book{
     }
     final GameObject weapon = weapons[index];
     if (weapon == null) {
-      level.noWeapon.play(
-        url: level.noWeaponUrl
-      );
+      level.noWeapon.play(url: level.noWeaponUrl);
     } else {
       player.weapon = weapon;
-      message(
-        text: weapon.title
-      );
+      message(weapon.title);
     }
   }
 
@@ -648,7 +570,7 @@ class Book{
       url: url,
       onfinish: onfinish
     );
-    scene.sound.play();
+    scene.sound.play(url: url);
     return scene;
   }
 
@@ -667,19 +589,13 @@ class Book{
       final GameObject obj = content.object;
       final int distance = nearestObject.distance;
       if (distance <= weapon.range) {
-        weapon.use.play(
-          url: weapon.useUrl
-        );
-        content.hit.play(
-          url: obj.hitUrl
-        );
+        weapon.use.play(url: weapon.useUrl);
+        content.hit.play(url: obj.hitUrl);
         content.health -= randint(
           end: weapon.damage
         );
         if (content.health < 0) {
-          content.die(
-            book: this
-          );
+          content.die(this);
         }
       }
     }

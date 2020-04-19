@@ -13,11 +13,7 @@ class Line {
   String Function(Book) titleFunc;
   void Function(Book) func;
 
-  String getTitle(
-    {
-      Book book
-    }
-  ) {
+  String getTitle(Book book) {
     if (titleString == null) {
       return titleFunc(book);
     }
