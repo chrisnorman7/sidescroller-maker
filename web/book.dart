@@ -395,7 +395,7 @@ class Book{
   ) {
     output ??= gain;
     setVolume(
-      value: min(output.gain.maxValue, output.gain.value + game.volumeChangeAmount),
+      value: min(1.0, output.gain.value + game.volumeChangeAmount),
       output: output,
     );
   }
@@ -407,7 +407,7 @@ class Book{
   ) {
     output ??= gain;
     setVolume(
-      value: max(output.gain.minValue, output.gain.value - game.volumeChangeAmount) as double,
+      value: max(0.0, output.gain.value - game.volumeChangeAmount) as double,
       output: output
     );
   }
@@ -509,7 +509,7 @@ class Book{
     if (hotkey != null) {
       final Function func = hotkey.func;
       e.preventDefault();
-      func();
+      func(this);
     }
   }
 

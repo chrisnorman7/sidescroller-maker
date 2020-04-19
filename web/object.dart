@@ -1,5 +1,3 @@
-import 'dart:mirrors';
-
 import 'game.dart';
 import 'level.dart';
 import 'sound.dart';
@@ -64,19 +62,6 @@ class GameObject {
     title = data['title'] as String ?? title;
     type = ObjectTypes.values[data['type'] as int];
     targetLevelIndex = data['targetLevelIndex'] as int;
-    final InstanceMirror reflection = reflect(this);
-    urls.forEach(
-      (String key, String description) {
-        data[key] ??= reflection.getField(key as Symbol).reflectee as String;
-        reflection.setField(key as Symbol, data[key] as String);
-      }
-    );
-    numericProperties.forEach(
-      (String key, String description) {
-        data[key] ??= reflection.getField(key as Symbol).reflectee as double;
-        reflection.setField(key as Symbol, data[key] as double);
-      }
-    );
     containedObjectIndices = data['contains'] as List<int>;
   }
 
@@ -104,17 +89,6 @@ class GameObject {
     } else {
       data['targetLevelIndex'] = game.levels.indexOf(targetLevel);
     }
-    final InstanceMirror reflection = reflect(this);
-    urls.forEach(
-      (String key, String devaultValue) {
-        data[key] = reflection.getField(key as Symbol).reflectee as String;
-      }
-    );
-    numericProperties.forEach(
-      (String key, String description) {
-        data[key] = reflection.getField(key as Symbol).reflectee as double;
-      }
-    );
     for (final GameObject containedObject in contains) {
       data['contains'].add(game.objects.indexOf(containedObject));
     }

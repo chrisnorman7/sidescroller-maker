@@ -11,4 +11,4 @@ final TextToSpeech textToSpeech = TextToSpeech();
 final GainNode gain = audio.createGain();
 final GainNode musicGain = audio.createGain();
 
-const Map<String, AudioBuffer> buffers = <String, AudioBuffer>{};
+Map<String, AudioBuffer> buffers = <String, AudioBuffer>{};

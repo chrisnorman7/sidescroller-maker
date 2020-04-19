@@ -1,5 +1,4 @@
 import 'dart:html';
-import 'dart:mirrors';
 import 'dart:web_audio';
 
 import 'book.dart';
@@ -226,22 +225,7 @@ class Level extends Page {
       Game game,
     }
   ) {
-    final InstanceMirror reflection = reflect(this);
     title = data['title'] as String ?? title;
-    urls.forEach(
-      (String name, String description) {
-        if (data[name] != null) {
-          reflection.setField(name as Symbol, data[name] as String);
-        }
-      }
-    );
-    numericProperties.forEach(
-      (String name, String description) {
-        if (data[name] != null) {
-          reflection.setField(name as Symbol, data[name] as String);
-        }
-      }
-    );
     for (final Map<String, int> contentData in data['contents'] as List<Map<String, int>>) {
       final LevelObject content = LevelObject.fromJson(
         level: level,
@@ -267,21 +251,10 @@ class Level extends Page {
       Game game,
     }
   ) {
-    final InstanceMirror reflection = reflect(this);
     final Map<String, dynamic> data = <String, dynamic>{
       'title': title,
       'contents': <Map<String, int>>[],
     };
-    numericProperties.forEach(
-      (String name, String description) {
-        data[name] = reflection.getField(name as Symbol).reflectee as double;
-      }
-    );
-    urls.forEach(
-      (String name, String description) {
-        data[name] = reflection.getField(name as Symbol).reflectee as String;
-      }
-    );
     for (final LevelObject content in contents) {
       data['contents'].add(
         content.toJson(
@@ -379,24 +352,28 @@ class Level extends Page {
     book.setPlayerPosition(position);
   }
 
-  Future<void> play(
+  void play(
     {
       Book book,
       int position,
     }
-  ) async {
+  ) {
     position ??= initialPosition;
     book.player.level = this;
     if (convolverUrl != null) {
       loading = true;
-      final AudioBuffer buffer = await getBuffer(convolverUrl);
-      convolver = audio.createConvolver();
-      convolver.buffer = buffer;
-      gain.connectNode(convolver);
-      convolverGain = audio.createGain();
-      convolverGain.gain.value = convolverVolume;
-      convolver.connectNode(convolverGain);
-      convolverGain.connectNode(audio.destination);
+      loadBuffer(
+        url: convolverUrl,
+        done: (AudioBuffer buffer) {
+          convolver = audio.createConvolver();
+          convolver.buffer = buffer;
+          gain.connectNode(convolver);
+          convolverGain = audio.createGain();
+          convolverGain.gain.value = convolverVolume;
+          convolver.connectNode(convolverGain);
+          convolverGain.connectNode(audio.destination);
+        }
+      );
     }
     if (beforeSceneUrl == null) {
       finalise(

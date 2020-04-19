@@ -11,30 +11,16 @@ import 'page.dart';
 import 'player.dart';
 import 'utils.dart';
 
-final Book book = Book();
+String stringPromptDefaultValue, textPromptDefaultValue;
 
-// Regexp copied from https://stackoverflow.com/questions/11550790/remove-hostname-and-port-from-url-using-regular-expression:
-final RegExp urlRegexp = RegExp(r'^[htps]{4,5}:\/{2}[a-z]+:?[0-9]{0,4}[^/]+\/([^$]+)$');
-
-final Element issueLink = querySelector('#issueLink');
-final Element startDiv = querySelector('#startDiv');
-final Element mainDiv = querySelector('main');
-final Element keyboardArea = querySelector('#keyboardArea');
-final Element gameJson = querySelector('#gameJson');
-final Element startButton = querySelector('#startButton');
-final Element message = querySelector('#message');
-
-final Element stringForm = querySelector('#stringForm');
-final Element stringPrompt = querySelector('#stringPrompt');
-final String stringPromptDefaultValue = stringPrompt.innerText;
-final Element stringInput = document.querySelector('#stringInput');
-final Element stringCancel = querySelector('#stringCancel');
-
-final Element textForm = querySelector('#textForm');
-final Element textPrompt = querySelector('#textPrompt');
-final String textPromptDefaultValue = textPrompt.innerText;
-final Element textInput = querySelector('#textInput');
-final Element textCancel = querySelector('#textCancel');
+AnchorElement issueLink;
+DivElement startDiv, mainDiv;
+ParagraphElement keyboardArea, message;
+TextAreaElement gameJson, textInput;
+FormElement stringForm, textForm;
+SpanElement stringPrompt, textPrompt;
+TextInputElement stringInput;
+ButtonInputElement startButton, stringCancel, textCancel;
 
 void getText(
   {
@@ -85,15 +71,15 @@ void getText(
   dynamic inputElement;
   ButtonInputElement cancelElement;
   if (multiline) {
-    form = textForm as FormElement;
-    promptElement = textPrompt as SpanElement;
-    inputElement = textInput as TextAreaElement;
-    cancelElement = textCancel as ButtonInputElement;
+    form = textForm;
+    promptElement = textPrompt;
+    inputElement = textInput;
+    cancelElement = textCancel;
   } else {
-    form = stringForm as FormElement;
-    promptElement = stringPrompt as SpanElement;
-    inputElement = stringInput as TextInputElement;
-    cancelElement = stringCancel as ButtonInputElement;
+    form = stringForm;
+    promptElement = stringPrompt;
+    inputElement = stringInput;
+    cancelElement = stringCancel;
   }
   cancelElement.onClick.listen(
     (MouseEvent e) => oncancel(
@@ -409,14 +395,34 @@ Page gameMenu(
 }
 
 void main() {
+  final Book book = Book();
+  issueLink = querySelector('#issueLink') as AnchorElement;
+  startDiv = querySelector('#startDiv') as DivElement;
+  mainDiv = querySelector('#main') as DivElement;
+  keyboardArea = querySelector('#keyboardArea') as ParagraphElement;
+  gameJson = querySelector('#gameJson') as TextAreaElement;
+  startButton = querySelector('#startButton') as ButtonInputElement;
+  message = querySelector('#message') as ParagraphElement;
+  stringForm = querySelector('#stringForm') as FormElement;
+  stringPrompt = querySelector('#stringPrompt') as SpanElement;
+  stringPromptDefaultValue = stringPrompt.innerText;
+  stringInput = document.querySelector('#stringInput') as TextInputElement;
+  stringCancel = querySelector('#stringCancel') as ButtonInputElement;
+  final Element textForm = querySelector('#textForm');
+  textPrompt = querySelector('#textPrompt') as SpanElement;
+  textPromptDefaultValue = textPrompt.innerText;
+  textInput = querySelector('#textInput') as TextAreaElement;
+  textCancel = querySelector('#textCancel') as ButtonInputElement;
   for (final Element e in <Element>[mainDiv, stringForm, textForm]) {
+    if (e == null) {
+      throw Exception('Check selectors and try again.');
+    }
     e.hidden = true;
   }
-  final AnchorElement link = issueLink as AnchorElement;
-  final String issueUrl = link.href;
-  link.onClick.listen(
+  final String issueUrl = issueLink.href;
+  issueLink.onClick.listen(
     (MouseEvent e) {
-      link.href = issueUrl; // Fallback in case something breaks
+      issueLink.href = issueUrl; // Fallback in case something breaks
       String title, soundVolume, musicVolume;
       String body = '';
       try {
@@ -508,7 +514,7 @@ void main() {
         title = 'Issue while running onclick handler';
         body = 'Error: ${e.message}';
       }
-      link.href = '$issueUrl?title=${Uri.encodeQueryComponent(title)}&body=${Uri.encodeQueryComponent(body)}';
+      issueLink.href = '$issueUrl?title=${Uri.encodeQueryComponent(title)}&body=${Uri.encodeQueryComponent(body)}';
     }
   );
   keyboardArea.onKeyDown.listen(
@@ -625,8 +631,7 @@ void main() {
                   title: 'Are you sure you want to reset your game and load from JSON?',
                   onok: (Book b) {
                     b.pop();
-                    final TextAreaElement e = gameJson as TextAreaElement;
-                    final Map<String, dynamic> data = jsonDecode(e.value) as Map<String, dynamic>;
+                    final Map<String, dynamic> data = jsonDecode(gameJson.value) as Map<String, dynamic>;
                     b.game.stopMusic();
                     b.game = Game.fromJson(
                       data: data
@@ -642,10 +647,9 @@ void main() {
               func: (Book b) {
                 final Map<String, dynamic> data = b.game.toJson();
                 final String json = jsonEncode(data);
-                final TextAreaElement e = gameJson as TextAreaElement;
-                e.value = json;
-                e.select();
-                e.setSelectionRange(0, -1);
+                gameJson.value = json;
+                gameJson.select();
+                gameJson.setSelectionRange(0, -1);
                 document.execCommand('copy');
                 keyboardArea.focus();
                 b.message('JSON copied.');

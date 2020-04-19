@@ -1,5 +1,3 @@
-import 'dart:mirrors';
-
 import 'book.dart';
 import 'constants.dart';
 import 'level.dart';
@@ -18,25 +16,8 @@ class Game {
     }
   ) {
     reset();
-    final InstanceMirror reflection = reflect(this);
     title = data['title'] as String ?? title;
     volumeChangeAmount = data['volumeChangeAmount'] as double ?? volumeChangeAmount;
-    urls.forEach(
-      (String key, String description) {
-        final String value = data[key] as String;
-        if (value != null) {
-          reflection.setField(key as Symbol, value);
-        }
-      }
-    );
-    numericProperties.forEach(
-      (String key, String description) {
-        final double value = data[key] as double;
-        if (value != null) {
-          reflection.setField(key as Symbol, value);
-        }
-      }
-    );
     for (final Map<String, dynamic> objectData in data['objects'] as List<Map<String, dynamic>>) {
       final GameObject obj = GameObject.fromJson(
         data: objectData
@@ -75,19 +56,6 @@ class Game {
       'levels': <Map<String, dynamic>>[],
       'objects': <Map<String, dynamic>>[]
     };
-    final InstanceMirror reflection = reflect(this);
-    urls.forEach(
-      (String key, String description) {
-        final InstanceMirror field = reflection.getField(key as Symbol);
-        data[key] = field.reflectee as String;
-      }
-    );
-    numericProperties.forEach(
-      (String key, String description) {
-        final InstanceMirror field = reflection.getField(key as Symbol);
-        data[key] = field.reflectee as double;
-      }
-    );
     for (final Level level in levels) {
       data['levels'].add(
         level.toJson(
