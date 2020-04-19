@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:web_audio';
 
 import 'constants.dart';
+import 'game.dart';
 import 'hotkey.dart';
 import 'level.dart';
 import 'line.dart';
@@ -10,10 +11,12 @@ import 'object.dart';
 import 'page.dart';
 import 'player.dart';
 import 'scene.dart';
+import 'sound.dart';
 import 'utils.dart';
 
 class Book{
   Book() {
+    game = Game();
     const String activateString = 'Activate a menu item"';
     const String cancelString = 'Return to the previous menu';
     hotkeys = <String, Hotkey>{
@@ -24,11 +27,11 @@ class Book{
           }
           return 'Move up in a menu';
         },
-        func: moveUp,
+        func: (Book b) => moveUp(),
       ),
       'ArrowDown': Hotkey(
         titleString: 'Move down in a menu',
-        func: moveDown,
+        func: (Book b) => moveDown(),
       ),
       ' ': Hotkey(
         titleFunc: (Page page) {
@@ -37,7 +40,7 @@ class Book{
           }
           return activateString;
         },
-        func: shootOrActivate,
+        func: (Book b) => shootOrActivate(),
       ),
       'ArrowRight': Hotkey(
         titleFunc: (Page page) {
@@ -46,7 +49,7 @@ class Book{
           }
           return activateString;
         },
-        func: moveOrActivate,
+        func: (Book b) => moveOrActivate(),
       ),
       'Enter': Hotkey(
         titleFunc: (Page page) {
@@ -55,7 +58,7 @@ class Book{
           }
           return activateString;
         },
-        func: takeOrActivate,
+        func: (Book b) => takeOrActivate(),
       ),
       'ArrowLeft': Hotkey(
         titleFunc: (Page page) {
@@ -64,58 +67,58 @@ class Book{
           }
           return cancelString;
         },
-        func: cancel,
+        func: (Book b) => cancel(),
       ),
       'Escape': Hotkey(
         titleString: 'Return to the previous menu',
-        func: cancel,
+        func: (Book b) => cancel(),
       ),
       '[': Hotkey(
         titleString: 'Decrease sound volume',
-        func: () => volumeDown(
+        func: (Book b) => volumeDown(
           output: gain
         ),
       ),
       ']': Hotkey(
         titleString: 'Increase sound volume',
-        func: () => volumeUp(
+        func: (Book b) => volumeUp(
           output: gain
         ),
       ),
       '-': Hotkey(
         titleString: 'Decrease music volume',
-        func: () => volumeDown(
+        func: (Book b) => volumeDown(
           output: musicGain
         ),
       ),
       '=': Hotkey(
         titleString: 'Increase music volume',
-        func: () => volumeUp(
+        func: (Book b) => volumeUp(
           output: musicGain
         ),
       ),
       'i': Hotkey(
         titleString: 'Inventory menu',
-        func: inventory,
+        func: (Book b) => inventory(),
       ),
-      'd'": Hotkey(
+      'd': Hotkey(
         titleString: 'Drop menu',
-        func: drop,
+        func: (Book b) => drop(),
       ),
       'f': Hotkey(
         titleString: 'Show which way you are facing',
-        func: showFacing,
+        func: (Book b) => showFacing(),
       ),
       'c': Hotkey(
         titleString: 'Show your current coordinate',
-        func: showPosition'
+        func: (Book b) => showPosition(),
       ),
       'x': Hotkey(
         titleString: 'Examine object',
-        func: () {
-          final Level level = player.level
-          if (!level.isLevel) {
-            return
+        func: (Book b) {
+          final Level level = player.level;
+          if (level == null) {
+            return;
           }
           final List<LevelObject> contents = level.contents.where(
             (LevelObject item) => item.position == player.position
@@ -123,23 +126,21 @@ class Book{
           if (contents.isNotEmpty) {
             return examine(
               content: contents[0]
-            )
+            );
           } else {
-            const list<Line> lines = <Line>[]
-            contents.forEach(
-              (LevelObject content) => {
-                lines.push(
-                  Line(
-                    titleString: content.object.title,
-                    func: (Book b) => b.examine(
-                      content: content
-                    )
+            const List<Line> lines = <Line>[];
+            for (final LevelObject content in contents) {
+              lines.add(
+                Line(
+                  titleString: content.object.title,
+                  func: (Book b) => b.examine(
+                    content: content
                   )
                 )
-              }
-            );
-            this.push(
-              Page(
+              );
+            }
+            push(
+              page: Page(
                 titleString: 'Examine Object',
                 lines: lines,
               )
@@ -149,19 +150,19 @@ class Book{
       ),
       '/': Hotkey(
         titleString: 'Show a list of hotkeys',
-        func: () {
+        func: (Book b) {
           push(
             page: hotkeysPage(
               book: this
             )
-          )
+          );
         },
       ),
-    }
+    };
     for (int i = 0; i < 10; i++) {
-      this.hotkeys[i.toString()] = Hotkey(
+      hotkeys[i.toString()] = Hotkey(
         titleString: 'Use the weapon in slot ${i == 0 ? 10 : i}',
-        func: () => {
+        func: (Book b) {
           selectWeapon(
             index: i
           );
@@ -171,7 +172,7 @@ class Book{
   }
 
   Map<String, Hotkey> hotkeys;
-  Game game = Game();
+  Game game;
   bool levelInPages = false;
   Scene scene;
   void Function({String text}) message;
@@ -194,35 +195,36 @@ class Book{
     const List<Line> lines = <Line>[];
     stats.forEach(
       (String name, String value) {
-        lines.push(
+        lines.add(
           Line(
             titleString: '$name: $value',
             func: (Book b) => b.pop(),
           )
-        )
+        );
       }
     );
-    this.push(
-      Page(
+    push(
+      page: Page(
         titleString: 'Examine ${obj.title}',
         lines: lines,
       )
     );
   }
 
-  speak(
+  SpeechSynthesisUtterance speak(
     {
       String text,
       bool interrupt = false,
     }
   ) {
     if (interrupt) {
-      window.SpeechSynthesis.cancel();
+      window.speechSynthesis.cancel();
     }
-    final u = SpeechSynthesisUtterance(text);
+    final SpeechSynthesisUtterance u = SpeechSynthesisUtterance(text);
     u.voice = textToSpeech.voice;
-    u.rate = textToSpeech.rate
-    window.SpeechSynthesis.speak(u);
+    u.rate = textToSpeech.rate;
+    window.speechSynthesis.speak(u);
+    return u;
   }
 
   void push(
@@ -234,7 +236,7 @@ class Book{
       levelInPages = true;
       game.stopMusic();
     } else {
-      if (game.music === null && !levelInPages) {
+      if (game.music == null && !levelInPages) {
         game.music = Sound(
           url: game.musicUrl,
           loop: true,
@@ -250,13 +252,15 @@ class Book{
   }
 
   Page pop() {
-    final Page oldPage = pages.pop(); // Remove the last page from the list.
+    final Page oldPage = pages.removeLast(); // Remove the last page from the list.
     if (oldPage.isLevel) {
       levelInPages = false;
     }
     if (pages.isNotEmpty) {
-      final Page page = pages.pop(); // Pop the next one too, so we can push it again.
-      push(page);
+      final Page page = pages.removeLast(); // Pop the next one too, so we can push it again.
+      push(
+        page: page
+      );
     }
     return oldPage;
   }
@@ -265,24 +269,25 @@ class Book{
     if (pages.isNotEmpty) {
       return pages[pages.length - 1];
     }
+    return null;
   }
 
   int getFocus() {
     final Page page = getPage();
     if (page == null) {
-      return;
+      return null;
     }
     return page.focus;
   }
 
   void showFocus() {
-    final Page page = this.getPage();
+    final Page page = getPage();
     if (page == null) {
-      throw("First push a page.");
+      throw 'First push a page.';
     } else if (page.focus == -1) {
       message(
-        text: getText(
-          page: page
+        text: page.getTitle(
+          book: this
         ),
       );
     } else if (!page.isLevel) {
@@ -291,8 +296,10 @@ class Book{
         url: game.moveSoundUrl
       );
       message(
-        text: getText(line.title),
-      )
+        text: line.getTitle(
+          book: this
+        )
+      );
     }
   }
 
@@ -301,9 +308,11 @@ class Book{
     if (page == null) {
       return; // There"s probably no pages.
     } else if (page.isLevel) {
-      page.jump(this);
+      player.level.jump(
+        book: this
+      );
     } else {
-      final int focus = this.getFocus();
+      final int focus = getFocus();
       if (focus == -1) {
         return; // Do nothing.
       }
@@ -326,32 +335,34 @@ class Book{
   }
 
   void takeOrActivate() {
-    final Level level = getPage();
-    if (!level.isLevel) {
-      return this.activate();
+    final Level level = player.level;
+    if (level == null) {
+      return activate();
     }
-    for (let LevelObject content in level.contents) {
+    for (final LevelObject content in level.contents) {
       if (content.position == player.position) {
         final GameObject obj = content.object;
-        if ([ObjectTypes.object, ObjectTypes.weapon].indexOf(obj.type) != -1) {
+        if (<ObjectTypes>[ObjectTypes.object, ObjectTypes.weapon].contains(obj.type)) {
           player.carrying.add(obj);
           obj.take.play(
             url: obj.takeUrl
           );
           content.destroy();
           message(
-            text: 'Taken: ${obj.title}.'
+            text: '${obj.title} taken.'
           );
         } else if (obj.type == ObjectTypes.exit) {
-          if (obj.targetLevel === null) {
+          if (obj.targetLevel == null) {
             obj.cantUse.play(
               url: obj.cantUseUrl,
             );
           } else {
-            level.leave(this);
+            level.leave(
+              book: this
+            );
             playScene(
               url: obj.useUrl,
-              (Book b) => {
+              onfinish: (Book b) {
                 obj.targetLevel.play(
                   book: b,
                   position: obj.targetPosition
@@ -372,7 +383,8 @@ class Book{
   void moveOrActivate() {
     final Page page = getPage();
     if (page.isLevel) {
-      page.right(
+      final Level level = player.level;
+      level.right(
         book: this
       );
     } else {
@@ -381,7 +393,7 @@ class Book{
   }
 
   void activate() {
-    final page = getPage();
+    final Page page = getPage();
     if (page == null) {
       return; // Can"t do anything with no page.
     } else {
@@ -392,9 +404,7 @@ class Book{
       game.activateSound.play(
         url: game.activateSoundUrl
       );
-      line.func(
-        book: this
-      );
+      line.func(this);
     }
   }
 
@@ -403,7 +413,8 @@ class Book{
     if (page == null || !page.dismissible) {
       return; // No page, or the page can"t be dismissed that easily.
     } else if (page.isLevel) {
-      page.left(
+      final Level level = player.level;
+      level.left(
         book: this
       );
     } else {
@@ -413,29 +424,30 @@ class Book{
 
   void setVolume(
     {
-      double value,
+      num value,
       GainNode output
     }
   ) {
     output.gain.value = value;
     if (game.volumeSoundUrl != null) {
       Sound(
-        url: this.game.volumeSoundUrl,
+        url: game.volumeSoundUrl,
         output: output
       ).play();
     }
     message(
-      text: '${round(output.gain.value * 100)}%.'
+      text: '${(output.gain.value * 100).round()}%.'
     );
   }
 
   void volumeUp(
     {
-      AudioNode output = gain,
+      GainNode output,
     }
   ) {
+    output ??= gain;
     setVolume(
-      value: min(1.0, output.gain.value + game.volumeChangeAmount),
+      value: min(output.gain.maxValue, output.gain.value + game.volumeChangeAmount),
       output: output,
     );
   }
@@ -447,7 +459,7 @@ class Book{
   ) {
     output ??= gain;
     setVolume(
-      value: max(0.0, output.gain.value - game.volumeChangeAmount),
+      value: max(output.gain.minValue, output.gain.value - game.volumeChangeAmount) as double,
       output: output
     );
   }
@@ -565,17 +577,6 @@ class Book{
     }
   }
 
-  String getText(
-    {
-      Page page
-    }
-  ) {
-    if (page.titleFunc == null) {
-      return page.titleString;
-    }
-    return page.titleFunc(this);
-  }
-
   void setPlayerPosition(
     {
       int position
@@ -636,10 +637,10 @@ class Book{
     }
   }
 
-  void playScene(
+  Scene playScene(
     {
       String url,
-      void Function(Book) onfinish
+      void Function(Book) onfinish,
     }
   ) {
     scene = Scene(
@@ -648,6 +649,7 @@ class Book{
       onfinish: onfinish
     );
     scene.sound.play();
+    return scene;
   }
 
   void shootOrActivate() {

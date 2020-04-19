@@ -6,12 +6,12 @@ import 'tts.dart';
 
 final Element issueLink = querySelector('#issueLink');
 final Element startDiv = querySelector('#startDiv');
-final Element mainDiv = querySelector("'main');
+final Element mainDiv = querySelector('main');
 final Element keyboardArea = querySelector('#keyboardArea');
 final Element gameJson = querySelector('#gameJson');
 final Element startButton = querySelector('#startButton');
 final Element message = querySelector('#message');
-final Book = book();
+final Book book = Book();
 
 final Element stringForm = querySelector('#stringForm');
 final Element stringPrompt = querySelector('#stringPrompt');

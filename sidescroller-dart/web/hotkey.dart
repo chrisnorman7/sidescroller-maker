@@ -1,26 +1,27 @@
+import 'book.dart';
 import 'page.dart';
 
 class Hotkey {
   Hotkey(
     {
-      this.descriptionString,
-      this.descriptionFunc,
+      this.titleString,
+      this.titleFunc,
       this.func,
     }
   );
 
-  String getDescription(
+  String titleString;
+  String Function(Page) titleFunc;
+  void Function(Book) func;
+
+  String getTitle(
     {
-      Page page
+      Page page,
     }
   ) {
-    if (descriptionFunc == null) {
-      return descriptionString;
+    if (titleString == null) {
+      return titleFunc(page);
     }
-    return descriptionFunc(page);
+    return titleString;
   }
-
-  final String descriptionString;
-  String Function(Page) descriptionFunc;
-  void Function() func;
 }

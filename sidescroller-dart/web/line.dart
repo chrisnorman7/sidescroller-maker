@@ -1,6 +1,6 @@
 import 'book.dart';
 
-class Line{
+class Line {
   Line(
     {
       this.titleString,
@@ -8,8 +8,19 @@ class Line{
       this.func,
     }
   );
-
-  final String titleString;
-  void Function(Book) func;
+  
+  String titleString;
   String Function(Book) titleFunc;
+  void Function(Book) func;
+
+  String getTitle(
+    {
+      Book book
+    }
+  ) {
+    if (titleString == null) {
+      return titleFunc(book);
+    }
+    return titleString;
+  }
 }

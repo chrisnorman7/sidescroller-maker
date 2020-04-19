@@ -404,27 +404,30 @@ class Level extends Page {
 
   void finalise(
     {
-      Book book
+      Book book,
+      int position,
     }
   ) {
     book.push(
       page: this
     );
-    book.player.level = this;
     ambiance.play(
       url: ambianceUrl
     );
     loadContents();
     book.setPlayerPosition(
-      position: initialPosition
+      position: position
     );
   }
 
   Future<void> play(
     {
       Book book,
+      int position,
     }
   ) async {
+    position ??= initialPosition;
+    book.player.level = this;
     if (convolverUrl != null) {
       loading = true;
       final AudioBuffer buffer = await getBuffer(
@@ -440,13 +443,15 @@ class Level extends Page {
     }
     if (beforeSceneUrl == null) {
       finalise(
-        book: book
+        book: book,
+        position: position,
       );
     } else {
       book.playScene(
         url: beforeSceneUrl,
         onfinish: (Book b) => finalise(
-          book: b
+          book: b,
+          position: position,
         )
       );
     }
@@ -464,8 +469,8 @@ class Level extends Page {
       Book book
     }
     ) {
-    book.pop();
     book.player.level = null;
+    book.pop();
     if (convolver != null) {
       gain.disconnect(convolver);
       convolverGain.disconnect();

@@ -63,7 +63,7 @@ class Game {
 
 
   String title, volumeSoundUrl, moveSoundUrl, activateSoundUrl, musicUrl;
-  double volumeChangeAmount, initialVolume, initialMusicVolume;
+  num volumeChangeAmount, initialVolume, initialMusicVolume;
   List<Level> levels;
   List<GameObject> objects;
   Sound moveSound, activateSound, music;

@@ -5,7 +5,7 @@ import 'constants.dart';
 import 'hotkey.dart';
 import 'line.dart';
 
-class Page{
+class Page {
   Page(
     {
       this.titleString,
@@ -18,9 +18,20 @@ class Page{
   final bool isLevel = false;
   final bool dismissible;
   int focus = 0;
-  final String titleString;
-  String Function(Book) titleFunc;
   final List<Line> lines;
+  String titleString;
+  String Function(Book) titleFunc;
+  
+  String getTitle(
+    {
+      Book book
+    }
+  ) {
+    if (titleString == null) {
+      return titleFunc(book);
+    }
+    return titleString;
+  }
 
   Line getLine() {
     if (focus == -1) {
@@ -131,7 +142,6 @@ Page hotkeysPage(
     ' ': 'Spacebar',
   };
   final List<Line> lines = <Line>[];
-  final Page page = book.getPage();
   book.hotkeys.forEach(
     (String key, Hotkey hotkey) {
       String keyString = key;
@@ -140,12 +150,12 @@ Page hotkeysPage(
       }
       lines.add(
         Line(
-          titleFunc: (Book b) => '$keyString: ${hotkey.getDescription(
-            page: page
+          titleFunc: (Book b) => '$keyString: ${hotkey.getTitle(
+            page: b.getPage()
           )}',
           func: (Book b) {
             b.pop();
-            hotkey.func();
+            hotkey.func(b);
           }
         )
       );
