@@ -98,11 +98,11 @@ class Book{
         ),
       ),
       'i': Hotkey(
-        titleString: 'Inventory menu',
+        titleString: 'Player inventory',
         func: (Book b) => inventory(),
       ),
       'd': Hotkey(
-        titleString: 'Drop menu',
+        titleString: 'Drop an object',
         func: (Book b) => drop(),
       ),
       'f': Hotkey(
