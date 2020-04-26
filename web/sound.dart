@@ -16,9 +16,14 @@ void loadBuffer(
     xhr.open('GET', url);
     xhr .onLoad.listen(
       (ProgressEvent e) async {
-        final AudioBuffer buffer = await audio.decodeAudioData(xhr.response as ByteBuffer);
-        buffers[url] = buffer;
-        done(buffer);
+        try {
+          final AudioBuffer buffer = await audio.decodeAudioData(xhr.response as ByteBuffer);
+          buffers[url] = buffer;
+          done(buffer);
+        }
+        catch(e) {
+          throw 'Failed to get "$url": $e';
+        }
       }
     );
     xhr.send();
