@@ -63,30 +63,29 @@ class LevelObject {
   }
 
   void spawn() {
-    final GameObject obj = object;
     panner = audio.createPanner();
     panner.maxDistance = 10;
     panner.rolloffFactor = 6;
     panner.connectNode(gain);
     move(position);
-    if (obj.soundUrl != null) {
+    if (object.soundUrl != null) {
       sound = Sound(
-        url:obj.soundUrl,
+        url:object.soundUrl,
         loop: true,
         output: panner
       );
-      sound.play(url: obj.soundUrl);
+      sound.play(url: object.soundUrl);
     }
     drop = Sound(
-      url: obj.dropUrl,
+      url: object.dropUrl,
       output: panner
     );
     hit = Sound(
-      url:obj.hitUrl,
+      url:object.hitUrl,
       output: panner
     );
     dieSound = Sound(
-      url: obj.dieUrl,
+      url: object.dieUrl,
       output: panner
     );
   }
@@ -385,11 +384,10 @@ class Level extends Page {
     book.player.level = null;
     book.pop();
     if (convolver != null) {
-      gain.disconnect(convolver);
-      convolverGain.disconnect();
       convolver.disconnect();
-      convolverGain = null;
       convolver = null;
+      convolverGain.disconnect();
+      convolverGain = null;
     }
     for (final LevelObject content in contents) {
       content.silence(

@@ -417,14 +417,14 @@ class Book{
       return; // They're not in a level.
     }
     if (player.carrying.isNotEmpty) {
-      const List<Line> lines = <Line>[];
+      final List<Line> lines = <Line>[];
       for (final GameObject obj in player.carrying) {
         lines.add(
           Line(
             titleString: obj.title,
             func: (Book b) {
-              b.message('Using ${obj.title}.');
               b.pop();
+              b.message('Using ${obj.title}.');
             },
           )
         );
@@ -446,18 +446,20 @@ class Book{
       return;
     }
     if (player.carrying.isNotEmpty) {
-      const List<Line> lines = <Line>[];
+      final List<Line> lines = <Line>[];
       for (final GameObject obj in player.carrying) {
         lines.add(
           Line(
             titleString: obj.title,
             func: (Book b) {
-              b.pop();
-              message('${obj.title} dropped.');
+              final Player player = b.player;
+              player.carrying.remove(obj);
               obj.drop(
                 level: level,
-                position: b.player.position
+                position: player.position,
               );
+              b.pop();
+              message('${obj.title} dropped.');
             }
           )
         );
