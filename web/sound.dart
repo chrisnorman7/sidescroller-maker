@@ -88,10 +88,10 @@ class Sound {
   ) {
     if (url!= _url) {
       stop();
-      if (url == null) {
-        return;
-      }
       _buffer = null;
+    }
+    if (url == null) {
+      return;
     }
     _url = url;
     if (_buffer == null) {
