@@ -129,15 +129,15 @@ Page editLevelMenu(
       func: (Book b) => getText(
         book: b,
         prompt: 'Enter new level name',
-        value: level.title,
+        value: level.titleString,
         onok: (
           {
             String value,
             Book book
           }
         ) {
-          if (value.isNotEmpty && value != level.title) {
-            level.title = value;
+          if (value.isNotEmpty && value != level.titleString) {
+            level.titleString = value;
             book.message('Level renamed.');
           }
         }
@@ -155,7 +155,7 @@ Page editLevelMenu(
       titleString: 'Delete',
       func: (Book b) => b.push(
         confirmPage(
-          title: 'Are you sure you want to delete "${level.title}"?',
+          title: 'Are you sure you want to delete "${level.titleString}"?',
           okTitle: 'Yes',
           cancelTitle: 'No',
           onok: (Book b) {
@@ -172,7 +172,7 @@ Page editLevelMenu(
     )
   );
   return Page(
-    titleFunc: (Book b) => 'Edit ${level.title}',
+    titleFunc: (Book b) => 'Edit ${level.titleString}',
     lines: lines
   );
 }
@@ -191,7 +191,7 @@ Page levelsMenu(Book b) {
   for (final Level level in b.game.levels) {
     lines.add(
       Line(
-        titleFunc: (Book b) => level.title,
+        titleFunc: (Book b) => level.titleString,
         func: (Book b) => b.push(
           editLevelMenu(
             level: level
@@ -257,13 +257,13 @@ Page editObjectMenu(
       }
     ),
     Line(
-      titleFunc: (Book b) => 'Target Level (${object.targetLevel == null ? "not set" : object.targetLevel.title})',
+      titleFunc: (Book b) => 'Target Level (${object.targetLevel == null ? "not set" : object.targetLevel.titleString})',
       func: (Book b) {
         final List<Line> lines = <Line>[];
         for (final Level level in b.game.levels) {
           lines.add(
             Line(
-              titleFunc: (Book b) => '${object.targetLevel == level ? "8 " : ""}${level.title}',
+              titleFunc: (Book b) => '${object.targetLevel == level ? "* " : ""}${level.titleString}',
               func: (Book b) {
                 object.targetLevel = level;
                 b.pop();

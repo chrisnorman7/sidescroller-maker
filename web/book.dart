@@ -350,14 +350,13 @@ class Book{
     final Page page = getPage();
     if (page == null) {
       return; // Can"t do anything with no page.
-    } else {
-      final Line line = page.getLine();
-      if (line == null) {
-        return; // They are probably looking at the title.
-      }
-      game.activateSound.play(url: game.activateSoundUrl);
-      line.func(this);
     }
+    final Line line = page.getLine();
+    if (line == null) {
+      return; // They are probably looking at the title.
+    }
+    game.activateSound.play(url: game.activateSoundUrl);
+    line.func(this);
   }
 
   void cancel() {

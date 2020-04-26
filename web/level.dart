@@ -19,7 +19,7 @@ enum LevelDirections {
 const Map<LevelDirections, int> levelDirectionConvertions = <LevelDirections, int>{
   LevelDirections.backwards: -1,
   LevelDirections.either: 0,
-  LevelDirections.forwards: 0,
+  LevelDirections.forwards: 1,
 };
 
 class LevelObject {
@@ -112,8 +112,8 @@ class LevelObject {
     }
   }
 
-  void move(int position) {
-    this.position = position;
+  void move(int p) {
+    position = p;
     panner.positionX.value = position / audioDivider;
   }
 
@@ -163,10 +163,11 @@ class NearestObject {
 
 class Level extends Page {
   Level() {
+    focus = -1;
     isLevel = true;
     deadObjects = <LevelObject>[];
     contents = <LevelObject>[];
-    title = 'Untitled Level';
+    titleString = 'Untitled Level';
     numericProperties = <String, String>{
       'size': 'The width of the level',
       'initialPosition': "The position the player should start at if they didn't get here via an exit",
@@ -226,7 +227,7 @@ class Level extends Page {
       Game game,
     }
   ) {
-    title = data['title'] as String ?? title;
+    titleString = data['titleString'] as String ?? titleString;
     for (final Map<String, int> contentData in data['contents'] as List<Map<String, int>>) {
       final LevelObject content = LevelObject.fromJson(
         level: level,
@@ -238,7 +239,7 @@ class Level extends Page {
   }
 
   bool loading = false;
-  String title, beforeSceneUrl, musicUrl, ambianceUrl, footstepUrl, wallUrl, turnUrl, tripUrl, convolverUrl, noWeaponUrl ;
+  String beforeSceneUrl, musicUrl, ambianceUrl, footstepUrl, wallUrl, turnUrl, tripUrl, convolverUrl, noWeaponUrl ;
   List<LevelObject> contents, deadObjects;
   Map<String, String> urls, numericProperties;
   int size, initialPosition, speed;
@@ -253,7 +254,7 @@ class Level extends Page {
     }
   ) {
     final Map<String, dynamic> data = <String, dynamic>{
-      'title': title,
+      'titleString': titleString,
       'contents': <Map<String, int>>[],
     };
     for (final LevelObject content in contents) {
@@ -323,7 +324,6 @@ class Level extends Page {
     final Player player = book.player;
     final int time = timestamp();
     if ((time - player.lastMoved) > speed) {
-      player.lastMoved = time;
       final int position = player.position + levelDirectionConvertions[direction];
       if (position < 0 || position > size) {
         wall.play(url: wallUrl);
