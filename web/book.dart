@@ -546,18 +546,19 @@ class Book{
     } else {
       index -= 1;
     }
-    const List<GameObject> weapons = <GameObject>[];
+    final List<GameObject> weapons = <GameObject>[fists];
     for (final GameObject obj in player.carrying) {
       if (obj.type == ObjectTypes.weapon) {
         weapons.add(obj);
       }
     }
-    final GameObject weapon = weapons[index];
-    if (weapon == null) {
-      level.noWeapon.play(url: level.noWeaponUrl);
-    } else {
+    try {
+      final GameObject weapon = weapons[index];
       player.weapon = weapon;
       message(weapon.title);
+    }
+    on RangeError {
+      level.noWeapon.play(url: level.noWeaponUrl);
     }
   }
 
