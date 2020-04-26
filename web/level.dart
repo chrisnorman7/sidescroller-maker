@@ -163,7 +163,6 @@ class NearestObject {
 
 class Level extends Page {
   Level() {
-    focus = -1;
     isLevel = true;
     deadObjects = <LevelObject>[];
     contents = <LevelObject>[];

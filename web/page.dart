@@ -17,7 +17,7 @@ class Page {
 
   bool isLevel = false;
   final bool dismissible;
-  int focus = 0;
+  int focus = -1;
   final List<Line> lines;
   String titleString;
   String Function(Book) titleFunc;
