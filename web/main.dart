@@ -524,6 +524,9 @@ void main() {
             return book.player.level.leave(book);
           } else if (e.key == 'o') {
             final List<Line> lines = <Line>[];
+            if (book.game.objects.isEmpty) {
+              return book.message('There are no objects you can spawn.');
+            }
             for (final GameObject obj in book.game.objects) {
               lines.add(
                 Line(
