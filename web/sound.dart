@@ -93,6 +93,8 @@ class Sound {
           buffer: buffer
         )
       );
+    } else {
+      playBuffer(buffer:_buffer);
     }
   }
 }

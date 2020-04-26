@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:web_audio';
 
 import 'constants.dart';
+import 'sound.dart';
 
 final Random random = Random();
 
@@ -59,8 +60,8 @@ void startAudio() {
     g.gain.value = 0.5;
     g.connectNode(audio.destination);
   }
-  // const music = new Sound("res/music/start.wav")
-  // music.play()
+  final Sound music = Sound();
+  music.play(url: 'res/music/start.wav');
 }
 
 int timestamp() {

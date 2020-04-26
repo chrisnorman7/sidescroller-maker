@@ -15,7 +15,7 @@ class Page {
     }
   );
 
-  final bool isLevel = false;
+  bool isLevel = false;
   final bool dismissible;
   int focus = 0;
   final List<Line> lines;

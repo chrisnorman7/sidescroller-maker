@@ -163,6 +163,7 @@ class NearestObject {
 
 class Level extends Page {
   Level() {
+    isLevel = true;
     deadObjects = <LevelObject>[];
     contents = <LevelObject>[];
     title = 'Untitled Level';
@@ -346,8 +347,7 @@ class Level extends Page {
     }
   ) {
     book.push(this);
-    ambiance.play(url: ambianceUrl
-);
+    ambiance.play(url: ambianceUrl);
     loadContents();
     book.setPlayerPosition(position);
   }

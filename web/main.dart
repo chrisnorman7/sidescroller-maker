@@ -408,17 +408,11 @@ void main() {
   stringPromptDefaultValue = stringPrompt.innerText;
   stringInput = document.querySelector('#stringInput') as TextInputElement;
   stringCancel = querySelector('#stringCancel') as ButtonInputElement;
-  final Element textForm = querySelector('#textForm');
+  textForm = querySelector('#textForm') as FormElement;
   textPrompt = querySelector('#textPrompt') as SpanElement;
   textPromptDefaultValue = textPrompt.innerText;
   textInput = querySelector('#textInput') as TextAreaElement;
   textCancel = querySelector('#textCancel') as ButtonInputElement;
-  for (final Element e in <Element>[mainDiv, stringForm, textForm]) {
-    if (e == null) {
-      throw Exception('Check selectors and try again.');
-    }
-    e.hidden = true;
-  }
   final String issueUrl = issueLink.href;
   issueLink.onClick.listen(
     (MouseEvent e) {
@@ -560,13 +554,15 @@ void main() {
       }
     }
   );
+  book.message = (String text) => message.innerText = text;
+  startDiv.hidden = false;
+  book.message('Finished loading.');
   startButton.onClick.listen(
     (MouseEvent e) {
       startAudio();
       startDiv.hidden = true;
       mainDiv.hidden = false;
       keyboardArea.focus();
-      book.message = (String text) => message.innerText = text;
       book.push(
         Page(
           titleString: 'Main Menu',
@@ -684,4 +680,5 @@ void main() {
       );
     }
   );
+  
 }
