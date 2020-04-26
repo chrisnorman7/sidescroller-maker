@@ -681,4 +681,5 @@ void main() {
     }
   );
   fists.type = ObjectTypes.weapon;
+  fists.title = 'Fists';
 }
