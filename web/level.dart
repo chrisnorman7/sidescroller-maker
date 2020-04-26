@@ -167,26 +167,9 @@ class Level extends Page {
     deadObjects = <LevelObject>[];
     contents = <LevelObject>[];
     titleString = 'Untitled Level';
-    numericProperties = <String, String>{
-      'size': 'The width of the level',
-      'initialPosition': "The position the player should start at if they didn't get here via an exit",
-      'speed': 'How often (in milliseconds) the player can move',
-      'convolverVolume': 'The volume of the impulse response'
-    };
     size = 200;
     initialPosition = 0;
     speed = 100;
-    urls = <String, String>{
-      'beforeSceneUrl': 'Scene to play before the level starts',
-      'musicUrl': 'Background music',
-      'ambianceUrl': 'Level Ambiance',
-      'footstepUrl': 'Footstep sound',
-      'wallUrl': 'Wall sound',
-      'turnUrl': 'Turning sound',
-      'tripUrl': 'Object discovery sound',
-      'convolverUrl': 'Impulse response',
-      'noWeaponUrl': 'Empty weapons slot'
-    };
     beforeScene = Sound(
       url: beforeSceneUrl,
     );
@@ -212,6 +195,7 @@ class Level extends Page {
     trip = Sound(
       url: tripUrl
     );
+    convolverUrl = 'res/impulses/EchoThiefImpulseResponseLibrary/Underground/TunnelToHell.wav';
     convolverVolume = 0.5;
     noWeaponUrl = 'res/level/noweapon.wav';
     noWeapon = Sound(
