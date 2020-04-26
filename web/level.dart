@@ -223,7 +223,6 @@ class Level extends Page {
   bool loading = false;
   String beforeSceneUrl, musicUrl, ambianceUrl, footstepUrl, wallUrl, turnUrl, tripUrl, convolverUrl, noWeaponUrl ;
   List<LevelObject> contents, deadObjects;
-  Map<String, String> urls, numericProperties;
   int size, initialPosition, speed;
   double convolverVolume;
   Sound beforeScene, music, ambiance, footstep, wall, turn, trip, noWeapon;

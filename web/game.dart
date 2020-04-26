@@ -48,7 +48,6 @@ class Game {
   List<Level> levels;
   List<GameObject> objects;
   Sound moveSound, activateSound, music;
-  Map<String, String> urls, numericProperties;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{
@@ -75,23 +74,12 @@ class Game {
 
   void reset() {
     stopMusic();
-    urls = <String, String>{
-      volumeSoundUrl: 'Volume change sound',
-      moveSoundUrl: 'Menu navigation sound',
-      activateSoundUrl: 'Activate sound',
-      musicUrl: 'Menu music'
-    };
     volumeSoundUrl = 'res/menus/volume.wav';
     moveSoundUrl = 'res/menus/move.wav';
     moveSound = Sound(url: moveSoundUrl);
     activateSoundUrl = 'res/menus/activate.wav';
     activateSound = Sound(url: activateSoundUrl);
     musicUrl = 'res/menus/music.mp3';
-    numericProperties = <String, String>{
-      'volumeChangeAmount': 'Volume key sensitivity',
-      'initialVolume': 'Initial volume',
-      'initialMusicVolume': 'Initial music volume',
-    };
     volumeChangeAmount = 0.05;
     initialVolume = 0.5;
     initialMusicVolume = 0.25;

@@ -21,15 +21,6 @@ const Map<ObjectTypes, String> objectTypeDescriptions = <ObjectTypes, String>{
 class GameObject {
   GameObject() {
     type = ObjectTypes.object;
-    urls = <String, String>{
-      'soundUrl': 'The sound constantly played by this object',
-      'takeUrl': 'The sound played when picking up this object',
-      'dropUrl': 'The sound that is played when this object is dropped',
-      'hitUrl': 'The sound that is heard when this object is hit',
-      'useUrl': 'The sound that is played when this object is used or fired',
-      'cantUseUrl': "The sound to be played when this object can't be used",
-      'dieUrl': 'The sound played when this object is killed or destroyed',
-    };
     takeUrl = 'res/objects/take.wav';
     take = Sound(url: takeUrl);
     soundUrl = 'res/objects/object.wav';
@@ -40,12 +31,6 @@ class GameObject {
     cantUseUrl = 'res/objects/cantuse.wav';
     cantUse = Sound(url: cantUseUrl);
     dieUrl = 'res/objects/die.wav';
-    numericProperties = <String, String>{
-      'damage': 'The amount of damage dealt by this weapon',
-      'range': 'The range of this weapon',
-      'health': 'The initial health of this object',
-      'targetPosition': 'The position the player should be in after using this exit',
-    };
     damage = 2;
     range = 1;
     health = 1;
@@ -70,7 +55,6 @@ class GameObject {
   Sound take, use, cantUse;
   Level targetLevel;
   int targetLevelIndex, damage, range, health, targetPosition;
-  Map<String, String> urls, numericProperties;
   List<GameObject> contains;
   List<int> containedObjectIndices;
 
