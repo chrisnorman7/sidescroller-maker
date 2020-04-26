@@ -10,6 +10,9 @@ void loadBuffer(
     void Function(AudioBuffer) done,
   }
 ) {
+  if (url == null) {
+    throw 'The url argument cannot be null.';
+  }
   if (buffers.containsKey(url) == false){
     final HttpRequest xhr = HttpRequest();
     xhr.responseType = 'arraybuffer';
