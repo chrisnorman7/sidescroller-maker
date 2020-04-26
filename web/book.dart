@@ -301,10 +301,11 @@ class Book{
   }
 
   void takeOrActivate() {
-    final Level level = player.level;
-    if (level == null) {
+    final Page page = getPage();
+    if (!page.isLevel) {
       return activate();
     }
+    final Level level = player.level;
     for (final LevelObject content in level.contents) {
       if (content.position == player.position) {
         final GameObject obj = content.object;
