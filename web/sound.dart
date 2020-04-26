@@ -13,24 +13,25 @@ void loadBuffer(
   if (url == null) {
     throw 'The url argument cannot be null.';
   }
-  if (buffers.containsKey(url) == false){
-    final HttpRequest xhr = HttpRequest();
-    xhr.responseType = 'arraybuffer';
-    xhr.open('GET', url);
-    xhr .onLoad.listen(
-      (ProgressEvent e) async {
-        try {
-          final AudioBuffer buffer = await audio.decodeAudioData(xhr.response as ByteBuffer);
-          buffers[url] = buffer;
-          done(buffer);
-        }
-        catch(e) {
-          throw 'Failed to get "$url": $e';
-        }
-      }
-    );
-    xhr.send();
+  if (buffers.containsKey(url)){
+    return done(buffers[url]);
   }
+  final HttpRequest xhr = HttpRequest();
+  xhr.responseType = 'arraybuffer';
+  xhr.open('GET', url);
+  xhr .onLoad.listen(
+    (ProgressEvent e) async {
+      try {
+        final AudioBuffer buffer = await audio.decodeAudioData(xhr.response as ByteBuffer);
+        buffers[url] = buffer;
+        done(buffer);
+      }
+      catch(e) {
+        throw 'Failed to get "$url": $e';
+      }
+    }
+  );
+  xhr.send();
 }
 
 class Sound {
