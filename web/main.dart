@@ -680,5 +680,5 @@ void main() {
       );
     }
   );
-  
+  fists.type = ObjectTypes.weapon;
 }
