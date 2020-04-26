@@ -582,6 +582,7 @@ class Book{
     if (level == null) {
       return activate();
     }
+    player.weapon ??= fists;
     final GameObject weapon = player.weapon;
     final NearestObject nearestObject = level.nearestObject(
       position: player.position,
