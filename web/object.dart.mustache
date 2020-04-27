@@ -1,0 +1,101 @@
+import 'game.dart';
+import 'level.dart';
+import 'sound.dart';
+
+enum ObjectTypes {
+  object,
+  aggressiveMonster,
+  peacefulMonster,
+  weapon,
+  exit,
+}
+
+const Map<ObjectTypes, String> objectTypeDescriptions = <ObjectTypes, String>{
+  ObjectTypes.object: 'An object which can be picked up by the player',
+  ObjectTypes.aggressiveMonster: 'A monster which will attack the player',
+  ObjectTypes.peacefulMonster: 'A monster which will ignore the player',
+  ObjectTypes.weapon: 'A weapon which can be wielded',
+  ObjectTypes.exit: 'An exit to another level'
+};
+
+class GameObject {
+  GameObject() {
+    type = ObjectTypes.object;
+    take = Sound(url: takeUrl);
+    use = Sound(url: useUrl);
+    cantUse = Sound(url: cantUseUrl);
+    contains = <GameObject>[];
+    containedObjectIndices = <int>[];
+    {{#variables}}
+    {{name}} = {{value}};
+    {{/variables}}
+  }
+
+  GameObject.fromJson(
+    {
+      Map<String, dynamic>data
+    }
+  ) {
+    type = ObjectTypes.values[data['type'] as int];
+    targetLevelIndex = data['targetLevelIndex'] as int;
+    containedObjectIndices = data['contains'] as List<int>;
+    {{#variables}}
+    {{name}} = data['{{name}}'] as {{type}};
+    {{/variables}}
+  }
+
+  {{# variables}}
+  {{#initialise}}
+  {{type}} {{name}};
+  {{/initialise}}
+  {{/ variables }}
+
+  ObjectTypes type;
+  Sound take, use, cantUse;
+  Level targetLevel;
+  int targetLevelIndex;
+  List<GameObject> contains;
+  List<int> containedObjectIndices;
+
+  Map<String, dynamic> toJson(
+    {
+      Game game
+    }
+  ) {
+    final Map<String, dynamic>data = <String, dynamic>{
+      'type': type.index,
+      'contains': <int>[]
+    };
+    if (targetLevel == null) {
+      data['targetLevelIndex'] = null;
+    } else {
+      data['targetLevelIndex'] = game.levels.indexOf(targetLevel);
+    }
+    for (final GameObject containedObject in contains) {
+      data['contains'].add(game.objects.indexOf(containedObject));
+    }
+    {{#variables}}
+    data['{{name}}'] = {{name}};
+    {{/variables}}
+    return data;
+  }
+
+  void drop(
+    {
+      Level level,
+      int position,
+      bool silent = false,
+    }
+  ) {
+    final LevelObject content = LevelObject(
+      level: level,
+      object: this,
+      position: position
+    );
+    level.contents.add(content);
+    content.spawn();
+    if (!silent) {
+      content.drop.play(url: dropUrl);
+    }
+  }
+}
