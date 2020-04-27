@@ -16,8 +16,6 @@ class Game {
     }
   ) {
     reset();
-    title = data['title'] as String ?? title;
-    volumeChangeAmount = data['volumeChangeAmount'] as double ?? volumeChangeAmount;
     for (final Map<String, dynamic> objectData in data['objects'] as List<Map<String, dynamic>>) {
       final GameObject obj = GameObject.fromJson(
         data: objectData
@@ -39,19 +37,32 @@ class Game {
         obj.contains.add(objects[index]);
       }
     }
+    title = data['title'] as String;
+    volumeSoundUrl = data['volumeSoundUrl'] as String;
+    moveSoundUrl = data['moveSoundUrl'] as String;
+    activateSoundUrl = data['activateSoundUrl'] as String;
+    musicUrl = data['musicUrl'] as String;
+    volumeChangeAmount = data['volumeChangeAmount'] as num;
+    initialVolume = data['initialVolume'] as num;
+    initialMusicVolume = data['initialMusicVolume'] as num;
     resetVolumes();
   }
 
+  String title;
+  String volumeSoundUrl;
+  String moveSoundUrl;
+  String activateSoundUrl;
+  String musicUrl;
+  num volumeChangeAmount;
+  num initialVolume;
+  num initialMusicVolume;
 
-  String title, volumeSoundUrl, moveSoundUrl, activateSoundUrl, musicUrl;
-  num volumeChangeAmount, initialVolume, initialMusicVolume;
   List<Level> levels;
   List<GameObject> objects;
   Sound moveSound, activateSound, music;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{
-      'title': title,
       'levels': <Map<String, dynamic>>[],
       'objects': <Map<String, dynamic>>[]
     };
@@ -69,23 +80,31 @@ class Game {
         )
       );
     }
+    data['title'] = title;
+    data['volumeSoundUrl'] = volumeSoundUrl;
+    data['moveSoundUrl'] = moveSoundUrl;
+    data['activateSoundUrl'] = activateSoundUrl;
+    data['musicUrl'] = musicUrl;
+    data['volumeChangeAmount'] = volumeChangeAmount;
+    data['initialVolume'] = initialVolume;
+    data['initialMusicVolume'] = initialMusicVolume;
     return data;
   }
 
   void reset() {
     stopMusic();
+    moveSound = Sound(url: moveSoundUrl);
+    activateSound = Sound(url: activateSoundUrl);
+    levels = <Level>[];
+    objects = <GameObject>[];
+    title = 'Untitled Game';
     volumeSoundUrl = 'res/menus/volume.wav';
     moveSoundUrl = 'res/menus/move.wav';
-    moveSound = Sound(url: moveSoundUrl);
     activateSoundUrl = 'res/menus/activate.wav';
-    activateSound = Sound(url: activateSoundUrl);
     musicUrl = 'res/menus/music.mp3';
     volumeChangeAmount = 0.05;
     initialVolume = 0.5;
     initialMusicVolume = 0.25;
-    title = 'Untitled Game';
-    levels = <Level>[];
-    objects = <GameObject>[];
     resetVolumes();
   }
 

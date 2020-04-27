@@ -168,7 +168,17 @@ class Level extends Page {
     titleString = 'Untitled Level';
     size = 200;
     initialPosition = 0;
-    speed = 100;
+    speed = 400;
+    beforeSceneUrl = null;
+    footstepUrl = 'res/footsteps/stone.wav';
+    wallUrl = 'res/level/wall.wav';
+    turnUrl = 'res/level/turn.wav';
+    tripUrl = 'res/level/trip.wav';
+    ambianceUrl = null;
+    musicUrl = null;
+    convolverUrl = 'res/impulses/EchoThiefImpulseResponseLibrary/Underground/TunnelToHell.wav';
+    convolverVolume = 0.5;
+    noWeaponUrl = 'res/level/noweapon.wav';
     beforeScene = Sound(
       url: beforeSceneUrl,
     );
@@ -178,25 +188,18 @@ class Level extends Page {
     ambiance = Sound(
       url: ambianceUrl
     );
-    footstepUrl = 'res/footsteps/stone.wav';
     footstep = Sound(
       url: footstepUrl,
     );
-    wallUrl = 'res/level/wall.wav';
     wall = Sound(
       url: wallUrl
     );
-    turnUrl = 'res/level/turn.wav';
     turn = Sound(
       url: turnUrl
     );
-    tripUrl = 'res/level/trip.wav';
     trip = Sound(
       url: tripUrl
     );
-    convolverUrl = 'res/impulses/EchoThiefImpulseResponseLibrary/Underground/TunnelToHell.wav';
-    convolverVolume = 0.5;
-    noWeaponUrl = 'res/level/noweapon.wav';
     noWeapon = Sound(
       url: noWeaponUrl,
     );
@@ -209,7 +212,6 @@ class Level extends Page {
       Game game,
     }
   ) {
-    titleString = data['titleString'] as String ?? titleString;
     for (final Map<String, int> contentData in data['contents'] as List<Map<String, int>>) {
       final LevelObject content = LevelObject.fromJson(
         level: level,
@@ -218,13 +220,38 @@ class Level extends Page {
       );
       level.contents.add(content);
     }
+    titleString = data['titleString'] as String;
+    size = data['size'] as int;
+    initialPosition = data['initialPosition'] as int;
+    speed = data['speed'] as int;
+    beforeSceneUrl = data['beforeSceneUrl'] as String;
+    footstepUrl = data['footstepUrl'] as String;
+    wallUrl = data['wallUrl'] as String;
+    turnUrl = data['turnUrl'] as String;
+    tripUrl = data['tripUrl'] as String;
+    ambianceUrl = data['ambianceUrl'] as String;
+    musicUrl = data['musicUrl'] as String;
+    convolverUrl = data['convolverUrl'] as String;
+    convolverVolume = data['convolverVolume'] as num;
+    noWeaponUrl = data['noWeaponUrl'] as String;
   }
 
+  int size;
+  int initialPosition;
+  int speed;
+  String beforeSceneUrl;
+  String footstepUrl;
+  String wallUrl;
+  String turnUrl;
+  String tripUrl;
+  String ambianceUrl;
+  String musicUrl;
+  String convolverUrl;
+  num convolverVolume;
+  String noWeaponUrl;
+
   bool loading = false;
-  String beforeSceneUrl, musicUrl, ambianceUrl, footstepUrl, wallUrl, turnUrl, tripUrl, convolverUrl, noWeaponUrl ;
   List<LevelObject> contents, deadObjects;
-  int size, initialPosition, speed;
-  double convolverVolume;
   Sound beforeScene, music, ambiance, footstep, wall, turn, trip, noWeapon;
   ConvolverNode convolver;
   GainNode convolverGain;
@@ -235,7 +262,6 @@ class Level extends Page {
     }
   ) {
     final Map<String, dynamic> data = <String, dynamic>{
-      'titleString': titleString,
       'contents': <Map<String, int>>[],
     };
     for (final LevelObject content in contents) {
@@ -245,6 +271,20 @@ class Level extends Page {
         )
       );
     }
+    data['titleString'] = titleString;
+    data['size'] = size;
+    data['initialPosition'] = initialPosition;
+    data['speed'] = speed;
+    data['beforeSceneUrl'] = beforeSceneUrl;
+    data['footstepUrl'] = footstepUrl;
+    data['wallUrl'] = wallUrl;
+    data['turnUrl'] = turnUrl;
+    data['tripUrl'] = tripUrl;
+    data['ambianceUrl'] = ambianceUrl;
+    data['musicUrl'] = musicUrl;
+    data['convolverUrl'] = convolverUrl;
+    data['convolverVolume'] = convolverVolume;
+    data['noWeaponUrl'] = noWeaponUrl;
     return data;
   }
 

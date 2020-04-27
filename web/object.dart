@@ -21,22 +21,23 @@ const Map<ObjectTypes, String> objectTypeDescriptions = <ObjectTypes, String>{
 class GameObject {
   GameObject() {
     type = ObjectTypes.object;
-    takeUrl = 'res/objects/take.wav';
     take = Sound(url: takeUrl);
-    soundUrl = 'res/objects/object.wav';
-    dropUrl = 'res/objects/drop.wav';
-    hitUrl = 'res/objects/hit.wav';
-    useUrl = 'res/weapons/punch.wav';
     use = Sound(url: useUrl);
-    cantUseUrl = 'res/objects/cantuse.wav';
     cantUse = Sound(url: cantUseUrl);
-    dieUrl = 'res/objects/die.wav';
-    damage = 2;
-    range = 1;
-    health = 1;
-    targetPosition = 0;
     contains = <GameObject>[];
     containedObjectIndices = <int>[];
+    targetPosition = 0;
+    title = null;
+    takeUrl = 'res/objects/take.wav';
+    dropUrl = 'res/objects/drop.wav';
+    useUrl = 'res/weapons/punch.wav';
+    cantUseUrl = 'res/objects/cantuse.wav';
+    hitUrl = 'res/objects/hit.wav';
+    dieUrl = 'res/objects/die.wav';
+    soundUrl = 'res/objects/object.wav';
+    damage = 2;
+    range = 1;
+    health = 3;
   }
 
   GameObject.fromJson(
@@ -44,17 +45,40 @@ class GameObject {
       Map<String, dynamic>data
     }
   ) {
-    title = data['title'] as String ?? title;
     type = ObjectTypes.values[data['type'] as int];
     targetLevelIndex = data['targetLevelIndex'] as int;
     containedObjectIndices = data['contains'] as List<int>;
+    targetPosition = data['targetPosition'] as int;
+    title = data['title'] as String;
+    takeUrl = data['takeUrl'] as String;
+    dropUrl = data['dropUrl'] as String;
+    useUrl = data['useUrl'] as String;
+    cantUseUrl = data['cantUseUrl'] as String;
+    hitUrl = data['hitUrl'] as String;
+    dieUrl = data['dieUrl'] as String;
+    soundUrl = data['soundUrl'] as String;
+    damage = data['damage'] as int;
+    range = data['range'] as int;
+    health = data['health'] as int;
   }
 
-  String title, takeUrl, soundUrl, dropUrl, hitUrl, useUrl, cantUseUrl, dieUrl;
+  int targetPosition;
+  String title;
+  String takeUrl;
+  String dropUrl;
+  String useUrl;
+  String cantUseUrl;
+  String hitUrl;
+  String dieUrl;
+  String soundUrl;
+  int damage;
+  int range;
+  int health;
+
   ObjectTypes type;
   Sound take, use, cantUse;
   Level targetLevel;
-  int targetLevelIndex, damage, range, health, targetPosition;
+  int targetLevelIndex;
   List<GameObject> contains;
   List<int> containedObjectIndices;
 
@@ -64,7 +88,6 @@ class GameObject {
     }
   ) {
     final Map<String, dynamic>data = <String, dynamic>{
-      'title': title,
       'type': type.index,
       'contains': <int>[]
     };
@@ -76,6 +99,18 @@ class GameObject {
     for (final GameObject containedObject in contains) {
       data['contains'].add(game.objects.indexOf(containedObject));
     }
+    data['targetPosition'] = targetPosition;
+    data['title'] = title;
+    data['takeUrl'] = takeUrl;
+    data['dropUrl'] = dropUrl;
+    data['useUrl'] = useUrl;
+    data['cantUseUrl'] = cantUseUrl;
+    data['hitUrl'] = hitUrl;
+    data['dieUrl'] = dieUrl;
+    data['soundUrl'] = soundUrl;
+    data['damage'] = damage;
+    data['range'] = range;
+    data['health'] = health;
     return data;
   }
 
