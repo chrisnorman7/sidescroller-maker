@@ -16,15 +16,15 @@ class Game {
     }
   ) {
     reset();
-    for (final Map<String, dynamic> objectData in data['objects'] as List<Map<String, dynamic>>) {
+    for (final dynamic objectData in data['objects']) {
       final GameObject obj = GameObject.fromJson(
-        data: objectData
+        data: objectData as Map<String, dynamic>
       );
       objects.add(obj);
     }
-    for (final Map<String, dynamic> levelData in data['levels'] as List<Map<String, dynamic>>) {
+    for (final dynamic levelData in data['levels']) {
       final Level level = Level.fromJson(
-        data: levelData,
+        data: levelData as Map<String, dynamic>,
         game: this
       );
       levels.add(level);

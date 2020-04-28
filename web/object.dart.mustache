@@ -20,12 +20,7 @@ const Map<ObjectTypes, String> objectTypeDescriptions = <ObjectTypes, String>{
 
 class GameObject {
   GameObject() {
-    type = ObjectTypes.object;
-    take = Sound(url: takeUrl);
-    use = Sound(url: useUrl);
-    cantUse = Sound(url: cantUseUrl);
-    contains = <GameObject>[];
-    containedObjectIndices = <int>[];
+    reset();
     {{#variables}}
     {{name}} = {{value}};
     {{/variables}}
@@ -36,9 +31,13 @@ class GameObject {
       Map<String, dynamic>data
     }
   ) {
+    reset();
     type = ObjectTypes.values[data['type'] as int];
     targetLevelIndex = data['targetLevelIndex'] as int;
-    containedObjectIndices = data['contains'] as List<int>;
+    for (final dynamic containedObjectIndexData in data['contains']) {
+      final int containedObjectIndex = containedObjectIndexData as int;
+      containedObjectIndices.add(containedObjectIndex);
+    }
     {{#variables}}
     {{name}} = data['{{name}}'] as {{type}};
     {{/variables}}
@@ -78,6 +77,15 @@ class GameObject {
     data['{{name}}'] = {{name}};
     {{/variables}}
     return data;
+  }
+  
+  void reset() {
+    type = ObjectTypes.object;
+    take = Sound(url: takeUrl);
+    use = Sound(url: useUrl);
+    cantUse = Sound(url: cantUseUrl);
+    contains = <GameObject>[];
+    containedObjectIndices = <int>[];
   }
 
   void drop(

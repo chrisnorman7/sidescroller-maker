@@ -201,10 +201,10 @@ class Level extends Page {
       Game game,
     }
   ) {
-    for (final Map<String, int> contentData in data['contents'] as List<Map<String, int>>) {
+    for (final dynamic contentData in data['contents']) {
       final LevelObject content = LevelObject.fromJson(
         level: level,
-        data: contentData,
+        data: contentData as Map<String, int>,
         game: game
       );
       level.contents.add(content);
