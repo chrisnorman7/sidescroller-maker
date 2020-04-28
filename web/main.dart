@@ -11,16 +11,16 @@ import 'page.dart';
 import 'player.dart';
 import 'utils.dart';
 
-String stringPromptDefaultValue, textPromptDefaultValue;
+String stringPromptDefaultValue;
 
 AnchorElement issueLink;
 DivElement startDiv, mainDiv;
 ParagraphElement keyboardArea, message;
-TextAreaElement gameJson, textInput;
-FormElement stringForm, textForm;
-SpanElement stringPrompt, textPrompt;
+TextAreaElement gameJson;
+FormElement stringForm;
+SpanElement stringPrompt;
 TextInputElement stringInput;
-ButtonInputElement startButton, stringCancel, textCancel;
+ButtonInputElement startButton, stringCancel;
 
 class GetText<T> {
   GetText(
@@ -36,44 +36,30 @@ class GetText<T> {
     if (T != String && multiline) {
       throw 'You cannot specify multiline with a non-String value.';
     }
-    if (prompt == null) {
-      if (multiline) {
-        prompt = textPromptDefaultValue;
-      } else {
-        prompt = stringPromptDefaultValue;
-      }
-    }
+    prompt ??= stringPromptDefaultValue;
     onok ??= (T value) => book.message(value.toString());
-    oncancel ??= (FormElement form) {
-      form.reset();
-      form.hidden = true;
+    oncancel ??= () {
+      stringForm.reset();
+      stringForm.hidden = true;
       keyboardArea.focus();
       book.showFocus();
     };
   }
 
+  final Book book;
+  String prompt;
+  final T value;
+  final bool multiline;
+  void Function(T value) onok;
+  void Function() oncancel;
+
   void dispatch() {
-    FormElement form;
-    SpanElement promptElement;
-    dynamic inputElement;
-    ButtonInputElement cancelElement;
-    if (multiline) {
-      form = textForm;
-      promptElement = textPrompt;
-      inputElement = textInput;
-      cancelElement = textCancel;
-    } else {
-      form = stringForm;
-      promptElement = stringPrompt;
-      inputElement = stringInput;
-      cancelElement = stringCancel;
-    }
-    cancelElement.onClick.listen((MouseEvent e) => oncancel(form));
-    form.onKeyDown.listen(
+    stringCancel.onClick.listen((MouseEvent e) => oncancel());
+    stringForm.onKeyDown.listen(
       (KeyboardEvent e) {
         if (e.key == 'Escape') {
           e.preventDefault();
-          oncancel(form);
+          oncancel();
         }
       }
     );
@@ -83,16 +69,16 @@ class GetText<T> {
     } else {
       stringValue = value.toString();
     }
-    inputElement.value = stringValue;
-    inputElement.setSelectionRange(0, -1);
-    promptElement.innerText = prompt;
-    form.hidden = false;
-    form.onSubmit.listen(
+    stringInput.value = stringValue;
+    stringInput.setSelectionRange(0, -1);
+    stringPrompt.innerText = prompt;
+    stringForm.hidden = false;
+    stringForm.onSubmit.listen(
       (Event e) {
         e.preventDefault();
-        form.hidden = true;
+        stringForm.hidden = true;
         book.showFocus();
-        final String stringValue = inputElement.value as String;
+        final String stringValue = stringInput.value;
         keyboardArea.focus();
         if (T == num) {
           onok(num.tryParse(stringValue) as T);
@@ -105,15 +91,8 @@ class GetText<T> {
         }
       }
     );
-    inputElement.focus();
+    stringInput.focus();
   }
-
-  final Book book;
-  String prompt;
-  final T value;
-  final bool multiline;
-  void Function(T value) onok;
-  void Function(FormElement form) oncancel;
 }
 
 Page editLevelMenu(Level level) {
@@ -811,11 +790,6 @@ void main() {
   stringPromptDefaultValue = stringPrompt.innerText;
   stringInput = document.querySelector('#stringInput') as TextInputElement;
   stringCancel = querySelector('#stringCancel') as ButtonInputElement;
-  textForm = querySelector('#textForm') as FormElement;
-  textPrompt = querySelector('#textPrompt') as SpanElement;
-  textPromptDefaultValue = textPrompt.innerText;
-  textInput = querySelector('#textInput') as TextAreaElement;
-  textCancel = querySelector('#textCancel') as ButtonInputElement;
   final String issueUrl = issueLink.href;
   issueLink.onClick.listen(
     (MouseEvent e) {
