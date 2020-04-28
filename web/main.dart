@@ -959,7 +959,7 @@ void main() {
                   b.game.objects,
                   (void Function() after) => GetText<String>(
                     b,
-                    prompt: 'Enter the name for the new object',
+                    prompt: 'Object name',
                     onok: (String value) {
                       if (value.isNotEmpty) {
                         final GameObject obj = GameObject();
