@@ -182,18 +182,21 @@ class Level extends Page {
   Level.fromJson(
     {
       Map<String, dynamic> data,
-      Level level,
       Game game,
     }
   ) {
     reset();
-    for (final dynamic contentData in data['contents']) {
+    for (final dynamic contentDataJson in data['contents']) {
+      final Map<String, int> contentData = <String, int>{
+        'objectIndex': contentDataJson['objectIndex'] as int,
+        'position': contentDataJson['position'] as int,
+      };
       final LevelObject content = LevelObject.fromJson(
-        level: level,
-        data: contentData as Map<String, int>,
+        level: this,
+        data: contentData,
         game: game
       );
-      level.contents.add(content);
+      contents.add(content);
     }
     titleString = data['titleString'] as String;
     size = data['size'] as int;
