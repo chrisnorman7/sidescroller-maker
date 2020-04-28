@@ -1,0 +1,68 @@
+{
+  "levels": [
+    {
+      "contents": [],
+      "titleString": "Level 1",
+      "size": 200,
+      "initialPosition": 0,
+      "speed": 400,
+      "beforeSceneUrl": null,
+      "footstepUrl": "res/footsteps/stone.wav",
+      "wallUrl": "res/level/wall.wav",
+      "turnUrl": "res/level/turn.wav",
+      "tripUrl": "res/level/trip.wav",
+      "ambianceUrl": null,
+      "musicUrl": null,
+      "convolverUrl": "res/impulses/EchoThiefImpulseResponseLibrary/Underground/TunnelToHell.wav",
+      "convolverVolume": 0.5,
+      "noWeaponUrl": "res/level/noweapon.wav"
+    }
+  ],
+  "objects": [
+    {
+      "type": 1,
+      "contains": [
+        1,
+        1
+      ],
+      "targetLevelIndex": null,
+      "title": "cat",
+      "takeUrl": "res/objects/take.wav",
+      "dropUrl": "res/objects/drop.wav",
+      "useUrl": "res/weapons/punch.wav",
+      "cantUseUrl": "res/objects/cantuse.wav",
+      "hitUrl": "res/objects/hit.wav",
+      "dieUrl": "res/objects/die.wav",
+      "soundUrl": "res/objects/object.wav",
+      "damage": 2,
+      "range": 1,
+      "health": 3,
+      "targetPosition": 0
+    },
+    {
+      "type": 2,
+      "contains": [],
+      "targetLevelIndex": null,
+      "title": "mouse",
+      "takeUrl": "res/objects/take.wav",
+      "dropUrl": "res/objects/drop.wav",
+      "useUrl": "res/weapons/punch.wav",
+      "cantUseUrl": "res/objects/cantuse.wav",
+      "hitUrl": "res/objects/hit.wav",
+      "dieUrl": "res/objects/die.wav",
+      "soundUrl": "res/objects/object.wav",
+      "damage": 2,
+      "range": 1,
+      "health": 3,
+      "targetPosition": 0
+    }
+  ],
+  "title": "Test Game",
+  "volumeSoundUrl": "res/menus/volume.wav",
+  "moveSoundUrl": "res/menus/move.wav",
+  "activateSoundUrl": "res/menus/activate.wav",
+  "musicUrl": "res/menus/music.mp3",
+  "volumeChangeAmount": 0.05,
+  "initialVolume": 0.5,
+  "initialMusicVolume": 0.25
+}
