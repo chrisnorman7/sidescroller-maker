@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
 
@@ -52,17 +53,20 @@ class GetText<T> {
   final bool multiline;
   void Function(T value) onok;
   void Function() oncancel;
+  StreamSubscription<Event> _cancelSubscription, _onkeydownSubscription, _onsubmitSubscription;
 
   void dispatch() {
-    stringCancel.onClick.listen((MouseEvent e) => oncancel());
-    stringForm.onKeyDown.listen(
-      (KeyboardEvent e) {
-        if (e.key == 'Escape') {
-          e.preventDefault();
-          oncancel();
-        }
+    _cancelSubscription = stringCancel.onClick.listen((MouseEvent e) {
+      stopListening();
+      oncancel();
+    });
+    _onkeydownSubscription = stringForm.onKeyDown.listen((KeyboardEvent e) {
+      if (e.key == 'Escape') {
+        e.preventDefault();
+        stopListening();
+        oncancel();
       }
-    );
+    });
     String stringValue;
     if (T == String) {
       stringValue = value as String;
@@ -73,7 +77,7 @@ class GetText<T> {
     stringInput.setSelectionRange(0, -1);
     stringPrompt.innerText = prompt;
     stringForm.hidden = false;
-    stringForm.onSubmit.listen(
+    _onsubmitSubscription = stringForm.onSubmit.listen(
       (Event e) {
         e.preventDefault();
         stringForm.hidden = true;
@@ -92,6 +96,12 @@ class GetText<T> {
       }
     );
     stringInput.focus();
+  }
+
+  void stopListening() {
+    _cancelSubscription.cancel();
+    _onkeydownSubscription.cancel();
+    _onsubmitSubscription.cancel();
   }
 }
 
