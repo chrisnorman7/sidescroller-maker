@@ -166,7 +166,7 @@ class Level extends Page {
     titleString = 'Untitled Level';
     size = 200;
     initialPosition = 0;
-    speed = 400;
+    speed = 200;
     beforeSceneUrl = 'res/level/beforescene.wav';
     footstepUrl = 'res/footsteps/stone.wav';
     wallUrl = 'res/level/wall.wav';
@@ -357,6 +357,7 @@ class Level extends Page {
       if (position < 0 || position > size) {
         wall.play(url: wallUrl);
       } else {
+        player.lastMoved = time;
         book.setPlayerPosition(position);
         if (direction != player.facing) {
           if (player.facing != LevelDirections.either) {
@@ -378,6 +379,7 @@ class Level extends Page {
     book.push(this);
     ambiance.play(url: ambianceUrl);
     loadContents();
+    book.player.lastMoved = 0;
     book.setPlayerPosition(position);
   }
 

@@ -91,7 +91,7 @@ Map<String, List<Attribute<dynamic>>> attributes = <String, List<Attribute<dynam
     ),
     Attribute<int>(
       'speed', 'Player speed',
-      value: 400
+      value: 200
     ),
     Attribute<String>(
       'beforeSceneUrl', 'Before scene URL',
