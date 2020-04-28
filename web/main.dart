@@ -1068,7 +1068,6 @@ void main() {
             Line(
               titleString: 'Throw an Error',
               func: (Book b) {
-                b.pop();
                 throw Exception('Error intentionally thrown by user.');
               }
             ),

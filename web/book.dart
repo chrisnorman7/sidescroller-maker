@@ -500,6 +500,9 @@ class Book{
   }
 
   void onkeydown(KeyboardEvent e) {
+    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey ) {
+      return; // Don't work with modifiers.
+    }
     final String key = e.key;
     if (scene != null) {
       if (key == 'Enter') {
