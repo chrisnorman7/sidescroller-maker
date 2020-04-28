@@ -534,7 +534,7 @@ Page editObjectMenu(GameObject object) {
       ).dispatch(),
     ),
     Line(
-      titleString: 'Position to exit from',
+      titleString: 'Exit position',
       func: (Book b) => GetText<int>(
         b,
         prompt: 'New value',
