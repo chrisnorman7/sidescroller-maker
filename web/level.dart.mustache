@@ -162,36 +162,10 @@ class NearestObject {
 
 class Level extends Page {
   Level() {
-    isLevel = true;
-    deadObjects = <LevelObject>[];
-    contents = <LevelObject>[];
+    reset();
     {{#variables}}
     {{name}} = {{value}};
     {{/variables}}
-    beforeScene = Sound(
-      url: beforeSceneUrl,
-    );
-    music = Sound(
-      url: musicUrl,
-    );
-    ambiance = Sound(
-      url: ambianceUrl
-    );
-    footstep = Sound(
-      url: footstepUrl,
-    );
-    wall = Sound(
-      url: wallUrl
-    );
-    turn = Sound(
-      url: turnUrl
-    );
-    trip = Sound(
-      url: tripUrl
-    );
-    noWeapon = Sound(
-      url: noWeaponUrl,
-    );
   }
 
   Level.fromJson(
@@ -201,6 +175,7 @@ class Level extends Page {
       Game game,
     }
   ) {
+    reset();
     for (final dynamic contentData in data['contents']) {
       final LevelObject content = LevelObject.fromJson(
         level: level,
@@ -245,6 +220,36 @@ class Level extends Page {
     data['{{name}}'] = {{name}};
     {{/variables}}
     return data;
+  }
+
+  void reset() {
+    isLevel = true;
+    deadObjects = <LevelObject>[];
+    contents = <LevelObject>[];
+    beforeScene = Sound(
+      url: beforeSceneUrl,
+    );
+    music = Sound(
+      url: musicUrl,
+    );
+    ambiance = Sound(
+      url: ambianceUrl
+    );
+    footstep = Sound(
+      url: footstepUrl,
+    );
+    wall = Sound(
+      url: wallUrl
+    );
+    turn = Sound(
+      url: turnUrl
+    );
+    trip = Sound(
+      url: tripUrl
+    );
+    noWeapon = Sound(
+      url: noWeaponUrl,
+    );
   }
 
   NearestObject nearestObject(

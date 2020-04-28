@@ -162,9 +162,7 @@ class NearestObject {
 
 class Level extends Page {
   Level() {
-    isLevel = true;
-    deadObjects = <LevelObject>[];
-    contents = <LevelObject>[];
+    reset();
     titleString = 'Untitled Level';
     size = 200;
     initialPosition = 0;
@@ -179,30 +177,6 @@ class Level extends Page {
     convolverUrl = 'res/impulses/EchoThiefImpulseResponseLibrary/Underground/TunnelToHell.wav';
     convolverVolume = 0.5;
     noWeaponUrl = 'res/level/noweapon.wav';
-    beforeScene = Sound(
-      url: beforeSceneUrl,
-    );
-    music = Sound(
-      url: musicUrl,
-    );
-    ambiance = Sound(
-      url: ambianceUrl
-    );
-    footstep = Sound(
-      url: footstepUrl,
-    );
-    wall = Sound(
-      url: wallUrl
-    );
-    turn = Sound(
-      url: turnUrl
-    );
-    trip = Sound(
-      url: tripUrl
-    );
-    noWeapon = Sound(
-      url: noWeaponUrl,
-    );
   }
 
   Level.fromJson(
@@ -212,6 +186,7 @@ class Level extends Page {
       Game game,
     }
   ) {
+    reset();
     for (final dynamic contentData in data['contents']) {
       final LevelObject content = LevelObject.fromJson(
         level: level,
@@ -286,6 +261,36 @@ class Level extends Page {
     data['convolverVolume'] = convolverVolume;
     data['noWeaponUrl'] = noWeaponUrl;
     return data;
+  }
+
+  void reset() {
+    isLevel = true;
+    deadObjects = <LevelObject>[];
+    contents = <LevelObject>[];
+    beforeScene = Sound(
+      url: beforeSceneUrl,
+    );
+    music = Sound(
+      url: musicUrl,
+    );
+    ambiance = Sound(
+      url: ambianceUrl
+    );
+    footstep = Sound(
+      url: footstepUrl,
+    );
+    wall = Sound(
+      url: wallUrl
+    );
+    turn = Sound(
+      url: turnUrl
+    );
+    trip = Sound(
+      url: tripUrl
+    );
+    noWeapon = Sound(
+      url: noWeaponUrl,
+    );
   }
 
   NearestObject nearestObject(
