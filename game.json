@@ -1,9 +1,14 @@
 {
   "levels": [
     {
-      "contents": [],
+      "contents": [
+        {
+          "objectIndex": 2,
+          "position": 20
+        }
+      ],
       "titleString": "Level 1",
-      "size": 200,
+      "size": 20,
       "initialPosition": 0,
       "speed": 400,
       "beforeSceneUrl": null,
@@ -11,7 +16,29 @@
       "wallUrl": "res/level/wall.wav",
       "turnUrl": "res/level/turn.wav",
       "tripUrl": "res/level/trip.wav",
-      "ambianceUrl": null,
+      "ambianceUrl": "res/level/amb/forest.wav",
+      "musicUrl": null,
+      "convolverUrl": "res/impulses/EchoThiefImpulseResponseLibrary/Underground/TunnelToHell.wav",
+      "convolverVolume": 0.5,
+      "noWeaponUrl": "res/level/noweapon.wav"
+    },
+    {
+      "contents": [
+        {
+          "objectIndex": 3,
+          "position": 15
+        }
+      ],
+      "titleString": "Level 2",
+      "size": 15,
+      "initialPosition": 0,
+      "speed": 400,
+      "beforeSceneUrl": null,
+      "footstepUrl": "res/footsteps/stone.wav",
+      "wallUrl": "res/level/wall.wav",
+      "turnUrl": "res/level/turn.wav",
+      "tripUrl": "res/level/trip.wav",
+      "ambianceUrl": "res/level/amb/ocean.wav",
       "musicUrl": null,
       "convolverUrl": "res/impulses/EchoThiefImpulseResponseLibrary/Underground/TunnelToHell.wav",
       "convolverVolume": 0.5,
@@ -44,6 +71,40 @@
       "contains": [],
       "targetLevelIndex": null,
       "title": "mouse",
+      "takeUrl": "res/objects/take.wav",
+      "dropUrl": "res/objects/drop.wav",
+      "useUrl": "res/weapons/punch.wav",
+      "cantUseUrl": "res/objects/cantuse.wav",
+      "hitUrl": "res/objects/hit.wav",
+      "dieUrl": "res/objects/die.wav",
+      "soundUrl": "res/objects/object.wav",
+      "damage": 2,
+      "range": 1,
+      "health": 3,
+      "targetPosition": 0
+    },
+    {
+      "type": 4,
+      "contains": [],
+      "targetLevelIndex": 1,
+      "title": "stairway going up",
+      "takeUrl": "res/objects/take.wav",
+      "dropUrl": "res/objects/drop.wav",
+      "useUrl": "res/weapons/punch.wav",
+      "cantUseUrl": "res/objects/cantuse.wav",
+      "hitUrl": "res/objects/hit.wav",
+      "dieUrl": "res/objects/die.wav",
+      "soundUrl": "res/objects/object.wav",
+      "damage": 2,
+      "range": 1,
+      "health": 3,
+      "targetPosition": 0
+    },
+    {
+      "type": 4,
+      "contains": [],
+      "targetLevelIndex": 0,
+      "title": "stairway going down",
       "takeUrl": "res/objects/take.wav",
       "dropUrl": "res/objects/drop.wav",
       "useUrl": "res/weapons/punch.wav",
