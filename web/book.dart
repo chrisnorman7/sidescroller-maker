@@ -272,10 +272,9 @@ class Book{
       } else if (page.playDefaultSounds) {
         url = game.moveSoundUrl;
       }
+      game.moveSound.stop();
       if (url != null) {
         game.moveSound.play(url: url);
-      } else {
-        game.moveSound.stop();
       }
       message(line.getTitle(this));
     }
