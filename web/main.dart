@@ -384,7 +384,7 @@ Page editObjectMenu(GameObject object) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
     ),
     Line(
       titleString: 'Take sound',
@@ -398,7 +398,8 @@ Page editObjectMenu(GameObject object) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: object.takeUrl,
     ),
     Line(
       titleString: 'Drop sound',
@@ -412,7 +413,8 @@ Page editObjectMenu(GameObject object) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: object.dropUrl,
     ),
     Line(
       titleString: 'Use sound',
@@ -426,7 +428,8 @@ Page editObjectMenu(GameObject object) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: object.useUrl,
     ),
     Line(
       titleString: 'Not usable sound',
@@ -440,7 +443,8 @@ Page editObjectMenu(GameObject object) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: object.cantUseUrl,
     ),
     Line(
       titleString: 'Hit sound',
@@ -454,7 +458,8 @@ Page editObjectMenu(GameObject object) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: object.hitUrl,
     ),
     Line(
       titleString: 'Die sound',
@@ -468,7 +473,8 @@ Page editObjectMenu(GameObject object) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: object.dieUrl,
     ),
     Line(
       titleString: 'Ambiance',
@@ -482,7 +488,8 @@ Page editObjectMenu(GameObject object) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: object.soundUrl,
     ),
     Line(
       titleString: 'Weapon damage',
@@ -496,7 +503,7 @@ Page editObjectMenu(GameObject object) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
     ),
     Line(
       titleString: 'Weapon range',
@@ -510,7 +517,7 @@ Page editObjectMenu(GameObject object) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
     ),
     Line(
       titleString: 'Max health',
@@ -524,7 +531,7 @@ Page editObjectMenu(GameObject object) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
     ),
     Line(
       titleString: 'Position to exit from',
@@ -538,7 +545,7 @@ Page editObjectMenu(GameObject object) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
     ),
     Line(
       titleFunc: (Book b) => 'Set Type (${objectTypeDescriptions[object.type]})',
@@ -622,6 +629,7 @@ Page editObjectMenu(GameObject object) {
   return Page(
     titleFunc: (Book b) => 'Edit ${object.title}',
     lines: lines,
+    playDefaultSounds: false,
   );
 }
 
@@ -675,7 +683,7 @@ Page gameMenu(Game game) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
     ),
     Line(
       titleString: 'Volume changed sound',
@@ -689,7 +697,8 @@ Page gameMenu(Game game) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: game.volumeSoundUrl,
     ),
     Line(
       titleString: 'Menu move sound',
@@ -703,7 +712,8 @@ Page gameMenu(Game game) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: game.moveSoundUrl,
     ),
     Line(
       titleString: 'Menu activate sound',
@@ -717,7 +727,8 @@ Page gameMenu(Game game) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: game.activateSoundUrl,
     ),
     Line(
       titleString: 'Menu music',
@@ -731,7 +742,8 @@ Page gameMenu(Game game) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: game.musicUrl,
     ),
     Line(
       titleString: 'Volume control sensitivity',
@@ -745,7 +757,7 @@ Page gameMenu(Game game) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
     ),
     Line(
       titleString: 'Initial sound volume',
@@ -759,7 +771,7 @@ Page gameMenu(Game game) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
     ),
     Line(
       titleString: 'Initial music volume',
@@ -773,12 +785,13 @@ Page gameMenu(Game game) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
     ),
   ];
   return Page(
     titleFunc: (Book b) => 'Configure ${game.title}',
-    lines: lines
+    lines: lines,
+    playDefaultSounds: false,
   );
 }
 

@@ -200,7 +200,10 @@ Page editObjectMenu(GameObject object) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      {{#soundUrl}}
+      soundUrl: object.{{name}},
+      {{/soundUrl}}
     ),
     {{/object}}
     Line(
@@ -285,6 +288,7 @@ Page editObjectMenu(GameObject object) {
   return Page(
     titleFunc: (Book b) => 'Edit ${object.title}',
     lines: lines,
+    playDefaultSounds: false,
   );
 }
 
@@ -339,13 +343,17 @@ Page gameMenu(Game game) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      {{#soundUrl}}
+      soundUrl: game.{{name}},
+      {{/soundUrl}}
     ),
     {{/game}}
   ];
   return Page(
     titleFunc: (Book b) => 'Configure ${game.title}',
-    lines: lines
+    lines: lines,
+    playDefaultSounds: false,
   );
 }
 
