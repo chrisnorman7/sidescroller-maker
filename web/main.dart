@@ -796,7 +796,8 @@ Page gameMenu(Game game) {
 }
 
 void main() {
-  final Book book = Book();
+      final Book book = Book();
+      book.message = (String text) => message.innerText = text;
   issueLink = querySelector('#issueLink') as AnchorElement;
   startDiv = querySelector('#startDiv') as DivElement;
   mainDiv = querySelector('#main') as DivElement;
@@ -857,10 +858,10 @@ void main() {
             }
           }
         }
-        if (gain == null) {
+        if (mainGain == null) {
           soundVolume = 'Sound output not present';
         } else {
-          soundVolume = gain.gain.value.toStringAsFixed(2);
+          soundVolume = mainGain.gain.value.toStringAsFixed(2);
         }
         if (musicGain == null) {
           musicVolume = 'Music output not present';
@@ -953,7 +954,6 @@ void main() {
       }
     }
   );
-  book.message = (String text) => message.innerText = text;
   startDiv.hidden = false;
   book.message('Finished loading.');
   startButton.onClick.listen(

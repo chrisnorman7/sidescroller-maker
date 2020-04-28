@@ -66,7 +66,7 @@ class LevelObject {
     panner = audio.createPanner();
     panner.maxDistance = 10;
     panner.rolloffFactor = 6;
-    panner.connectNode(gain);
+    panner.connectNode(soundGain);
     move(position);
     if (object.soundUrl != null) {
       sound = Sound(
@@ -277,7 +277,9 @@ class Level extends Page {
       url: musicUrl,
     );
     ambiance = Sound(
-      url: ambianceUrl
+      url: ambianceUrl,
+      loop: true,
+      output: ambianceGain
     );
     footstep = Sound(
       url: footstepUrl,
@@ -379,7 +381,7 @@ class Level extends Page {
     book.push(this);
     ambiance.play(url: ambianceUrl);
     loadContents();
-    gain.connectNode(convolver);
+    soundGain.connectNode(convolver);
     book.player.lastMoved = 0;
     book.setPlayerPosition(position);
   }

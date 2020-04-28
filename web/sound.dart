@@ -44,7 +44,7 @@ class Sound {
   ) {
     _url = url;
     _loop = loop;
-    _output = output ?? gain;
+    _output = output ?? soundGain;
   }
 
   String _url;

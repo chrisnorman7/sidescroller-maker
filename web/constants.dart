@@ -9,7 +9,9 @@ final AudioContext audio = AudioContext();
 
 final TextToSpeech textToSpeech = TextToSpeech();
 
-final GainNode gain = audio.createGain();
+final GainNode soundGain = audio.createGain();
+final GainNode ambianceGain = audio.createGain();
+final GainNode mainGain = audio.createGain();
 final GainNode musicGain = audio.createGain();
 
 Map<String, AudioBuffer> buffers = <String, AudioBuffer>{};

@@ -76,13 +76,13 @@ class Book{
       '[': Hotkey(
         titleString: 'Decrease sound volume',
         func: (Book b) => volumeDown(
-          output: gain
+          output: mainGain
         ),
       ),
       ']': Hotkey(
         titleString: 'Increase sound volume',
         func: (Book b) => volumeUp(
-          output: gain
+          output: mainGain
         ),
       ),
       '-': Hotkey(
@@ -402,7 +402,7 @@ class Book{
       GainNode output,
     }
   ) {
-    output ??= gain;
+    output ??= mainGain;
     setVolume(
       value: min(1.0, output.gain.value + game.volumeChangeAmount),
       output: output,
@@ -414,7 +414,7 @@ class Book{
       GainNode output,
     }
   ) {
-    output ??= gain;
+    output ??= mainGain;
     setVolume(
       value: max(0.0, output.gain.value - game.volumeChangeAmount) as double,
       output: output

@@ -109,7 +109,7 @@ class Game {
   }
 
   void resetVolumes() {
-    gain.gain.value = initialVolume;
+    mainGain.gain.value = initialVolume;
     musicGain.gain.value = initialMusicVolume;
   }
 

@@ -56,7 +56,9 @@ int distanceBetween(
 void startAudio() {
   audio.listener.setOrientation(0, 0, -1, 0, 1, 0);
   audio.listener.positionZ.value = -1;
-  for (final GainNode g in <GainNode>[gain, musicGain]) {
+  soundGain.connectNode(mainGain);
+  ambianceGain.connectNode(mainGain);
+  for (final GainNode g in <GainNode>[mainGain, musicGain]) {
     g.gain.value = 0.5;
     g.connectNode(audio.destination);
   }
