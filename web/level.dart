@@ -167,7 +167,7 @@ class Level extends Page {
     size = 200;
     initialPosition = 0;
     speed = 400;
-    beforeSceneUrl = null;
+    beforeSceneUrl = 'res/level/beforescene.wav';
     footstepUrl = 'res/footsteps/stone.wav';
     wallUrl = 'res/level/wall.wav';
     turnUrl = 'res/level/turn.wav';

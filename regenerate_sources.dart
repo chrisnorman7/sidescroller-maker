@@ -95,6 +95,7 @@ Map<String, List<Attribute<dynamic>>> attributes = <String, List<Attribute<dynam
     ),
     Attribute<String>(
       'beforeSceneUrl', 'Before scene URL',
+      value: 'res/level/beforescene.wav',
       soundUrl: true
     ),
     Attribute<String>(
