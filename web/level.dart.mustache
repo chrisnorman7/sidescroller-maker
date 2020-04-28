@@ -338,6 +338,7 @@ class Level extends Page {
     book.push(this);
     ambiance.play(url: ambianceUrl);
     loadContents();
+    gain.connectNode(convolver);
     book.player.lastMoved = 0;
     book.setPlayerPosition(position);
   }
@@ -350,14 +351,15 @@ class Level extends Page {
   ) {
     position ??= initialPosition;
     book.player.level = this;
-    if (convolverUrl != null) {
+    if (convolverUrl == null) {
+      convolver = null;
+    } else {
       loading = true;
       loadBuffer(
         url: convolverUrl,
         done: (AudioBuffer buffer) {
           convolver = audio.createConvolver();
           convolver.buffer = buffer;
-          gain.connectNode(convolver);
           convolverGain = audio.createGain();
           convolverGain.gain.value = convolverVolume;
           convolver.connectNode(convolverGain);
