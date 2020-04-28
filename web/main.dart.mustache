@@ -77,9 +77,9 @@ class GetText<T> {
     stringInput.setSelectionRange(0, -1);
     stringPrompt.innerText = prompt;
     stringForm.hidden = false;
-    _onsubmitSubscription = stringForm.onSubmit.listen(
-      (Event e) {
+    _onsubmitSubscription = stringForm.onSubmit.listen((Event e) {
         e.preventDefault();
+        stopListening();
         stringForm.hidden = true;
         book.showFocus();
         final String stringValue = stringInput.value;
@@ -93,8 +93,7 @@ class GetText<T> {
         } else {
           throw 'Unsure how to ast as <$T>.';
         }
-      }
-    );
+    });
     stringInput.focus();
   }
 
