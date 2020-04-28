@@ -1,5 +1,7 @@
 import 'dart:io';
+
 import 'package:mustache/mustache.dart';
+import 'package:path/path.dart' as path;
 
 class Attribute<T> {
   Attribute(
@@ -37,7 +39,7 @@ class Attribute<T> {
 Map<String, List<Attribute<dynamic>>> attributes = <String, List<Attribute<dynamic>>>{
   'web/game.dart': <Attribute<dynamic>>[
     Attribute<String>(
-      'title', 'Game Title',
+      'title', 'Rename',
       value: 'Untitled Game'
     ),
     Attribute<String>(
@@ -71,7 +73,7 @@ Map<String, List<Attribute<dynamic>>> attributes = <String, List<Attribute<dynam
   ],
   'web/level.dart': <Attribute<dynamic>>[
     Attribute<String>(
-      'titleString', 'Name',
+      'titleString', 'Rename',
       value: 'Untitled Level', initialise: false
     ),
     Attribute<int>(
@@ -125,12 +127,8 @@ Map<String, List<Attribute<dynamic>>> attributes = <String, List<Attribute<dynam
     ),
   ],
   'web/object.dart': <Attribute<dynamic>>[
-    Attribute<int>(
-      'targetPosition', 'Position to exit from',
-      value: 0
-    ),
     Attribute<String>(
-      'title', 'Name'
+      'title', 'Rename'
     ),
     Attribute<String>(
       'takeUrl', 'Take sound',
@@ -145,7 +143,7 @@ Map<String, List<Attribute<dynamic>>> attributes = <String, List<Attribute<dynam
       value: 'res/weapons/punch.wav'
     ),
     Attribute<String>(
-      'cantUseUrl', "Can't use sound",
+      'cantUseUrl', 'Not usable sound',
       value: 'res/objects/cantuse.wav'
     ),
     Attribute<String>(
@@ -172,10 +170,16 @@ Map<String, List<Attribute<dynamic>>> attributes = <String, List<Attribute<dynam
       'health', 'Max health',
       value: 3
     ),
+    Attribute<int>(
+      'targetPosition', 'Position to exit from',
+      value: 0
+    ),
   ]
 };
 
 void main() {
+  final Stopwatch clock = Stopwatch();
+  clock.start();
   final Map<String, List<Map<String, dynamic>>> allAttributes = <String, List<Map<String, dynamic>>>{};
   attributes.forEach(
     (String filename, List<Attribute<dynamic>> classAttributes) {
@@ -183,6 +187,7 @@ void main() {
       for (final Attribute<dynamic> attribute in classAttributes) {
         variablesData.add(<String, dynamic>{
           'name': attribute.name,
+          'description': attribute.description,
           'type': attribute.type.toString(),
           'value': attribute.stringValue,
           'declaration': attribute.declaration,
@@ -203,8 +208,7 @@ void main() {
       final Template template = Template(templateContents, htmlEscapeValues : false);
       final String source = template.renderString(
         <String, dynamic>{
-          'variables': attributesList,
-          'attributes': allAttributes,
+          'variables': attributesList
         }
       );
       final File sourceFile = File(filename);
@@ -212,4 +216,19 @@ void main() {
       print('Wrote file $filename.');
     }
   );
+  const String filename = 'web/main.dart';
+  final Map<String, dynamic> mainAttributes = <String, dynamic>{};
+  allAttributes.forEach(
+    (String filename, List<Map<String, dynamic>> a) => mainAttributes[path.basenameWithoutExtension(filename)] = a
+  );
+  final File templateFile = File('$filename.mustache');
+  print('Reading file $filename.');
+  final String templateContents = templateFile.readAsStringSync();
+  final Template template = Template(templateContents, htmlEscapeValues : false);
+  final String source = template.renderString(mainAttributes);
+  final File sourceFile = File(filename);
+  sourceFile.writeAsString(source);
+  print('Wrote file $filename.');
+  clock.stop();
+  print('Completed in ${clock.elapsed}.');
 }

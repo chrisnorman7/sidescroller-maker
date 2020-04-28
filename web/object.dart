@@ -26,7 +26,6 @@ class GameObject {
     cantUse = Sound(url: cantUseUrl);
     contains = <GameObject>[];
     containedObjectIndices = <int>[];
-    targetPosition = 0;
     title = null;
     takeUrl = 'res/objects/take.wav';
     dropUrl = 'res/objects/drop.wav';
@@ -38,6 +37,7 @@ class GameObject {
     damage = 2;
     range = 1;
     health = 3;
+    targetPosition = 0;
   }
 
   GameObject.fromJson(
@@ -48,7 +48,6 @@ class GameObject {
     type = ObjectTypes.values[data['type'] as int];
     targetLevelIndex = data['targetLevelIndex'] as int;
     containedObjectIndices = data['contains'] as List<int>;
-    targetPosition = data['targetPosition'] as int;
     title = data['title'] as String;
     takeUrl = data['takeUrl'] as String;
     dropUrl = data['dropUrl'] as String;
@@ -60,9 +59,9 @@ class GameObject {
     damage = data['damage'] as int;
     range = data['range'] as int;
     health = data['health'] as int;
+    targetPosition = data['targetPosition'] as int;
   }
 
-  int targetPosition;
   String title;
   String takeUrl;
   String dropUrl;
@@ -74,6 +73,7 @@ class GameObject {
   int damage;
   int range;
   int health;
+  int targetPosition;
 
   ObjectTypes type;
   Sound take, use, cantUse;
@@ -99,7 +99,6 @@ class GameObject {
     for (final GameObject containedObject in contains) {
       data['contains'].add(game.objects.indexOf(containedObject));
     }
-    data['targetPosition'] = targetPosition;
     data['title'] = title;
     data['takeUrl'] = takeUrl;
     data['dropUrl'] = dropUrl;
@@ -111,6 +110,7 @@ class GameObject {
     data['damage'] = damage;
     data['range'] = range;
     data['health'] = health;
+    data['targetPosition'] = targetPosition;
     return data;
   }
 

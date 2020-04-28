@@ -22,132 +22,303 @@ SpanElement stringPrompt, textPrompt;
 TextInputElement stringInput;
 ButtonInputElement startButton, stringCancel, textCancel;
 
-void getText(
-  {
-    Book book,
-    String prompt,
-    String value = '',
-    bool multiline = false,
-    void Function(
-      {
-        String value,
-        Book book,
-      }
-    ) onok,
-    void Function(
-      {
-        FormElement form,
-        Book book,
-      }
-    ) oncancel,
-  }
-) {
-  if (prompt == null) {
-    if (multiline) {
-      prompt = textPromptDefaultValue;
-    } else {
-      prompt = stringPromptDefaultValue;
-    }
-  }
-  onok ??= (
+class GetText<T> {
+  GetText(
+    this.book,
     {
-      String value,
-      Book book
-    }
-  ) => book.message(value);
-  oncancel ??= (
-    {
-      FormElement form,
-      Book book,
+      this.prompt,
+      this.value,
+      this.onok,
+      this.oncancel,
+      this.multiline = false,
     }
   ) {
-    form.reset();
-    form.hidden = true;
-    keyboardArea.focus();
-    book.showFocus();
-  };
-  FormElement form;
-  SpanElement promptElement;
-  dynamic inputElement;
-  ButtonInputElement cancelElement;
-  if (multiline) {
-    form = textForm;
-    promptElement = textPrompt;
-    inputElement = textInput;
-    cancelElement = textCancel;
-  } else {
-    form = stringForm;
-    promptElement = stringPrompt;
-    inputElement = stringInput;
-    cancelElement = stringCancel;
-  }
-  cancelElement.onClick.listen(
-    (MouseEvent e) => oncancel(
-      form: form,
-      book: book
-    )
-  );
-  form.onKeyDown.listen(
-    (KeyboardEvent e) {
-      if (e.key == 'Escape') {
-        e.preventDefault();
-        oncancel(
-          form: form,
-          book: book
-        );
+    if (T != String && multiline) {
+      throw 'You cannot specify multiline with a non-String value.';
+    }
+    if (prompt == null) {
+      if (multiline) {
+        prompt = textPromptDefaultValue;
+      } else {
+        prompt = stringPromptDefaultValue;
       }
     }
-  );
-  inputElement.value = value;
-  inputElement.setSelectionRange(0, -1);
-  promptElement.innerText = prompt;
-  form.hidden = false;
-  form.onSubmit.listen(
-    (Event e) {
-      e.preventDefault();
+    onok ??= (T value) => book.message(value.toString());
+    oncancel ??= (FormElement form) {
+      form.reset();
       form.hidden = true;
-      book.showFocus();
-      onok(
-        value: inputElement.value as String,
-        book: book
-      );
       keyboardArea.focus();
+      book.showFocus();
+    };
+  }
+
+  void dispatch() {
+    FormElement form;
+    SpanElement promptElement;
+    dynamic inputElement;
+    ButtonInputElement cancelElement;
+    if (multiline) {
+      form = textForm;
+      promptElement = textPrompt;
+      inputElement = textInput;
+      cancelElement = textCancel;
+    } else {
+      form = stringForm;
+      promptElement = stringPrompt;
+      inputElement = stringInput;
+      cancelElement = stringCancel;
     }
-  );
-  inputElement.focus();
+    cancelElement.onClick.listen((MouseEvent e) => oncancel(form));
+    form.onKeyDown.listen(
+      (KeyboardEvent e) {
+        if (e.key == 'Escape') {
+          e.preventDefault();
+          oncancel(form);
+        }
+      }
+    );
+    String stringValue;
+    if (T == String) {
+      stringValue = value as String;
+    } else {
+      stringValue = value.toString();
+    }
+    inputElement.value = stringValue;
+    inputElement.setSelectionRange(0, -1);
+    promptElement.innerText = prompt;
+    form.hidden = false;
+    form.onSubmit.listen(
+      (Event e) {
+        e.preventDefault();
+        form.hidden = true;
+        book.showFocus();
+        final String stringValue = inputElement.value as String;
+        keyboardArea.focus();
+        if (T == num) {
+          onok(num.tryParse(stringValue) as T);
+        } else if (T == String) {
+          onok(stringValue as T);
+        } else if (T == int) {
+          onok(int.tryParse(stringValue) as T);
+        } else {
+          throw 'Unsure how to ast as <$T>.';
+        }
+      }
+    );
+    inputElement.focus();
+  }
+
+  final Book book;
+  String prompt;
+  final T value;
+  final bool multiline;
+  void Function(T value) onok;
+  void Function(FormElement form) oncancel;
 }
 
-Page editLevelMenu(
-  {
-    Book b,
-    Level level,
-  }
-) {
+Page editLevelMenu(Level level) {
   final List<Line> lines = <Line>[
-    Line(
-      titleString: 'Rename',
-      func: (Book b) => getText(
-        book: b,
-        prompt: 'Enter new level name',
-        value: level.titleString,
-        onok: (
-          {
-            String value,
-            Book book
-          }
-        ) {
-          if (value.isNotEmpty && value != level.titleString) {
-            level.titleString = value;
-            book.message('Level renamed.');
-          }
-        }
-      )
-    ),
     Line(
       titleString: 'Play',
       func: (Book b) => level.play(
         book: b
       )
+    ),
+    Line(
+      titleString: 'Rename',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: level.titleString,
+        onok: (String value) {
+          if (value != level.titleString) {
+            level.titleString = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Width',
+      func: (Book b) => GetText<int>(
+        b,
+        prompt: 'New value',
+        value: level.size,
+        onok: (int value) {
+          if (value != level.size) {
+            level.size = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Start at',
+      func: (Book b) => GetText<int>(
+        b,
+        prompt: 'New value',
+        value: level.initialPosition,
+        onok: (int value) {
+          if (value != level.initialPosition) {
+            level.initialPosition = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Player speed',
+      func: (Book b) => GetText<int>(
+        b,
+        prompt: 'New value',
+        value: level.speed,
+        onok: (int value) {
+          if (value != level.speed) {
+            level.speed = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Before scene URL',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: level.beforeSceneUrl,
+        onok: (String value) {
+          if (value != level.beforeSceneUrl) {
+            level.beforeSceneUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Footstep sound',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: level.footstepUrl,
+        onok: (String value) {
+          if (value != level.footstepUrl) {
+            level.footstepUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Wall sound',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: level.wallUrl,
+        onok: (String value) {
+          if (value != level.wallUrl) {
+            level.wallUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Turn sound',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: level.turnUrl,
+        onok: (String value) {
+          if (value != level.turnUrl) {
+            level.turnUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Trip sound',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: level.tripUrl,
+        onok: (String value) {
+          if (value != level.tripUrl) {
+            level.tripUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Ambiance',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: level.ambianceUrl,
+        onok: (String value) {
+          if (value != level.ambianceUrl) {
+            level.ambianceUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Level music',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: level.musicUrl,
+        onok: (String value) {
+          if (value != level.musicUrl) {
+            level.musicUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Impulse response',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: level.convolverUrl,
+        onok: (String value) {
+          if (value != level.convolverUrl) {
+            level.convolverUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Convolver volume',
+      func: (Book b) => GetText<num>(
+        b,
+        prompt: 'New value',
+        value: level.convolverVolume,
+        onok: (num value) {
+          if (value != level.convolverVolume) {
+            level.convolverVolume = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'No weapon sound',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: level.noWeaponUrl,
+        onok: (String value) {
+          if (value != level.noWeaponUrl) {
+            level.noWeaponUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
     ),
   ];
   lines.add(
@@ -193,9 +364,7 @@ Page levelsMenu(Book b) {
       Line(
         titleFunc: (Book b) => level.titleString,
         func: (Book b) => b.push(
-          editLevelMenu(
-            level: level
-          )
+          editLevelMenu(level)
         )
       )
     );
@@ -206,30 +375,175 @@ Page levelsMenu(Book b) {
   );
 }
 
-Page editObjectMenu(
-  {
-    GameObject object,
-  }
-) {
+Page editObjectMenu(GameObject object) {
   final List<Line> lines = <Line>[
     Line(
       titleString: 'Rename',
-      func: (Book b) => getText(
-        book: b,
-        prompt: 'New title',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
         value: object.title,
-        onok: (
-          {
-            String value,
-            Book book,
-          }
-        ) {
-          if (value.isNotEmpty) {
+        onok: (String value) {
+          if (value != object.title) {
             object.title = value;
+            b.message('Done.');
           }
-          book.showFocus();
         }
-      )
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Take sound',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: object.takeUrl,
+        onok: (String value) {
+          if (value != object.takeUrl) {
+            object.takeUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Drop sound',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: object.dropUrl,
+        onok: (String value) {
+          if (value != object.dropUrl) {
+            object.dropUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Use sound',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: object.useUrl,
+        onok: (String value) {
+          if (value != object.useUrl) {
+            object.useUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Not usable sound',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: object.cantUseUrl,
+        onok: (String value) {
+          if (value != object.cantUseUrl) {
+            object.cantUseUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Hit sound',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: object.hitUrl,
+        onok: (String value) {
+          if (value != object.hitUrl) {
+            object.hitUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Die sound',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: object.dieUrl,
+        onok: (String value) {
+          if (value != object.dieUrl) {
+            object.dieUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Ambiance',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: object.soundUrl,
+        onok: (String value) {
+          if (value != object.soundUrl) {
+            object.soundUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Weapon damage',
+      func: (Book b) => GetText<int>(
+        b,
+        prompt: 'New value',
+        value: object.damage,
+        onok: (int value) {
+          if (value != object.damage) {
+            object.damage = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Weapon range',
+      func: (Book b) => GetText<int>(
+        b,
+        prompt: 'New value',
+        value: object.range,
+        onok: (int value) {
+          if (value != object.range) {
+            object.range = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Max health',
+      func: (Book b) => GetText<int>(
+        b,
+        prompt: 'New value',
+        value: object.health,
+        onok: (int value) {
+          if (value != object.health) {
+            object.health = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Position to exit from',
+      func: (Book b) => GetText<int>(
+        b,
+        prompt: 'New value',
+        value: object.targetPosition,
+        onok: (int value) {
+          if (value != object.targetPosition) {
+            object.targetPosition = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
     ),
     Line(
       titleFunc: (Book b) => 'Set Type (${objectTypeDescriptions[object.type]})',
@@ -362,34 +676,123 @@ Page objectsMenu(
   );
 }
 
-Page gameMenu(
-  {
-    Game game
-  }
-) {
+Page gameMenu(Game game) {
   final List<Line> lines = <Line>[
     Line(
       titleString: 'Rename',
-      func: (Book b) => getText(
-        book: b,
-        prompt: 'Enter a new name',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
         value: game.title,
-        onok: (
-          {
-            String value,
-            Book book,
+        onok: (String value) {
+          if (value != game.title) {
+            game.title = value;
+            b.message('Done.');
           }
-        ) {
-          if (value.isEmpty) {
-            value = game.title;
-          }
-          game.title = value;
         }
-      )
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Volume changed sound',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: game.volumeSoundUrl,
+        onok: (String value) {
+          if (value != game.volumeSoundUrl) {
+            game.volumeSoundUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Menu move sound',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: game.moveSoundUrl,
+        onok: (String value) {
+          if (value != game.moveSoundUrl) {
+            game.moveSoundUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Menu activate sound',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: game.activateSoundUrl,
+        onok: (String value) {
+          if (value != game.activateSoundUrl) {
+            game.activateSoundUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Menu music',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: game.musicUrl,
+        onok: (String value) {
+          if (value != game.musicUrl) {
+            game.musicUrl = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Volume control sensitivity',
+      func: (Book b) => GetText<num>(
+        b,
+        prompt: 'New value',
+        value: game.volumeChangeAmount,
+        onok: (num value) {
+          if (value != game.volumeChangeAmount) {
+            game.volumeChangeAmount = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Initial sound volume',
+      func: (Book b) => GetText<num>(
+        b,
+        prompt: 'New value',
+        value: game.initialVolume,
+        onok: (num value) {
+          if (value != game.initialVolume) {
+            game.initialVolume = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    Line(
+      titleString: 'Initial music volume',
+      func: (Book b) => GetText<num>(
+        b,
+        prompt: 'New value',
+        value: game.initialMusicVolume,
+        onok: (num value) {
+          if (value != game.initialMusicVolume) {
+            game.initialMusicVolume = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
     ),
   ];
   return Page(
-    titleString: 'Game Menu',
+    titleFunc: (Book b) => 'Configure ${game.title}',
     lines: lines
   );
 }
@@ -585,15 +988,10 @@ void main() {
                       Book book,
                       void Function() after
                     }
-                  ) => getText(
-                    book: b,
+                  ) => GetText<String>(
+                    b,
                     prompt: 'Enter the name for the new object',
-                    onok: (
-                      {
-                        String value,
-                        Book book
-                      }
-                    ) {
+                    onok: (String value) {
                       if (value.isNotEmpty) {
                         final GameObject obj = GameObject();
                         obj.title = value;
@@ -601,16 +999,14 @@ void main() {
                         after();
                       }
                     }
-                  ),
+                  ).dispatch(),
                   editObject: (
                     {
                       Book book,
                       GameObject object
                     }
                   ) => book.push(
-                    editObjectMenu(
-                      object: object
-                    )
+                    editObjectMenu(object)
                   )
                 )
               )
@@ -618,9 +1014,7 @@ void main() {
             Line(
               titleString: 'Configure Game',
               func: (Book b) => b.push(
-                gameMenu(
-                  game: b.game
-                )
+                gameMenu(b.game)
               )
             ),
             Line(

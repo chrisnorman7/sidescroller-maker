@@ -22,133 +22,124 @@ SpanElement stringPrompt, textPrompt;
 TextInputElement stringInput;
 ButtonInputElement startButton, stringCancel, textCancel;
 
-void getText(
-  {
-    Book book,
-    String prompt,
-    String value = '',
-    bool multiline = false,
-    void Function(
-      {
-        String value,
-        Book book,
-      }
-    ) onok,
-    void Function(
-      {
-        FormElement form,
-        Book book,
-      }
-    ) oncancel,
-  }
-) {
-  if (prompt == null) {
-    if (multiline) {
-      prompt = textPromptDefaultValue;
-    } else {
-      prompt = stringPromptDefaultValue;
-    }
-  }
-  onok ??= (
+class GetText<T> {
+  GetText(
+    this.book,
     {
-      String value,
-      Book book
-    }
-  ) => book.message(value);
-  oncancel ??= (
-    {
-      FormElement form,
-      Book book,
+      this.prompt,
+      this.value,
+      this.onok,
+      this.oncancel,
+      this.multiline = false,
     }
   ) {
-    form.reset();
-    form.hidden = true;
-    keyboardArea.focus();
-    book.showFocus();
-  };
-  FormElement form;
-  SpanElement promptElement;
-  dynamic inputElement;
-  ButtonInputElement cancelElement;
-  if (multiline) {
-    form = textForm;
-    promptElement = textPrompt;
-    inputElement = textInput;
-    cancelElement = textCancel;
-  } else {
-    form = stringForm;
-    promptElement = stringPrompt;
-    inputElement = stringInput;
-    cancelElement = stringCancel;
-  }
-  cancelElement.onClick.listen(
-    (MouseEvent e) => oncancel(
-      form: form,
-      book: book
-    )
-  );
-  form.onKeyDown.listen(
-    (KeyboardEvent e) {
-      if (e.key == 'Escape') {
-        e.preventDefault();
-        oncancel(
-          form: form,
-          book: book
-        );
+    if (T != String && multiline) {
+      throw 'You cannot specify multiline with a non-String value.';
+    }
+    if (prompt == null) {
+      if (multiline) {
+        prompt = textPromptDefaultValue;
+      } else {
+        prompt = stringPromptDefaultValue;
       }
     }
-  );
-  inputElement.value = value;
-  inputElement.setSelectionRange(0, -1);
-  promptElement.innerText = prompt;
-  form.hidden = false;
-  form.onSubmit.listen(
-    (Event e) {
-      e.preventDefault();
+    onok ??= (T value) => book.message(value.toString());
+    oncancel ??= (FormElement form) {
+      form.reset();
       form.hidden = true;
-      book.showFocus();
-      onok(
-        value: inputElement.value as String,
-        book: book
-      );
       keyboardArea.focus();
+      book.showFocus();
+    };
+  }
+
+  void dispatch() {
+    FormElement form;
+    SpanElement promptElement;
+    dynamic inputElement;
+    ButtonInputElement cancelElement;
+    if (multiline) {
+      form = textForm;
+      promptElement = textPrompt;
+      inputElement = textInput;
+      cancelElement = textCancel;
+    } else {
+      form = stringForm;
+      promptElement = stringPrompt;
+      inputElement = stringInput;
+      cancelElement = stringCancel;
     }
-  );
-  inputElement.focus();
+    cancelElement.onClick.listen((MouseEvent e) => oncancel(form));
+    form.onKeyDown.listen(
+      (KeyboardEvent e) {
+        if (e.key == 'Escape') {
+          e.preventDefault();
+          oncancel(form);
+        }
+      }
+    );
+    String stringValue;
+    if (T == String) {
+      stringValue = value as String;
+    } else {
+      stringValue = value.toString();
+    }
+    inputElement.value = stringValue;
+    inputElement.setSelectionRange(0, -1);
+    promptElement.innerText = prompt;
+    form.hidden = false;
+    form.onSubmit.listen(
+      (Event e) {
+        e.preventDefault();
+        form.hidden = true;
+        book.showFocus();
+        final String stringValue = inputElement.value as String;
+        keyboardArea.focus();
+        if (T == num) {
+          onok(num.tryParse(stringValue) as T);
+        } else if (T == String) {
+          onok(stringValue as T);
+        } else if (T == int) {
+          onok(int.tryParse(stringValue) as T);
+        } else {
+          throw 'Unsure how to ast as <$T>.';
+        }
+      }
+    );
+    inputElement.focus();
+  }
+
+  final Book book;
+  String prompt;
+  final T value;
+  final bool multiline;
+  void Function(T value) onok;
+  void Function(FormElement form) oncancel;
 }
 
-Page editLevelMenu(
-  {
-    Book b,
-    Level level,
-  }
-) {
+Page editLevelMenu(Level level) {
   final List<Line> lines = <Line>[
-    Line(
-      titleString: 'Rename',
-      func: (Book b) => getText(
-        book: b,
-        prompt: 'Enter new level name',
-        value: level.titleString,
-        onok: (
-          {
-            String value,
-            Book book
-          }
-        ) {
-          if (value.isNotEmpty && value != level.titleString) {
-            level.titleString = value;
-            book.message('Level renamed.');
-          }
-        }
-      )
-    ),
     Line(
       titleString: 'Play',
       func: (Book b) => level.play(
         book: b
       )
     ),
+    {{#level}}
+    Line(
+      titleString: '{{description}}',
+      func: (Book b) => GetText<{{type}}>(
+        b,
+        prompt: 'New value',
+        value: level.{{name}},
+        onok: ({{type}} value) {
+          if (value != level.{{name}}) {
+            level.{{name}} = value;
+            b.message('Done.');
+          }
+        }
+      ).dispatch()
+    ),
+    {{/level}}
   ];
   lines.add(
     Line(
@@ -193,9 +184,7 @@ Page levelsMenu(Book b) {
       Line(
         titleFunc: (Book b) => level.titleString,
         func: (Book b) => b.push(
-          editLevelMenu(
-            level: level
-          )
+          editLevelMenu(level)
         )
       )
     );
@@ -206,31 +195,24 @@ Page levelsMenu(Book b) {
   );
 }
 
-Page editObjectMenu(
-  {
-    GameObject object,
-  }
-) {
+Page editObjectMenu(GameObject object) {
   final List<Line> lines = <Line>[
+    {{#object}}
     Line(
-      titleString: 'Rename',
-      func: (Book b) => getText(
-        book: b,
-        prompt: 'New title',
-        value: object.title,
-        onok: (
-          {
-            String value,
-            Book book,
+      titleString: '{{description}}',
+      func: (Book b) => GetText<{{type}}>(
+        b,
+        prompt: 'New value',
+        value: object.{{name}},
+        onok: ({{type}} value) {
+          if (value != object.{{name}}) {
+            object.{{name}} = value;
+            b.message('Done.');
           }
-        ) {
-          if (value.isNotEmpty) {
-            object.title = value;
-          }
-          book.showFocus();
         }
-      )
+      ).dispatch()
     ),
+    {{/object}}
     Line(
       titleFunc: (Book b) => 'Set Type (${objectTypeDescriptions[object.type]})',
       func: (Book b) {
@@ -362,34 +344,27 @@ Page objectsMenu(
   );
 }
 
-Page gameMenu(
-  {
-    Game game
-  }
-) {
+Page gameMenu(Game game) {
   final List<Line> lines = <Line>[
+    {{#game}}
     Line(
-      titleString: 'Rename',
-      func: (Book b) => getText(
-        book: b,
-        prompt: 'Enter a new name',
-        value: game.title,
-        onok: (
-          {
-            String value,
-            Book book,
+      titleString: '{{description}}',
+      func: (Book b) => GetText<{{type}}>(
+        b,
+        prompt: 'New value',
+        value: game.{{name}},
+        onok: ({{type}} value) {
+          if (value != game.{{name}}) {
+            game.{{name}} = value;
+            b.message('Done.');
           }
-        ) {
-          if (value.isEmpty) {
-            value = game.title;
-          }
-          game.title = value;
         }
-      )
+      ).dispatch()
     ),
+    {{/game}}
   ];
   return Page(
-    titleString: 'Game Menu',
+    titleFunc: (Book b) => 'Configure ${game.title}',
     lines: lines
   );
 }
@@ -585,15 +560,10 @@ void main() {
                       Book book,
                       void Function() after
                     }
-                  ) => getText(
-                    book: b,
+                  ) => GetText<String>(
+                    b,
                     prompt: 'Enter the name for the new object',
-                    onok: (
-                      {
-                        String value,
-                        Book book
-                      }
-                    ) {
+                    onok: (String value) {
                       if (value.isNotEmpty) {
                         final GameObject obj = GameObject();
                         obj.title = value;
@@ -601,16 +571,14 @@ void main() {
                         after();
                       }
                     }
-                  ),
+                  ).dispatch(),
                   editObject: (
                     {
                       Book book,
                       GameObject object
                     }
                   ) => book.push(
-                    editObjectMenu(
-                      object: object
-                    )
+                    editObjectMenu(object)
                   )
                 )
               )
@@ -618,9 +586,7 @@ void main() {
             Line(
               titleString: 'Configure Game',
               func: (Book b) => b.push(
-                gameMenu(
-                  game: b.game
-                )
+                gameMenu(b.game)
               )
             ),
             Line(
