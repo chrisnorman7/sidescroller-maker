@@ -113,7 +113,7 @@ Page editLevelMenu(Level level) {
       )
     ),
     Line(
-      titleFunc: (Book b) => 'Rename (${level.titleString})',
+      titleFunc: (Book b) => 'Rename (${level.titleString ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -121,13 +121,13 @@ Page editLevelMenu(Level level) {
         onok: (String value) {
           if (value != level.titleString) {
             level.titleString = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
     ),
     Line(
-      titleFunc: (Book b) => 'Width (${level.size})',
+      titleFunc: (Book b) => 'Width (${level.size ?? "Not set"})',
       func: (Book b) => GetText<int>(
         b,
         prompt: 'New value',
@@ -135,13 +135,13 @@ Page editLevelMenu(Level level) {
         onok: (int value) {
           if (value != level.size) {
             level.size = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
     ),
     Line(
-      titleFunc: (Book b) => 'Start at (${level.initialPosition})',
+      titleFunc: (Book b) => 'Start at (${level.initialPosition ?? "Not set"})',
       func: (Book b) => GetText<int>(
         b,
         prompt: 'New value',
@@ -149,13 +149,13 @@ Page editLevelMenu(Level level) {
         onok: (int value) {
           if (value != level.initialPosition) {
             level.initialPosition = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
     ),
     Line(
-      titleFunc: (Book b) => 'Player speed (${level.speed})',
+      titleFunc: (Book b) => 'Player speed (${level.speed ?? "Not set"})',
       func: (Book b) => GetText<int>(
         b,
         prompt: 'New value',
@@ -163,13 +163,13 @@ Page editLevelMenu(Level level) {
         onok: (int value) {
           if (value != level.speed) {
             level.speed = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
     ),
     Line(
-      titleFunc: (Book b) => 'Before scene URL (${level.beforeSceneUrl})',
+      titleFunc: (Book b) => 'Before scene URL (${level.beforeSceneUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -177,14 +177,14 @@ Page editLevelMenu(Level level) {
         onok: (String value) {
           if (value != level.beforeSceneUrl) {
             level.beforeSceneUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => level.beforeSceneUrl,
     ),
     Line(
-      titleFunc: (Book b) => 'Footstep sound (${level.footstepUrl})',
+      titleFunc: (Book b) => 'Footstep sound (${level.footstepUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -192,14 +192,14 @@ Page editLevelMenu(Level level) {
         onok: (String value) {
           if (value != level.footstepUrl) {
             level.footstepUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => level.footstepUrl,
     ),
     Line(
-      titleFunc: (Book b) => 'Wall sound (${level.wallUrl})',
+      titleFunc: (Book b) => 'Wall sound (${level.wallUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -207,14 +207,14 @@ Page editLevelMenu(Level level) {
         onok: (String value) {
           if (value != level.wallUrl) {
             level.wallUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => level.wallUrl,
     ),
     Line(
-      titleFunc: (Book b) => 'Turn sound (${level.turnUrl})',
+      titleFunc: (Book b) => 'Turn sound (${level.turnUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -222,14 +222,14 @@ Page editLevelMenu(Level level) {
         onok: (String value) {
           if (value != level.turnUrl) {
             level.turnUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => level.turnUrl,
     ),
     Line(
-      titleFunc: (Book b) => 'Trip sound (${level.tripUrl})',
+      titleFunc: (Book b) => 'Trip sound (${level.tripUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -237,14 +237,14 @@ Page editLevelMenu(Level level) {
         onok: (String value) {
           if (value != level.tripUrl) {
             level.tripUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => level.tripUrl,
     ),
     Line(
-      titleFunc: (Book b) => 'Ambiance (${level.ambianceUrl})',
+      titleFunc: (Book b) => 'Ambiance (${level.ambianceUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -252,14 +252,14 @@ Page editLevelMenu(Level level) {
         onok: (String value) {
           if (value != level.ambianceUrl) {
             level.ambianceUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => level.ambianceUrl,
     ),
     Line(
-      titleFunc: (Book b) => 'Level music (${level.musicUrl})',
+      titleFunc: (Book b) => 'Level music (${level.musicUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -267,14 +267,14 @@ Page editLevelMenu(Level level) {
         onok: (String value) {
           if (value != level.musicUrl) {
             level.musicUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => level.musicUrl,
     ),
     Line(
-      titleFunc: (Book b) => 'Impulse response (${level.convolverUrl})',
+      titleFunc: (Book b) => 'Impulse response (${level.convolverUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -282,13 +282,13 @@ Page editLevelMenu(Level level) {
         onok: (String value) {
           if (value != level.convolverUrl) {
             level.convolverUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
     ),
     Line(
-      titleFunc: (Book b) => 'Convolver volume (${level.convolverVolume})',
+      titleFunc: (Book b) => 'Convolver volume (${level.convolverVolume ?? "Not set"})',
       func: (Book b) => GetText<num>(
         b,
         prompt: 'New value',
@@ -296,13 +296,13 @@ Page editLevelMenu(Level level) {
         onok: (num value) {
           if (value != level.convolverVolume) {
             level.convolverVolume = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
     ),
     Line(
-      titleFunc: (Book b) => 'No weapon sound (${level.noWeaponUrl})',
+      titleFunc: (Book b) => 'No weapon sound (${level.noWeaponUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -310,7 +310,7 @@ Page editLevelMenu(Level level) {
         onok: (String value) {
           if (value != level.noWeaponUrl) {
             level.noWeaponUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
@@ -373,7 +373,7 @@ Page levelsMenu(Book b) {
 Page editObjectMenu(GameObject object) {
   final List<Line> lines = <Line>[
     Line(
-      titleString: 'Rename',
+      titleFunc: (Book b) => 'Rename (${object.title ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -381,13 +381,13 @@ Page editObjectMenu(GameObject object) {
         onok: (String value) {
           if (value != object.title) {
             object.title = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
     ),
     Line(
-      titleString: 'Take sound',
+      titleFunc: (Book b) => 'Take sound (${object.takeUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -395,14 +395,14 @@ Page editObjectMenu(GameObject object) {
         onok: (String value) {
           if (value != object.takeUrl) {
             object.takeUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => object.takeUrl,
     ),
     Line(
-      titleString: 'Drop sound',
+      titleFunc: (Book b) => 'Drop sound (${object.dropUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -410,14 +410,14 @@ Page editObjectMenu(GameObject object) {
         onok: (String value) {
           if (value != object.dropUrl) {
             object.dropUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => object.dropUrl,
     ),
     Line(
-      titleString: 'Use sound',
+      titleFunc: (Book b) => 'Use sound (${object.useUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -425,14 +425,14 @@ Page editObjectMenu(GameObject object) {
         onok: (String value) {
           if (value != object.useUrl) {
             object.useUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => object.useUrl,
     ),
     Line(
-      titleString: 'Not usable sound',
+      titleFunc: (Book b) => 'Not usable sound (${object.cantUseUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -440,14 +440,14 @@ Page editObjectMenu(GameObject object) {
         onok: (String value) {
           if (value != object.cantUseUrl) {
             object.cantUseUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => object.cantUseUrl,
     ),
     Line(
-      titleString: 'Hit sound',
+      titleFunc: (Book b) => 'Hit sound (${object.hitUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -455,14 +455,14 @@ Page editObjectMenu(GameObject object) {
         onok: (String value) {
           if (value != object.hitUrl) {
             object.hitUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => object.hitUrl,
     ),
     Line(
-      titleString: 'Die sound',
+      titleFunc: (Book b) => 'Die sound (${object.dieUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -470,14 +470,14 @@ Page editObjectMenu(GameObject object) {
         onok: (String value) {
           if (value != object.dieUrl) {
             object.dieUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => object.dieUrl,
     ),
     Line(
-      titleString: 'Ambiance',
+      titleFunc: (Book b) => 'Ambiance (${object.soundUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -485,14 +485,14 @@ Page editObjectMenu(GameObject object) {
         onok: (String value) {
           if (value != object.soundUrl) {
             object.soundUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => object.soundUrl,
     ),
     Line(
-      titleString: 'Weapon damage',
+      titleFunc: (Book b) => 'Weapon damage (${object.damage ?? "Not set"})',
       func: (Book b) => GetText<int>(
         b,
         prompt: 'New value',
@@ -500,13 +500,13 @@ Page editObjectMenu(GameObject object) {
         onok: (int value) {
           if (value != object.damage) {
             object.damage = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
     ),
     Line(
-      titleString: 'Weapon range',
+      titleFunc: (Book b) => 'Weapon range (${object.range ?? "Not set"})',
       func: (Book b) => GetText<int>(
         b,
         prompt: 'New value',
@@ -514,13 +514,13 @@ Page editObjectMenu(GameObject object) {
         onok: (int value) {
           if (value != object.range) {
             object.range = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
     ),
     Line(
-      titleString: 'Max health',
+      titleFunc: (Book b) => 'Max health (${object.health ?? "Not set"})',
       func: (Book b) => GetText<int>(
         b,
         prompt: 'New value',
@@ -528,13 +528,13 @@ Page editObjectMenu(GameObject object) {
         onok: (int value) {
           if (value != object.health) {
             object.health = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
     ),
     Line(
-      titleString: 'Exit position',
+      titleFunc: (Book b) => 'Exit position (${object.targetPosition ?? "Not set"})',
       func: (Book b) => GetText<int>(
         b,
         prompt: 'New value',
@@ -542,7 +542,7 @@ Page editObjectMenu(GameObject object) {
         onok: (int value) {
           if (value != object.targetPosition) {
             object.targetPosition = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
@@ -672,7 +672,7 @@ Page objectsMenu(
 Page gameMenu(Game game) {
   final List<Line> lines = <Line>[
     Line(
-      titleString: 'Rename',
+      titleFunc: (Book b) => 'Rename (${game.title ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -680,13 +680,13 @@ Page gameMenu(Game game) {
         onok: (String value) {
           if (value != game.title) {
             game.title = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
     ),
     Line(
-      titleString: 'Volume changed sound',
+      titleFunc: (Book b) => 'Volume changed sound (${game.volumeSoundUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -694,14 +694,14 @@ Page gameMenu(Game game) {
         onok: (String value) {
           if (value != game.volumeSoundUrl) {
             game.volumeSoundUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => game.volumeSoundUrl,
     ),
     Line(
-      titleString: 'Menu move sound',
+      titleFunc: (Book b) => 'Menu move sound (${game.moveSoundUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -709,14 +709,14 @@ Page gameMenu(Game game) {
         onok: (String value) {
           if (value != game.moveSoundUrl) {
             game.moveSoundUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => game.moveSoundUrl,
     ),
     Line(
-      titleString: 'Menu activate sound',
+      titleFunc: (Book b) => 'Menu activate sound (${game.activateSoundUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -724,14 +724,14 @@ Page gameMenu(Game game) {
         onok: (String value) {
           if (value != game.activateSoundUrl) {
             game.activateSoundUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => game.activateSoundUrl,
     ),
     Line(
-      titleString: 'Menu music',
+      titleFunc: (Book b) => 'Menu music (${game.musicUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -739,14 +739,14 @@ Page gameMenu(Game game) {
         onok: (String value) {
           if (value != game.musicUrl) {
             game.musicUrl = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
       soundUrl: (Book b) => game.musicUrl,
     ),
     Line(
-      titleString: 'Volume control sensitivity',
+      titleFunc: (Book b) => 'Volume control sensitivity (${game.volumeChangeAmount ?? "Not set"})',
       func: (Book b) => GetText<num>(
         b,
         prompt: 'New value',
@@ -754,13 +754,13 @@ Page gameMenu(Game game) {
         onok: (num value) {
           if (value != game.volumeChangeAmount) {
             game.volumeChangeAmount = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
     ),
     Line(
-      titleString: 'Initial sound volume',
+      titleFunc: (Book b) => 'Initial sound volume (${game.initialVolume ?? "Not set"})',
       func: (Book b) => GetText<num>(
         b,
         prompt: 'New value',
@@ -768,13 +768,13 @@ Page gameMenu(Game game) {
         onok: (num value) {
           if (value != game.initialVolume) {
             game.initialVolume = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
     ),
     Line(
-      titleString: 'Initial music volume',
+      titleFunc: (Book b) => 'Initial music volume (${game.initialMusicVolume ?? "Not set"})',
       func: (Book b) => GetText<num>(
         b,
         prompt: 'New value',
@@ -782,7 +782,7 @@ Page gameMenu(Game game) {
         onok: (num value) {
           if (value != game.initialMusicVolume) {
             game.initialMusicVolume = value;
-            b.message('Done.');
+            b.showFocus();
           }
         }
       ).dispatch(),
