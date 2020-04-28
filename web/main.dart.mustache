@@ -125,7 +125,10 @@ Page editLevelMenu(Level level) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      {{#soundUrl}}
+      soundUrl: level.{{name}},
+      {{/soundUrl}}
     ),
     {{/level}}
     Line(
@@ -150,7 +153,8 @@ Page editLevelMenu(Level level) {
   ];
   return Page(
     titleFunc: (Book b) => 'Edit ${level.titleString}',
-    lines: lines
+    lines: lines,
+    playDefaultSounds: false,
   );
 }
 

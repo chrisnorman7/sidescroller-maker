@@ -124,7 +124,7 @@ Page editLevelMenu(Level level) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
     ),
     Line(
       titleString: 'Width',
@@ -138,7 +138,7 @@ Page editLevelMenu(Level level) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
     ),
     Line(
       titleString: 'Start at',
@@ -152,7 +152,7 @@ Page editLevelMenu(Level level) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
     ),
     Line(
       titleString: 'Player speed',
@@ -166,7 +166,7 @@ Page editLevelMenu(Level level) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
     ),
     Line(
       titleString: 'Before scene URL',
@@ -180,7 +180,8 @@ Page editLevelMenu(Level level) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: level.beforeSceneUrl,
     ),
     Line(
       titleString: 'Footstep sound',
@@ -194,7 +195,8 @@ Page editLevelMenu(Level level) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: level.footstepUrl,
     ),
     Line(
       titleString: 'Wall sound',
@@ -208,7 +210,8 @@ Page editLevelMenu(Level level) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: level.wallUrl,
     ),
     Line(
       titleString: 'Turn sound',
@@ -222,7 +225,8 @@ Page editLevelMenu(Level level) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: level.turnUrl,
     ),
     Line(
       titleString: 'Trip sound',
@@ -236,7 +240,8 @@ Page editLevelMenu(Level level) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: level.tripUrl,
     ),
     Line(
       titleString: 'Ambiance',
@@ -250,7 +255,8 @@ Page editLevelMenu(Level level) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: level.ambianceUrl,
     ),
     Line(
       titleString: 'Level music',
@@ -264,7 +270,8 @@ Page editLevelMenu(Level level) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: level.musicUrl,
     ),
     Line(
       titleString: 'Impulse response',
@@ -278,7 +285,7 @@ Page editLevelMenu(Level level) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
     ),
     Line(
       titleString: 'Convolver volume',
@@ -292,7 +299,7 @@ Page editLevelMenu(Level level) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
     ),
     Line(
       titleString: 'No weapon sound',
@@ -306,7 +313,8 @@ Page editLevelMenu(Level level) {
             b.message('Done.');
           }
         }
-      ).dispatch()
+      ).dispatch(),
+      soundUrl: level.noWeaponUrl,
     ),
     Line(
       titleString: 'Delete',
@@ -330,7 +338,8 @@ Page editLevelMenu(Level level) {
   ];
   return Page(
     titleFunc: (Book b) => 'Edit ${level.titleString}',
-    lines: lines
+    lines: lines,
+    playDefaultSounds: false,
   );
 }
 

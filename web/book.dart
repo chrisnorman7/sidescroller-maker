@@ -266,7 +266,17 @@ class Book{
       message(page.getTitle(this));
     } else if (!page.isLevel) {
       final Line line = page.getLine();
-      game.moveSound.play(url: game.moveSoundUrl);
+      String url;
+      if (line.soundUrl != null) {
+        url = line.soundUrl;
+      } else if (page.playDefaultSounds) {
+        url = game.moveSoundUrl;
+      }
+      if (url != null) {
+        game.moveSound.play(url: url);
+      } else {
+        game.moveSound.stop();
+      }
       message(line.getTitle(this));
     }
   }

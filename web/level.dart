@@ -172,7 +172,7 @@ class Level extends Page {
     wallUrl = 'res/level/wall.wav';
     turnUrl = 'res/level/turn.wav';
     tripUrl = 'res/level/trip.wav';
-    ambianceUrl = null;
+    ambianceUrl = 'res/level/amb/forest.wav';
     musicUrl = null;
     convolverUrl = 'res/impulses/EchoThiefImpulseResponseLibrary/Underground/TunnelToHell.wav';
     convolverVolume = 0.5;

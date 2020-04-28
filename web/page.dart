@@ -12,10 +12,11 @@ class Page {
       this.titleFunc,
       this.lines = const <Line>[],
       this.dismissible = true,
+      this.playDefaultSounds = true,
     }
   );
 
-  bool isLevel = false;
+  bool isLevel = false, playDefaultSounds;
   final bool dismissible;
   int focus = -1;
   final List<Line> lines;

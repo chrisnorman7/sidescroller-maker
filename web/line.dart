@@ -6,10 +6,11 @@ class Line {
       this.titleString,
       this.titleFunc,
       this.func,
+      this.soundUrl,
     }
   );
   
-  String titleString;
+  String titleString, soundUrl;
   String Function(Book) titleFunc;
   void Function(Book) func;
 

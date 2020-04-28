@@ -9,14 +9,15 @@ class Attribute<T> {
     this.description,
     {
       this.value,
-      this.initialise = true
+      this.initialise = true,
+      this.soundUrl = false,
     }
   );
 
   final String name, description;
   final Object type = T;
   final T value;
-  final bool initialise;
+  final bool initialise, soundUrl;
 
   String get stringValue {
     if (value == null) {
@@ -44,19 +45,23 @@ Map<String, List<Attribute<dynamic>>> attributes = <String, List<Attribute<dynam
     ),
     Attribute<String>(
       'volumeSoundUrl', 'Volume changed sound',
-      value: 'res/menus/volume.wav'
+      value: 'res/menus/volume.wav',
+      soundUrl: true
     ),
     Attribute<String>(
       'moveSoundUrl', 'Menu move sound',
-      value: 'res/menus/move.wav'
+      value: 'res/menus/move.wav',
+      soundUrl: true
     ),
     Attribute<String>(
       'activateSoundUrl', 'Menu activate sound',
-      value: 'res/menus/activate.wav'
-      ),
+      value: 'res/menus/activate.wav',
+      soundUrl: true
+    ),
     Attribute<String>(
       'musicUrl', 'Menu music',
-      value: 'res/menus/music.mp3'
+      value: 'res/menus/music.mp3',
+      soundUrl: true
     ),
     Attribute<num>(
       'volumeChangeAmount', 'Volume control sensitivity',
@@ -89,29 +94,37 @@ Map<String, List<Attribute<dynamic>>> attributes = <String, List<Attribute<dynam
       value: 400
     ),
     Attribute<String>(
-      'beforeSceneUrl', 'Before scene URL'
+      'beforeSceneUrl', 'Before scene URL',
+      soundUrl: true
     ),
     Attribute<String>(
       'footstepUrl', 'Footstep sound',
-      value: 'res/footsteps/stone.wav'
+      value: 'res/footsteps/stone.wav',
+      soundUrl: true
     ),
     Attribute<String>(
       'wallUrl', 'Wall sound',
-      value: 'res/level/wall.wav'
+      value: 'res/level/wall.wav',
+      soundUrl: true
     ),
     Attribute<String>(
       'turnUrl', 'Turn sound',
-      value: 'res/level/turn.wav'
+      value: 'res/level/turn.wav',
+      soundUrl: true
     ),
     Attribute<String>(
       'tripUrl', 'Trip sound',
-      value: 'res/level/trip.wav'
+      value: 'res/level/trip.wav',
+      soundUrl: true
     ),
     Attribute<String>(
-      'ambianceUrl', 'Ambiance'
+      'ambianceUrl', 'Ambiance',
+      value: 'res/level/amb/forest.wav',
+      soundUrl: true
     ),
     Attribute<String>(
-      'musicUrl', 'Level music'
+      'musicUrl', 'Level music',
+      soundUrl: true
     ),
     Attribute<String>(
       'convolverUrl', 'Impulse response',
@@ -123,7 +136,8 @@ Map<String, List<Attribute<dynamic>>> attributes = <String, List<Attribute<dynam
     ),
     Attribute<String>(
       'noWeaponUrl', 'No weapon sound',
-      value: 'res/level/noweapon.wav'
+      value: 'res/level/noweapon.wav',
+      soundUrl: true
     ),
   ],
   'web/object.dart': <Attribute<dynamic>>[
@@ -132,31 +146,38 @@ Map<String, List<Attribute<dynamic>>> attributes = <String, List<Attribute<dynam
     ),
     Attribute<String>(
       'takeUrl', 'Take sound',
-      value: 'res/objects/take.wav'
+      value: 'res/objects/take.wav',
+      soundUrl: true
     ),
     Attribute<String>(
       'dropUrl', 'Drop sound',
-      value: 'res/objects/drop.wav'
+      value: 'res/objects/drop.wav',
+      soundUrl: true
     ),
     Attribute<String>(
       'useUrl', 'Use sound',
-      value: 'res/weapons/punch.wav'
+      value: 'res/weapons/punch.wav',
+      soundUrl: true
     ),
     Attribute<String>(
       'cantUseUrl', 'Not usable sound',
-      value: 'res/objects/cantuse.wav'
+      value: 'res/objects/cantuse.wav',
+      soundUrl: true
     ),
     Attribute<String>(
       'hitUrl', 'Hit sound',
-      value: 'res/objects/hit.wav'
+      value: 'res/objects/hit.wav',
+      soundUrl: true
     ),
     Attribute<String>(
       'dieUrl', 'Die sound',
-      value:'res/objects/die.wav', 
+      value:'res/objects/die.wav',
+      soundUrl: true
     ),
     Attribute<String>(
       'soundUrl', 'Ambiance',
-      value: 'res/objects/object.wav'
+      value: 'res/objects/object.wav',
+      soundUrl: true
     ),
     Attribute<int>(
       'damage', 'Weapon damage',
@@ -192,6 +213,7 @@ void main() {
           'value': attribute.stringValue,
           'declaration': attribute.declaration,
           'initialise': attribute.initialise,
+          'soundUrl': attribute.soundUrl,
         });
       }
       allAttributes[filename] = variablesData;
