@@ -45,6 +45,9 @@ class Game {
     volumeChangeAmount = data['volumeChangeAmount'] as num;
     initialVolume = data['initialVolume'] as num;
     initialMusicVolume = data['initialMusicVolume'] as num;
+    menuSearchTimeout = data['menuSearchTimeout'] as int;
+    searchSuccessUrl = data['searchSuccessUrl'] as String;
+    searchFailUrl = data['searchFailUrl'] as String;
     resetVolumes();
   }
 
@@ -56,10 +59,13 @@ class Game {
   num volumeChangeAmount;
   num initialVolume;
   num initialMusicVolume;
+  int menuSearchTimeout;
+  String searchSuccessUrl;
+  String searchFailUrl;
 
   List<Level> levels;
   List<GameObject> objects;
-  Sound moveSound, activateSound, music;
+  Sound moveSound, activateSound, music, searchFailSound, searchSuccessSound;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{
@@ -88,6 +94,9 @@ class Game {
     data['volumeChangeAmount'] = volumeChangeAmount;
     data['initialVolume'] = initialVolume;
     data['initialMusicVolume'] = initialMusicVolume;
+    data['menuSearchTimeout'] = menuSearchTimeout;
+    data['searchSuccessUrl'] = searchSuccessUrl;
+    data['searchFailUrl'] = searchFailUrl;
     return data;
   }
 
@@ -95,6 +104,8 @@ class Game {
     stopMusic();
     moveSound = Sound(url: moveSoundUrl);
     activateSound = Sound(url: activateSoundUrl);
+    searchFailSound = Sound(url:searchFailUrl);
+    searchSuccessSound = Sound(url: searchSuccessUrl);
     levels = <Level>[];
     objects = <GameObject>[];
     title = 'Untitled Game';
@@ -105,6 +116,9 @@ class Game {
     volumeChangeAmount = 0.05;
     initialVolume = 0.5;
     initialMusicVolume = 0.25;
+    menuSearchTimeout = 400;
+    searchSuccessUrl = 'res/menus/searchsuccess.wav';
+    searchFailUrl = 'res/menus/searchfail.wav';
     resetVolumes();
   }
 

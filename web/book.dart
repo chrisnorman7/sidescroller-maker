@@ -41,6 +41,7 @@ class Book{
           return activateString;
         },
         func: (Book b) => shootOrActivate(),
+        levelOnly: true,
       ),
       'ArrowRight': Hotkey(
         titleFunc: (Page page) {
@@ -100,18 +101,22 @@ class Book{
       'i': Hotkey(
         titleString: 'Player inventory',
         func: (Book b) => inventory(),
+        levelOnly: true,
       ),
       'd': Hotkey(
         titleString: 'Drop an object',
         func: (Book b) => drop(),
+        levelOnly: true,
       ),
       'f': Hotkey(
         titleString: 'Show which way you are facing',
         func: (Book b) => showFacing(),
+        levelOnly: true,
       ),
       'c': Hotkey(
         titleString: 'Show your current coordinate',
         func: (Book b) => showPosition(),
+        levelOnly: true,
       ),
       'x': Hotkey(
         titleString: 'Examine object',
@@ -143,6 +148,7 @@ class Book{
             );
           }
         },
+        levelOnly: true,
       ),
       '/': Hotkey(
         titleString: 'Show a list of hotkeys',
@@ -157,10 +163,13 @@ class Book{
         func: (Book b) {
           selectWeapon(i);
         },
+        levelOnly: true,
       );
     }
   }
 
+  String searchString;
+  int lastSearchTime;
   Map<String, Hotkey> hotkeys;
   Game game;
   bool levelInPages = false;
@@ -214,6 +223,7 @@ class Book{
   }
 
   void push(Page page) {
+    lastSearchTime = 0;
     if (page.isLevel) {
       levelInPages = true;
       game.stopMusic();
@@ -519,11 +529,39 @@ class Book{
       }
       return;
     }
+    e.preventDefault();
     final Hotkey hotkey = hotkeys[key];
-    if (hotkey != null) {
-      final Function func = hotkey.func;
-      e.preventDefault();
-      func(this);
+    if (hotkey == null || (hotkey.levelOnly && player.level == null)) {
+      if (key.length == 1) { // Don't search with number pad keys for example.
+        handleSearch(key);
+      }
+    } else {
+      hotkey.func(this);
+    }
+  }
+
+  void handleSearch(String term) {
+    final Page page = getPage();
+    if (page == null || page.isLevel) {
+      return; // Don't search in levels or when there is no page.
+    }
+    final int now = timestamp();
+    if ((now - lastSearchTime) >= game.menuSearchTimeout) {
+      searchString = '';
+    }
+    lastSearchTime = now;
+    searchString += term.toLowerCase();
+    final int index = page.lines.indexWhere(
+      (Line entry) => entry.getTitle(this).toLowerCase().startsWith(searchString)
+    );
+    if (index == -1) {
+      game.searchSuccessSound.stop();
+      game.searchFailSound.play(url: game.searchFailUrl);
+    } else {
+      game.searchFailSound.stop();
+      game.searchSuccessSound.play(url: game.searchSuccessUrl);
+      page.focus = index;
+      showFocus();
     }
   }
 

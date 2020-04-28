@@ -787,6 +787,50 @@ Page gameMenu(Game game) {
         }
       ).dispatch(),
     ),
+    Line(
+      titleFunc: (Book b) => 'Menu search timeout (${game.menuSearchTimeout ?? "Not set"})',
+      func: (Book b) => GetText<int>(
+        b,
+        prompt: 'New value',
+        value: game.menuSearchTimeout,
+        onok: (int value) {
+          if (value != game.menuSearchTimeout) {
+            game.menuSearchTimeout = value;
+            b.showFocus();
+          }
+        }
+      ).dispatch(),
+    ),
+    Line(
+      titleFunc: (Book b) => 'Search succeeded (${game.searchSuccessUrl ?? "Not set"})',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: game.searchSuccessUrl,
+        onok: (String value) {
+          if (value != game.searchSuccessUrl) {
+            game.searchSuccessUrl = value;
+            b.showFocus();
+          }
+        }
+      ).dispatch(),
+      soundUrl: (Book b) => game.searchSuccessUrl,
+    ),
+    Line(
+      titleFunc: (Book b) => 'Search failed (${game.searchFailUrl ?? "Not set"})',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: game.searchFailUrl,
+        onok: (String value) {
+          if (value != game.searchFailUrl) {
+            game.searchFailUrl = value;
+            b.showFocus();
+          }
+        }
+      ).dispatch(),
+      soundUrl: (Book b) => game.searchFailUrl,
+    ),
   ];
   return Page(
     titleFunc: (Book b) => 'Configure ${game.title}',

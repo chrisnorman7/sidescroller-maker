@@ -51,7 +51,7 @@ class Game {
 
   List<Level> levels;
   List<GameObject> objects;
-  Sound moveSound, activateSound, music;
+  Sound moveSound, activateSound, music, searchFailSound, searchSuccessSound;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{
@@ -82,6 +82,8 @@ class Game {
     stopMusic();
     moveSound = Sound(url: moveSoundUrl);
     activateSound = Sound(url: activateSoundUrl);
+    searchFailSound = Sound(url:searchFailUrl);
+    searchSuccessSound = Sound(url: searchSuccessUrl);
     levels = <Level>[];
     objects = <GameObject>[];
     {{#variables}}

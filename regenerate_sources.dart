@@ -75,6 +75,20 @@ Map<String, List<Attribute<dynamic>>> attributes = <String, List<Attribute<dynam
       'initialMusicVolume', 'Initial music volume',
       value: 0.25
     ),
+    Attribute<int>(
+      'menuSearchTimeout', 'Menu search timeout',
+      value: 400,
+    ),
+    Attribute<String>(
+      'searchSuccessUrl', 'Search succeeded',
+      value: 'res/menus/searchsuccess.wav',
+      soundUrl: true
+    ),
+    Attribute<String>(
+      'searchFailUrl', 'Search failed',
+      value: 'res/menus/searchfail.wav',
+      soundUrl: true
+    ),
   ],
   'web/level.dart': <Attribute<dynamic>>[
     Attribute<String>(
