@@ -1002,7 +1002,8 @@ void main() {
               titleString: 'Copy Game JSON',
               func: (Book b) {
                 final Map<String, dynamic> data = b.game.toJson();
-                final String json = jsonEncode(data);
+                const JsonEncoder jsonEncoder = JsonEncoder.withIndent('  ');
+                final String json = jsonEncoder.convert(data);
                 gameJson.value = json;
                 gameJson.select();
                 gameJson.setSelectionRange(0, -1);
