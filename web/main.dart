@@ -1001,36 +1001,46 @@ void main() {
               )
             ),
             Line(
-              titleString: 'Load Game JSON',
+              titleString: 'JSON',
               func: (Book b) => b.push(
-                confirmPage(
-                  title: 'Are you sure you want to reset your game and load from JSON?',
-                  onok: (Book b) {
-                    b.pop();
-                    final Map<String, dynamic> data = jsonDecode(gameJson.value) as Map<String, dynamic>;
-                    b.game.stopMusic();
-                    b.game = Game.fromJson(
-                      data: data
-                    );
-                    b.game.reloadMusic(b);
-                    b.message('Game loaded.');
-                  }
+                Page(
+                  titleString: 'JSON Menu',
+                  lines: <Line>[
+                    Line(
+                      titleString: 'Load Game JSON',
+                      func: (Book b) => b.push(
+                        confirmPage(
+                          title: 'Are you sure you want to reset your game and load from JSON?',
+                          onok: (Book b) {
+                            b.pop();
+                            final Map<String, dynamic> data = jsonDecode(gameJson.value) as Map<String, dynamic>;
+                            b.game.stopMusic();
+                            b.game = Game.fromJson(
+                              data: data
+                            );
+                            b.game.reloadMusic(b);
+                            b.message('Game loaded.');
+                          }
+                        )
+                      )
+                    ),
+                    Line(
+                      titleString: 'Copy Game JSON',
+                      func: (Book b) {
+                        final Map<String, dynamic> data = b.game.toJson();
+                        const JsonEncoder jsonEncoder = JsonEncoder.withIndent('  ');
+                        final String json = jsonEncoder.convert(data);
+                        gameJson.value = json;
+                        gameJson.select();
+                        gameJson.setSelectionRange(0, -1);
+                        document.execCommand('copy');
+                        keyboardArea.focus();
+                        b.message('JSON copied.');
+                      }
+                    ),
+                  ]
                 )
-              )
-            ),
-            Line(
-              titleString: 'Copy Game JSON',
-              func: (Book b) {
-                final Map<String, dynamic> data = b.game.toJson();
-                const JsonEncoder jsonEncoder = JsonEncoder.withIndent('  ');
-                final String json = jsonEncoder.convert(data);
-                gameJson.value = json;
-                gameJson.select();
-                gameJson.setSelectionRange(0, -1);
-                document.execCommand('copy');
-                keyboardArea.focus();
-                b.message('JSON copied.');
-              }
+              ),
             ),
             Line(
               titleString: 'Reset Game',
