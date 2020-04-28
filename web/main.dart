@@ -308,8 +308,6 @@ Page editLevelMenu(Level level) {
         }
       ).dispatch()
     ),
-  ];
-  lines.add(
     Line(
       titleString: 'Delete',
       func: (Book b) => b.push(
@@ -329,7 +327,7 @@ Page editLevelMenu(Level level) {
         )
       )
     )
-  );
+  ];
   return Page(
     titleFunc: (Book b) => 'Edit ${level.titleString}',
     lines: lines
