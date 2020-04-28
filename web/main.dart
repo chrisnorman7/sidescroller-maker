@@ -587,13 +587,8 @@ Page editObjectMenu(GameObject object) {
       titleFunc: (Book b) => 'Contained Objects (${object.contains.length})',
       func: (Book b) => b.push(
         objectsMenu(
-          objects: object.contains,
-          addObject: (
-            {
-              Book book,
-              void Function() after,
-            }
-          ) {
+          object.contains,
+          (void Function() after) {
             final List<Line> objectLines = <Line>[];
             for (final GameObject o in b.game.objects) {
               objectLines.add(
@@ -625,37 +620,32 @@ Page editObjectMenu(GameObject object) {
 }
 
 Page objectsMenu(
+  List<GameObject> objects,
+  void Function(void Function() after) addObject,
   {
-    List<GameObject> objects,
-    void Function({Book book, void Function() after}) addObject,
-    void Function({GameObject object}) editObject
+    void Function(GameObject) editObject
   }
 ) {
+  assert(addObject != null, 'addObject must not be null.');
   final List<Line> lines = <Line>[
     Line(
       titleString: 'Add Object',
-      func: (Book b) => addObject(
-        book: b,
-        after: () {
-          b.pop();
-          final Page page = objectsMenu(
-            objects: objects ,
-            addObject: addObject,
-            editObject: editObject
-          );
-          page.focus = objects.length;
-          b.push(page);
-        }
-      )
+      func: (Book b) => addObject(() {
+        b.pop();
+        final Page page = objectsMenu(
+          objects , addObject,
+          editObject: editObject
+        );
+        page.focus = objects.length;
+        b.push(page);
+      })
     )
   ];
   for (final GameObject obj in objects) {
     lines.add(
       Line(
         titleFunc: (Book b) => obj.title,
-        func: (Book b) => editObject(
-          object: obj
-        )
+        func: (Book b) => editObject(obj)
       )
     );
   }
@@ -966,13 +956,8 @@ void main() {
               titleString: 'Objects and Monsters',
               func: (Book b) => b.push(
                 objectsMenu(
-                  objects: b.game.objects,
-                  addObject: (
-                    {
-                      Book book,
-                      void Function() after
-                    }
-                  ) => GetText<String>(
+                  b.game.objects,
+                  (void Function() after) => GetText<String>(
                     b,
                     prompt: 'Enter the name for the new object',
                     onok: (String value) {
@@ -984,12 +969,7 @@ void main() {
                       }
                     }
                   ).dispatch(),
-                  editObject: (
-                    {
-                      Book book,
-                      GameObject object
-                    }
-                  ) => book.push(
+                  editObject: (GameObject object) => b.push(
                     editObjectMenu(object)
                   )
                 )
