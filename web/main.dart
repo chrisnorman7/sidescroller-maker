@@ -1011,7 +1011,10 @@ void main() {
                       func: (Book b) => b.push(
                         confirmPage(
                           title: 'Are you sure you want to reset your game and load from JSON?',
+                          okTitle: 'Yes',
+                          cancelTitle: 'No',
                           onok: (Book b) {
+                            b.pop();
                             b.pop();
                             final Map<String, dynamic> data = jsonDecode(gameJson.value) as Map<String, dynamic>;
                             b.game.stopMusic();
