@@ -114,7 +114,7 @@ Page editLevelMenu(Level level) {
     ),
     {{#level}}
     Line(
-      titleString: '{{description}}',
+      titleFunc: (Book b) => '{{description}} (${level.{{name}}})',
       func: (Book b) => GetText<{{type}}>(
         b,
         prompt: 'New value',
@@ -127,7 +127,7 @@ Page editLevelMenu(Level level) {
         }
       ).dispatch(),
       {{#soundUrl}}
-      soundUrl: level.{{name}},
+      soundUrl: (Book b) => level.{{name}},
       {{/soundUrl}}
     ),
     {{/level}}
@@ -202,7 +202,7 @@ Page editObjectMenu(GameObject object) {
         }
       ).dispatch(),
       {{#soundUrl}}
-      soundUrl: object.{{name}},
+      soundUrl: (Book b) => object.{{name}},
       {{/soundUrl}}
     ),
     {{/object}}
@@ -345,7 +345,7 @@ Page gameMenu(Game game) {
         }
       ).dispatch(),
       {{#soundUrl}}
-      soundUrl: game.{{name}},
+      soundUrl: (Book b) => game.{{name}},
       {{/soundUrl}}
     ),
     {{/game}}

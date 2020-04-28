@@ -113,7 +113,7 @@ Page editLevelMenu(Level level) {
       )
     ),
     Line(
-      titleString: 'Rename',
+      titleFunc: (Book b) => 'Rename (${level.titleString})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -127,7 +127,7 @@ Page editLevelMenu(Level level) {
       ).dispatch(),
     ),
     Line(
-      titleString: 'Width',
+      titleFunc: (Book b) => 'Width (${level.size})',
       func: (Book b) => GetText<int>(
         b,
         prompt: 'New value',
@@ -141,7 +141,7 @@ Page editLevelMenu(Level level) {
       ).dispatch(),
     ),
     Line(
-      titleString: 'Start at',
+      titleFunc: (Book b) => 'Start at (${level.initialPosition})',
       func: (Book b) => GetText<int>(
         b,
         prompt: 'New value',
@@ -155,7 +155,7 @@ Page editLevelMenu(Level level) {
       ).dispatch(),
     ),
     Line(
-      titleString: 'Player speed',
+      titleFunc: (Book b) => 'Player speed (${level.speed})',
       func: (Book b) => GetText<int>(
         b,
         prompt: 'New value',
@@ -169,7 +169,7 @@ Page editLevelMenu(Level level) {
       ).dispatch(),
     ),
     Line(
-      titleString: 'Before scene URL',
+      titleFunc: (Book b) => 'Before scene URL (${level.beforeSceneUrl})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -181,10 +181,10 @@ Page editLevelMenu(Level level) {
           }
         }
       ).dispatch(),
-      soundUrl: level.beforeSceneUrl,
+      soundUrl: (Book b) => level.beforeSceneUrl,
     ),
     Line(
-      titleString: 'Footstep sound',
+      titleFunc: (Book b) => 'Footstep sound (${level.footstepUrl})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -196,10 +196,10 @@ Page editLevelMenu(Level level) {
           }
         }
       ).dispatch(),
-      soundUrl: level.footstepUrl,
+      soundUrl: (Book b) => level.footstepUrl,
     ),
     Line(
-      titleString: 'Wall sound',
+      titleFunc: (Book b) => 'Wall sound (${level.wallUrl})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -211,10 +211,10 @@ Page editLevelMenu(Level level) {
           }
         }
       ).dispatch(),
-      soundUrl: level.wallUrl,
+      soundUrl: (Book b) => level.wallUrl,
     ),
     Line(
-      titleString: 'Turn sound',
+      titleFunc: (Book b) => 'Turn sound (${level.turnUrl})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -226,10 +226,10 @@ Page editLevelMenu(Level level) {
           }
         }
       ).dispatch(),
-      soundUrl: level.turnUrl,
+      soundUrl: (Book b) => level.turnUrl,
     ),
     Line(
-      titleString: 'Trip sound',
+      titleFunc: (Book b) => 'Trip sound (${level.tripUrl})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -241,10 +241,10 @@ Page editLevelMenu(Level level) {
           }
         }
       ).dispatch(),
-      soundUrl: level.tripUrl,
+      soundUrl: (Book b) => level.tripUrl,
     ),
     Line(
-      titleString: 'Ambiance',
+      titleFunc: (Book b) => 'Ambiance (${level.ambianceUrl})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -256,10 +256,10 @@ Page editLevelMenu(Level level) {
           }
         }
       ).dispatch(),
-      soundUrl: level.ambianceUrl,
+      soundUrl: (Book b) => level.ambianceUrl,
     ),
     Line(
-      titleString: 'Level music',
+      titleFunc: (Book b) => 'Level music (${level.musicUrl})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -271,10 +271,10 @@ Page editLevelMenu(Level level) {
           }
         }
       ).dispatch(),
-      soundUrl: level.musicUrl,
+      soundUrl: (Book b) => level.musicUrl,
     ),
     Line(
-      titleString: 'Impulse response',
+      titleFunc: (Book b) => 'Impulse response (${level.convolverUrl})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -288,7 +288,7 @@ Page editLevelMenu(Level level) {
       ).dispatch(),
     ),
     Line(
-      titleString: 'Convolver volume',
+      titleFunc: (Book b) => 'Convolver volume (${level.convolverVolume})',
       func: (Book b) => GetText<num>(
         b,
         prompt: 'New value',
@@ -302,7 +302,7 @@ Page editLevelMenu(Level level) {
       ).dispatch(),
     ),
     Line(
-      titleString: 'No weapon sound',
+      titleFunc: (Book b) => 'No weapon sound (${level.noWeaponUrl})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',
@@ -314,7 +314,7 @@ Page editLevelMenu(Level level) {
           }
         }
       ).dispatch(),
-      soundUrl: level.noWeaponUrl,
+      soundUrl: (Book b) => level.noWeaponUrl,
     ),
     Line(
       titleString: 'Delete',
@@ -399,7 +399,7 @@ Page editObjectMenu(GameObject object) {
           }
         }
       ).dispatch(),
-      soundUrl: object.takeUrl,
+      soundUrl: (Book b) => object.takeUrl,
     ),
     Line(
       titleString: 'Drop sound',
@@ -414,7 +414,7 @@ Page editObjectMenu(GameObject object) {
           }
         }
       ).dispatch(),
-      soundUrl: object.dropUrl,
+      soundUrl: (Book b) => object.dropUrl,
     ),
     Line(
       titleString: 'Use sound',
@@ -429,7 +429,7 @@ Page editObjectMenu(GameObject object) {
           }
         }
       ).dispatch(),
-      soundUrl: object.useUrl,
+      soundUrl: (Book b) => object.useUrl,
     ),
     Line(
       titleString: 'Not usable sound',
@@ -444,7 +444,7 @@ Page editObjectMenu(GameObject object) {
           }
         }
       ).dispatch(),
-      soundUrl: object.cantUseUrl,
+      soundUrl: (Book b) => object.cantUseUrl,
     ),
     Line(
       titleString: 'Hit sound',
@@ -459,7 +459,7 @@ Page editObjectMenu(GameObject object) {
           }
         }
       ).dispatch(),
-      soundUrl: object.hitUrl,
+      soundUrl: (Book b) => object.hitUrl,
     ),
     Line(
       titleString: 'Die sound',
@@ -474,7 +474,7 @@ Page editObjectMenu(GameObject object) {
           }
         }
       ).dispatch(),
-      soundUrl: object.dieUrl,
+      soundUrl: (Book b) => object.dieUrl,
     ),
     Line(
       titleString: 'Ambiance',
@@ -489,7 +489,7 @@ Page editObjectMenu(GameObject object) {
           }
         }
       ).dispatch(),
-      soundUrl: object.soundUrl,
+      soundUrl: (Book b) => object.soundUrl,
     ),
     Line(
       titleString: 'Weapon damage',
@@ -698,7 +698,7 @@ Page gameMenu(Game game) {
           }
         }
       ).dispatch(),
-      soundUrl: game.volumeSoundUrl,
+      soundUrl: (Book b) => game.volumeSoundUrl,
     ),
     Line(
       titleString: 'Menu move sound',
@@ -713,7 +713,7 @@ Page gameMenu(Game game) {
           }
         }
       ).dispatch(),
-      soundUrl: game.moveSoundUrl,
+      soundUrl: (Book b) => game.moveSoundUrl,
     ),
     Line(
       titleString: 'Menu activate sound',
@@ -728,7 +728,7 @@ Page gameMenu(Game game) {
           }
         }
       ).dispatch(),
-      soundUrl: game.activateSoundUrl,
+      soundUrl: (Book b) => game.activateSoundUrl,
     ),
     Line(
       titleString: 'Menu music',
@@ -743,7 +743,7 @@ Page gameMenu(Game game) {
           }
         }
       ).dispatch(),
-      soundUrl: game.musicUrl,
+      soundUrl: (Book b) => game.musicUrl,
     ),
     Line(
       titleString: 'Volume control sensitivity',

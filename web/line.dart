@@ -10,8 +10,8 @@ class Line {
     }
   );
   
-  String titleString, soundUrl;
-  String Function(Book) titleFunc;
+  String titleString;
+  String Function(Book) titleFunc, soundUrl;
   void Function(Book) func;
 
   String getTitle(Book book) {

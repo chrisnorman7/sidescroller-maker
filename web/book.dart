@@ -268,7 +268,7 @@ class Book{
       final Line line = page.getLine();
       String url;
       if (line.soundUrl != null) {
-        url = line.soundUrl;
+        url = line.soundUrl(this);
       } else if (page.playDefaultSounds) {
         url = game.moveSoundUrl;
       }
