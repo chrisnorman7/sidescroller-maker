@@ -37,17 +37,39 @@ class Game {
         obj.contains.add(objects[index]);
       }
     }
-    title = data['title'] as String;
-    volumeSoundUrl = data['volumeSoundUrl'] as String;
-    moveSoundUrl = data['moveSoundUrl'] as String;
-    activateSoundUrl = data['activateSoundUrl'] as String;
-    musicUrl = data['musicUrl'] as String;
-    volumeChangeAmount = data['volumeChangeAmount'] as num;
-    initialVolume = data['initialVolume'] as num;
-    initialMusicVolume = data['initialMusicVolume'] as num;
-    menuSearchTimeout = data['menuSearchTimeout'] as int;
-    searchSuccessUrl = data['searchSuccessUrl'] as String;
-    searchFailUrl = data['searchFailUrl'] as String;
+    if (data.containsKey('title')) {
+      title = data['title'] as String;
+    }
+    if (data.containsKey('volumeSoundUrl')) {
+      volumeSoundUrl = data['volumeSoundUrl'] as String;
+    }
+    if (data.containsKey('moveSoundUrl')) {
+      moveSoundUrl = data['moveSoundUrl'] as String;
+    }
+    if (data.containsKey('activateSoundUrl')) {
+      activateSoundUrl = data['activateSoundUrl'] as String;
+    }
+    if (data.containsKey('musicUrl')) {
+      musicUrl = data['musicUrl'] as String;
+    }
+    if (data.containsKey('volumeChangeAmount')) {
+      volumeChangeAmount = data['volumeChangeAmount'] as num;
+    }
+    if (data.containsKey('initialVolume')) {
+      initialVolume = data['initialVolume'] as num;
+    }
+    if (data.containsKey('initialMusicVolume')) {
+      initialMusicVolume = data['initialMusicVolume'] as num;
+    }
+    if (data.containsKey('menuSearchTimeout')) {
+      menuSearchTimeout = data['menuSearchTimeout'] as int;
+    }
+    if (data.containsKey('searchSuccessUrl')) {
+      searchSuccessUrl = data['searchSuccessUrl'] as String;
+    }
+    if (data.containsKey('searchFailUrl')) {
+      searchFailUrl = data['searchFailUrl'] as String;
+    }
     resetVolumes();
   }
 

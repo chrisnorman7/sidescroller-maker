@@ -21,9 +21,6 @@ const Map<ObjectTypes, String> objectTypeDescriptions = <ObjectTypes, String>{
 class GameObject {
   GameObject() {
     reset();
-    {{#variables}}
-    {{name}} = {{value}};
-    {{/variables}}
   }
 
   GameObject.fromJson(
@@ -39,7 +36,9 @@ class GameObject {
       containedObjectIndices.add(containedObjectIndex);
     }
     {{#variables}}
-    {{name}} = data['{{name}}'] as {{type}};
+    if (data.containsKey('{{name}}')) {
+      {{name}} = data['{{name}}'] as {{type}};
+    }
     {{/variables}}
   }
 
@@ -81,6 +80,9 @@ class GameObject {
   
   void reset() {
     type = ObjectTypes.object;
+    {{#variables}}
+    {{name}} = {{value}};
+    {{/variables}}
     take = Sound(url: takeUrl);
     use = Sound(url: useUrl);
     cantUse = Sound(url: cantUseUrl);

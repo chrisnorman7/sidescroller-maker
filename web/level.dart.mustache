@@ -163,9 +163,6 @@ class NearestObject {
 class Level extends Page {
   Level() {
     reset();
-    {{#variables}}
-    {{name}} = {{value}};
-    {{/variables}}
   }
 
   Level.fromJson(
@@ -188,7 +185,9 @@ class Level extends Page {
       contents.add(content);
     }
     {{#variables}}
-    {{name}} = data['{{name}}'] as {{type}};
+    if (data.containsKey('{{name}}')) {
+      {{name}} = data['{{name}}'] as {{type}};
+    }
     {{/variables}}
   }
 
@@ -229,6 +228,9 @@ class Level extends Page {
     isLevel = true;
     deadObjects = <LevelObject>[];
     contents = <LevelObject>[];
+    {{#variables}}
+    {{name}} = {{value}};
+    {{/variables}}
     beforeScene = Sound(
       url: beforeSceneUrl,
     );

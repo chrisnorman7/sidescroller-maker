@@ -163,20 +163,6 @@ class NearestObject {
 class Level extends Page {
   Level() {
     reset();
-    titleString = 'Untitled Level';
-    size = 200;
-    initialPosition = 0;
-    speed = 200;
-    beforeSceneUrl = 'res/level/beforescene.wav';
-    footstepUrl = 'res/footsteps/stone.wav';
-    wallUrl = 'res/level/wall.wav';
-    turnUrl = 'res/level/turn.wav';
-    tripUrl = 'res/level/trip.wav';
-    ambianceUrl = 'res/level/amb/forest.wav';
-    musicUrl = null;
-    convolverUrl = 'res/impulses/EchoThiefImpulseResponseLibrary/Underground/TunnelToHell.wav';
-    convolverVolume = 0.5;
-    noWeaponUrl = 'res/level/noweapon.wav';
   }
 
   Level.fromJson(
@@ -198,20 +184,48 @@ class Level extends Page {
       );
       contents.add(content);
     }
-    titleString = data['titleString'] as String;
-    size = data['size'] as int;
-    initialPosition = data['initialPosition'] as int;
-    speed = data['speed'] as int;
-    beforeSceneUrl = data['beforeSceneUrl'] as String;
-    footstepUrl = data['footstepUrl'] as String;
-    wallUrl = data['wallUrl'] as String;
-    turnUrl = data['turnUrl'] as String;
-    tripUrl = data['tripUrl'] as String;
-    ambianceUrl = data['ambianceUrl'] as String;
-    musicUrl = data['musicUrl'] as String;
-    convolverUrl = data['convolverUrl'] as String;
-    convolverVolume = data['convolverVolume'] as num;
-    noWeaponUrl = data['noWeaponUrl'] as String;
+    if (data.containsKey('titleString')) {
+      titleString = data['titleString'] as String;
+    }
+    if (data.containsKey('size')) {
+      size = data['size'] as int;
+    }
+    if (data.containsKey('initialPosition')) {
+      initialPosition = data['initialPosition'] as int;
+    }
+    if (data.containsKey('speed')) {
+      speed = data['speed'] as int;
+    }
+    if (data.containsKey('beforeSceneUrl')) {
+      beforeSceneUrl = data['beforeSceneUrl'] as String;
+    }
+    if (data.containsKey('footstepUrl')) {
+      footstepUrl = data['footstepUrl'] as String;
+    }
+    if (data.containsKey('wallUrl')) {
+      wallUrl = data['wallUrl'] as String;
+    }
+    if (data.containsKey('turnUrl')) {
+      turnUrl = data['turnUrl'] as String;
+    }
+    if (data.containsKey('tripUrl')) {
+      tripUrl = data['tripUrl'] as String;
+    }
+    if (data.containsKey('ambianceUrl')) {
+      ambianceUrl = data['ambianceUrl'] as String;
+    }
+    if (data.containsKey('musicUrl')) {
+      musicUrl = data['musicUrl'] as String;
+    }
+    if (data.containsKey('convolverUrl')) {
+      convolverUrl = data['convolverUrl'] as String;
+    }
+    if (data.containsKey('convolverVolume')) {
+      convolverVolume = data['convolverVolume'] as num;
+    }
+    if (data.containsKey('noWeaponUrl')) {
+      noWeaponUrl = data['noWeaponUrl'] as String;
+    }
   }
 
   int size;
@@ -270,6 +284,20 @@ class Level extends Page {
     isLevel = true;
     deadObjects = <LevelObject>[];
     contents = <LevelObject>[];
+    titleString = 'Untitled Level';
+    size = 200;
+    initialPosition = 0;
+    speed = 200;
+    beforeSceneUrl = 'res/level/beforescene.wav';
+    footstepUrl = 'res/footsteps/stone.wav';
+    wallUrl = 'res/level/wall.wav';
+    turnUrl = 'res/level/turn.wav';
+    tripUrl = 'res/level/trip.wav';
+    ambianceUrl = 'res/level/amb/forest.wav';
+    musicUrl = null;
+    convolverUrl = 'res/impulses/EchoThiefImpulseResponseLibrary/Underground/TunnelToHell.wav';
+    convolverVolume = 0.5;
+    noWeaponUrl = 'res/level/noweapon.wav';
     beforeScene = Sound(
       url: beforeSceneUrl,
     );

@@ -529,15 +529,17 @@ class Book{
       }
       return;
     }
-    e.preventDefault();
     final Hotkey hotkey = hotkeys[key];
     if (hotkey == null || (hotkey.levelOnly && player.level == null)) {
       if (key.length == 1) { // Don't search with number pad keys for example.
         handleSearch(key);
+      } else {
+        return; // Don't preventDefault, so tab key keeps on working.
       }
     } else {
       hotkey.func(this);
     }
+    e.preventDefault();
   }
 
   void handleSearch(String term) {

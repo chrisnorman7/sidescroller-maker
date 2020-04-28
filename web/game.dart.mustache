@@ -38,7 +38,9 @@ class Game {
       }
     }
     {{#variables}}
-    {{name}} = data['{{name}}'] as {{type}};
+    if (data.containsKey('{{name}}')) {
+      {{name}} = data['{{name}}'] as {{type}};
+    }
     {{/variables}}
     resetVolumes();
   }
