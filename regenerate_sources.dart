@@ -192,7 +192,7 @@ Map<String, List<Attribute<dynamic>>> attributes = <String, List<Attribute<dynam
       value: 3
     ),
     Attribute<int>(
-      'targetPosition', 'Position to exit from',
+      'targetPosition', 'Exit position',
       value: 0
     ),
   ]
