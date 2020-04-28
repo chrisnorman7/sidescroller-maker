@@ -10,7 +10,7 @@
       "titleString": "Level 1",
       "size": 20,
       "initialPosition": 0,
-      "speed": 400,
+      "speed": 200,
       "beforeSceneUrl": "res/level/beforescene.wav",
       "footstepUrl": "res/footsteps/stone.wav",
       "wallUrl": "res/level/wall.wav",
@@ -32,7 +32,7 @@
       "titleString": "Level 2",
       "size": 15,
       "initialPosition": 0,
-      "speed": 400,
+      "speed": 200,
       "beforeSceneUrl": null,
       "footstepUrl": "res/footsteps/stone.wav",
       "wallUrl": "res/level/wall.wav",
@@ -125,5 +125,8 @@
   "musicUrl": "res/menus/music.mp3",
   "volumeChangeAmount": 0.05,
   "initialVolume": 0.5,
-  "initialMusicVolume": 0.25
+  "initialMusicVolume": 0.25,
+  "menuSearchTimeout": 400,
+  "searchSuccessUrl": "res/menus/searchsuccess.wav",
+  "searchFailUrl": "res/menus/searchfail.wav"
 }
