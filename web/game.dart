@@ -154,7 +154,7 @@ class Game {
 
   void resetVolumes() {
     mainVolume = initialVolume;
-    ambianceGain.gain.value = initialVolume;
+    mainGain.gain.value = initialVolume;
     musicVolume = initialMusicVolume;
     if (music != null) {
       music.output.gain.value = initialMusicVolume;

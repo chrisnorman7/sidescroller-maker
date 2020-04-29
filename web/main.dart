@@ -916,10 +916,10 @@ void main() {
             }
           }
         }
-        if (ambianceGain == null) {
+        if (mainGain == null) {
           soundVolume = 'Sound output not present';
         } else {
-          soundVolume = ambianceGain.gain.value.toStringAsFixed(2);
+          soundVolume = mainGain.gain.value.toStringAsFixed(2);
         }
         if (game.music == null) {
           musicVolume = 'Music output not present';

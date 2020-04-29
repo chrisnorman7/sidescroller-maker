@@ -55,8 +55,8 @@ int distanceBetween(
 void startAudio() {
   audio.listener.setOrientation(0, 0, -1, 0, 1, 0);
   audio.listener.positionZ.value = -1;
-  soundGain.connectNode(ambianceGain);
-  ambianceGain.connectNode(audio.destination);
+  soundGain.connectNode(mainGain);
+  mainGain.connectNode(audio.destination);
   final Sound music = Sound();
   music.play(url: 'res/music/start.wav');
 }

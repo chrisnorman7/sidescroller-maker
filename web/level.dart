@@ -307,7 +307,7 @@ class Level extends Page {
     ambiance = Sound(
       url: ambianceUrl,
       loop: true,
-      output: ambianceGain
+      output: mainGain
     );
     footstep = Sound(
       url: footstepUrl,
@@ -447,7 +447,7 @@ class Level extends Page {
           convolverGain = audio.createGain();
           convolverGain.gain.value = convolverVolume;
           convolver.connectNode(convolverGain);
-          convolverGain.connectNode(audio.destination);
+          convolverGain.connectNode(mainGain);
           soundGain.connectNode(convolver);
         }
       );
