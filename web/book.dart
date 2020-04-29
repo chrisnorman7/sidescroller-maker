@@ -605,6 +605,7 @@ class Book{
       void Function(Book) onfinish,
     }
   ) {
+    game.stopMusic();
     scene = Scene(
       book: this,
       url: url,
