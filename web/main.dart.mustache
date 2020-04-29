@@ -31,12 +31,9 @@ class GetText<T> {
       this.value,
       this.onok,
       this.oncancel,
-      this.multiline = false,
+      this.emptyValueToNull = true,
     }
   ) {
-    if (T != String && multiline) {
-      throw 'You cannot specify multiline with a non-String value.';
-    }
     prompt ??= stringPromptDefaultValue;
     onok ??= (T value) => book.message(value.toString());
     oncancel ??= () {
@@ -50,7 +47,8 @@ class GetText<T> {
   final Book book;
   String prompt;
   final T value;
-  final bool multiline;
+  final bool emptyValueToNull;
+
   void Function(T value) onok;
   void Function() oncancel;
   StreamSubscription<Event> _cancelSubscription, _onkeydownSubscription, _onsubmitSubscription;
@@ -84,7 +82,9 @@ class GetText<T> {
         book.showFocus();
         final String stringValue = stringInput.value;
         keyboardArea.focus();
-        if (T == num) {
+        if (stringValue.isEmpty && emptyValueToNull) {
+          return onok(null);
+        } else if (T == num) {
           onok(num.tryParse(stringValue) as T);
         } else if (T == String) {
           onok(stringValue as T);
