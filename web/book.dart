@@ -414,7 +414,7 @@ class Book{
     GainNode output;
     if (outputType == OutputTypes.main) {
       mainVolume = value;
-      output = mainGain;
+      output = soundGain;
     } else {
       musicVolume = value;
       if (game.music != null) {
