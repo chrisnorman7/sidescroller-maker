@@ -423,7 +423,6 @@ class Level extends Page {
     book.push(this);
     ambiance.play(url: ambianceUrl);
     loadContents();
-    soundGain.connectNode(convolver);
     book.player.lastMoved = 0;
     book.setPlayerPosition(position);
   }
@@ -449,6 +448,7 @@ class Level extends Page {
           convolverGain.gain.value = convolverVolume;
           convolver.connectNode(convolverGain);
           convolverGain.connectNode(audio.destination);
+          soundGain.connectNode(convolver);
         }
       );
     }

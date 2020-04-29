@@ -64,6 +64,10 @@ Map<String, List<Attribute<dynamic>>> attributes = <String, List<Attribute<dynam
       soundUrl: true
     ),
     Attribute<num>(
+      'musicFadeout', 'Music fadeout multiplier',
+      value: 0.5
+    ),
+    Attribute<num>(
       'volumeChangeAmount', 'Volume control sensitivity',
       value: 0.05
     ),

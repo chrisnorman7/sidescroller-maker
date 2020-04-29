@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:web_audio';
 
 import 'constants.dart';
 import 'sound.dart';
@@ -58,10 +57,8 @@ void startAudio() {
   audio.listener.positionZ.value = -1;
   soundGain.connectNode(mainGain);
   ambianceGain.connectNode(mainGain);
-  for (final GainNode g in <GainNode>[mainGain, musicGain]) {
-    g.gain.value = 0.5;
-    g.connectNode(audio.destination);
-  }
+  mainGain.gain.value = 0.5;
+  mainGain.connectNode(audio.destination);
   final Sound music = Sound();
   music.play(url: 'res/music/start.wav');
 }

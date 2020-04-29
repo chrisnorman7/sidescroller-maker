@@ -1,5 +1,4 @@
 import 'dart:html';
-import 'dart:math';
 import 'dart:web_audio';
 
 import 'constants.dart';
@@ -7,12 +6,18 @@ import 'game.dart';
 import 'hotkey.dart';
 import 'level.dart';
 import 'line.dart';
+import 'music.dart';
 import 'object.dart';
 import 'page.dart';
 import 'player.dart';
 import 'scene.dart';
 import 'sound.dart';
 import 'utils.dart';
+
+enum OutputTypes {
+  main,
+  music,
+}
 
 class Book{
   Book() {
@@ -71,27 +76,19 @@ class Book{
       ),
       '[': Hotkey(
         titleString: 'Decrease sound volume',
-        func: (Book b) => volumeDown(
-          output: mainGain
-        ),
+        func: (Book b) => volumeDown(OutputTypes.main),
       ),
       ']': Hotkey(
         titleString: 'Increase sound volume',
-        func: (Book b) => volumeUp(
-          output: mainGain
-        ),
+        func: (Book b) => volumeUp(OutputTypes.main),
       ),
       '-': Hotkey(
         titleString: 'Decrease music volume',
-        func: (Book b) => volumeDown(
-          output: musicGain
-        ),
+        func: (Book b) => volumeDown(OutputTypes.music),
       ),
       '=': Hotkey(
         titleString: 'Increase music volume',
-        func: (Book b) => volumeUp(
-          output: musicGain
-        ),
+        func: (Book b) => volumeUp(OutputTypes.music),
       ),
       'i': Hotkey(
         titleString: 'Player inventory',
@@ -226,12 +223,7 @@ class Book{
       game.stopMusic();
     } else {
       if (game.music == null && !levelInPages) {
-        game.music = Sound(
-          url: game.musicUrl,
-          loop: true,
-          output: musicGain
-        );
-        game.music.play(url: game.musicUrl);
+        game.music = Music(game.musicUrl);
       }
     }
     pages.add(page);
@@ -388,44 +380,59 @@ class Book{
     }
   }
 
-  void setVolume(
-    {
-      num value,
-      GainNode output
+  void adjustVolume(OutputTypes outputType, num adjust) {
+    num start;
+    if (outputType == OutputTypes.main) {
+      start = mainVolume;
+    } else {
+      start = musicVolume;
     }
-  ) {
-    output.gain.value = value;
+    start += adjust;
+    if (start < 0.0) {
+      start = 0;
+    } else if (start > 1.0) {
+      start = 1.0;
+    }
     if (game.volumeSoundUrl != null) {
-      Sound(
+      final GainNode output = audio.createGain();
+      output.connectNode(audio.destination);
+      output.gain.value = start;
+      final Sound beep = Sound(
         url: game.volumeSoundUrl,
         output: output
-      ).play(url: game.volumeSoundUrl);
+      );
+      beep.onEnded = (Event event) {
+        beep.stop();
+        output.disconnect();
+      };
+      beep.play(url: game.volumeSoundUrl);
     }
-    message('${(output.gain.value * 100).round()}%.');
+    setVolume(outputType, start);
   }
 
-  void volumeUp(
-    {
-      GainNode output,
+  void setVolume(OutputTypes outputType, num value) {
+    GainNode output;
+    if (outputType == OutputTypes.main) {
+      mainVolume = value;
+      output = mainGain;
+    } else {
+      musicVolume = value;
+      if (game.music != null) {
+        output = game.music.output;
+      }
     }
-  ) {
-    output ??= mainGain;
-    setVolume(
-      value: min(1.0, output.gain.value + game.volumeChangeAmount),
-      output: output,
-    );
+    if (output != null) {
+      output.gain.value = value;
+    }
+    message('${(value * 100).round()}%.');
   }
 
-  void volumeDown(
-    {
-      GainNode output,
-    }
-  ) {
-    output ??= mainGain;
-    setVolume(
-      value: max(0.0, output.gain.value - game.volumeChangeAmount) as double,
-      output: output
-    );
+  void volumeUp(OutputTypes outputType) {
+    adjustVolume(outputType, game.volumeChangeAmount);
+  }
+
+  void volumeDown(OutputTypes outputType) {
+    adjustVolume(outputType, -game.volumeChangeAmount);
   }
 
   void inventory() {

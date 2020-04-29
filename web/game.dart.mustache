@@ -1,6 +1,7 @@
 import 'book.dart';
 import 'constants.dart';
 import 'level.dart';
+import 'music.dart';
 import 'object.dart';
 import 'page.dart';
 import 'sound.dart';
@@ -53,7 +54,8 @@ class Game {
 
   List<Level> levels;
   List<GameObject> objects;
-  Sound moveSound, activateSound, music, searchFailSound, searchSuccessSound;
+  Sound moveSound, activateSound, searchFailSound, searchSuccessSound;
+  Music music;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{
@@ -96,12 +98,16 @@ class Game {
 
   void resetVolumes() {
     mainGain.gain.value = initialVolume;
-    musicGain.gain.value = initialMusicVolume;
+    if (music != null) {
+      music.output.gain.value = initialMusicVolume;
+    }
   }
 
   void stopMusic() {
     if (music != null) {
-      music.stop();
+      final num when = audio.currentTime + (musicFadeout * 10);
+      music.stop(when);
+      music.output.gain.setTargetAtTime(0.0, audio.currentTime, musicFadeout);
       music = null;
     }
   }

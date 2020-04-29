@@ -1,6 +1,7 @@
 import 'book.dart';
 import 'constants.dart';
 import 'level.dart';
+import 'music.dart';
 import 'object.dart';
 import 'page.dart';
 import 'sound.dart';
@@ -52,6 +53,9 @@ class Game {
     if (data.containsKey('musicUrl')) {
       musicUrl = data['musicUrl'] as String;
     }
+    if (data.containsKey('musicFadeout')) {
+      musicFadeout = data['musicFadeout'] as num;
+    }
     if (data.containsKey('volumeChangeAmount')) {
       volumeChangeAmount = data['volumeChangeAmount'] as num;
     }
@@ -78,6 +82,7 @@ class Game {
   String moveSoundUrl;
   String activateSoundUrl;
   String musicUrl;
+  num musicFadeout;
   num volumeChangeAmount;
   num initialVolume;
   num initialMusicVolume;
@@ -87,7 +92,8 @@ class Game {
 
   List<Level> levels;
   List<GameObject> objects;
-  Sound moveSound, activateSound, music, searchFailSound, searchSuccessSound;
+  Sound moveSound, activateSound, searchFailSound, searchSuccessSound;
+  Music music;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{
@@ -113,6 +119,7 @@ class Game {
     data['moveSoundUrl'] = moveSoundUrl;
     data['activateSoundUrl'] = activateSoundUrl;
     data['musicUrl'] = musicUrl;
+    data['musicFadeout'] = musicFadeout;
     data['volumeChangeAmount'] = volumeChangeAmount;
     data['initialVolume'] = initialVolume;
     data['initialMusicVolume'] = initialMusicVolume;
@@ -135,6 +142,7 @@ class Game {
     moveSoundUrl = 'res/menus/move.wav';
     activateSoundUrl = 'res/menus/activate.wav';
     musicUrl = 'res/menus/music.mp3';
+    musicFadeout = 0.5;
     volumeChangeAmount = 0.05;
     initialVolume = 0.5;
     initialMusicVolume = 0.25;
@@ -146,12 +154,16 @@ class Game {
 
   void resetVolumes() {
     mainGain.gain.value = initialVolume;
-    musicGain.gain.value = initialMusicVolume;
+    if (music != null) {
+      music.output.gain.value = initialMusicVolume;
+    }
   }
 
   void stopMusic() {
     if (music != null) {
-      music.stop();
+      final num when = audio.currentTime + (musicFadeout * 10);
+      music.stop(when);
+      music.output.gain.setTargetAtTime(0.0, audio.currentTime, musicFadeout);
       music = null;
     }
   }

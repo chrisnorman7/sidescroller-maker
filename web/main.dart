@@ -746,7 +746,7 @@ Page gameMenu(Game game) {
       soundUrl: (Book b) => game.musicUrl,
     ),
     Line(
-      titleFunc: (Book b) => 'Music gadeout time (${game.musicFadeout ?? "Not set"})',
+      titleFunc: (Book b) => 'Music fadeout multiplier (${game.musicFadeout ?? "Not set"})',
       func: (Book b) => GetText<num>(
         b,
         prompt: 'New value',
@@ -921,10 +921,10 @@ void main() {
         } else {
           soundVolume = mainGain.gain.value.toStringAsFixed(2);
         }
-        if (musicGain == null) {
+        if (game.music == null) {
           musicVolume = 'Music output not present';
         } else {
-          musicVolume = musicGain.gain.value.toStringAsFixed(2);
+          musicVolume = game.music.output.gain.value.toStringAsFixed(2);
           String presentString = 'present';
           if (game.music == null || game.music.source == null) {
             presentString = 'not $presentString';

@@ -12,8 +12,10 @@ final TextToSpeech textToSpeech = TextToSpeech();
 final GainNode soundGain = audio.createGain();
 final GainNode ambianceGain = audio.createGain();
 final GainNode mainGain = audio.createGain();
-final GainNode musicGain = audio.createGain();
 
 Map<String, AudioBuffer> buffers = <String, AudioBuffer>{};
 
 final GameObject fists = GameObject();
+
+num musicVolume = 0.5;
+num mainVolume = 0.5;
