@@ -34,13 +34,8 @@ class Book{
         func: (Book b) => moveDown(),
       ),
       ' ': Hotkey(
-        titleFunc: (Page page) {
-          if (page.isLevel) {
-            return 'Use a weapon';
-          }
-          return activateString;
-        },
-        func: (Book b) => shootOrActivate(),
+        titleString: 'Use a weapon',
+        func: (Book b) => shoot(),
         levelOnly: true,
       ),
       'ArrowRight': Hotkey(
@@ -122,9 +117,6 @@ class Book{
         titleString: 'Examine object',
         func: (Book b) {
           final Level level = player.level;
-          if (level == null) {
-            return;
-          }
           final List<LevelObject> contents = level.contents.where(
             (LevelObject item) => item.position == player.position
           ).toList();
@@ -432,9 +424,6 @@ class Book{
   }
 
   void inventory() {
-    if (player.level == null) {
-      return; // They're not in a level.
-    }
     if (player.carrying.isNotEmpty) {
       final List<Line> lines = <Line>[];
       for (final GameObject obj in player.carrying) {
@@ -461,9 +450,6 @@ class Book{
 
   void drop() {
     final Level level = player.level;
-    if (level == null) {
-      return;
-    }
     if (player.carrying.isNotEmpty) {
       final List<Line> lines = <Line>[];
       for (final GameObject obj in player.carrying) {
@@ -495,9 +481,6 @@ class Book{
   }
 
   void showFacing() {
-    if (player.level == null) {
-      return;
-    }
     String direction;
     if (player.facing == LevelDirections.backwards) {
       direction = 'backwards';
@@ -512,9 +495,6 @@ class Book{
   }
 
   void showPosition() {
-    if (player.level == null) {
-      return;
-    }
     message('Position: ${player.position}.');
   }
 
@@ -629,11 +609,8 @@ class Book{
     return scene;
   }
 
-  void shootOrActivate() {
+  void shoot() {
     final Level level = player.level;
-    if (level == null) {
-      return activate();
-    }
     player.weapon ??= fists;
     final GameObject weapon = player.weapon;
     final NearestObject nearestObject = level.nearestObject(
