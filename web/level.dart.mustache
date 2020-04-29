@@ -323,14 +323,28 @@ class Level extends Page {
         player.lastMoved = time;
         book.setPlayerPosition(position);
         if (direction != player.facing) {
-          if (player.facing != LevelDirections.either) {
-            turn.play(url: turnUrl);
-          }
-          player.facing = direction;
+          turnPlayer(player, direction: direction);
         }
         footstep.play(url: footstepUrl);
       }
     }
+  }
+
+  void turnPlayer(
+    Player player,
+    {LevelDirections direction}
+  ) {
+    if (direction == null) {
+      if (player.facing == LevelDirections.forwards) {
+        direction = LevelDirections.backwards;
+      } else {
+        direction = LevelDirections.forwards;
+      }
+    }
+    if (player.facing != LevelDirections.either && direction != player.facing) {
+      turn.play(url: turnUrl);
+    }
+    player.facing = direction;
   }
 
   void finalise(

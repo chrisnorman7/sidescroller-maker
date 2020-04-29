@@ -108,6 +108,11 @@ class Book{
         func: (Book b) => showFacing(),
         levelOnly: true,
       ),
+      't': Hotkey(
+        titleString: 'Turn to face the other way',
+        func: (Book b) => b.player.level.turnPlayer(b.player),
+        levelOnly: true,
+      ),
       'c': Hotkey(
         titleString: 'Show your current coordinate',
         func: (Book b) => showPosition(),
