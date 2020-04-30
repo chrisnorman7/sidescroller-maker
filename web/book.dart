@@ -120,13 +120,18 @@ class Book{
         titleString: 'Examine object',
         func: (Book b) {
           final Level level = player.level;
+          if (level != b.getPage()) {
+            return; // Most likely a menu overlay.
+          }
           final List<LevelObject> contents = level.contents.where(
             (LevelObject item) => item.position == player.position
           ).toList();
-          if (contents.isNotEmpty) {
+          if (contents.isEmpty) {
+            return b.message('There is nothing nearby to examine.');
+          } else if (contents.length == 1) {
             return examine(contents[0]);
           } else {
-            const List<Line> lines = <Line>[];
+            final List<Line> lines = <Line>[];
             for (final LevelObject content in contents) {
               lines.add(
                 Line(
@@ -182,7 +187,7 @@ class Book{
       'Damage': '${obj.damage}',
       'Range': '${obj.range}',
     };
-    const List<Line> lines = <Line>[];
+    final List<Line> lines = <Line>[];
     stats.forEach(
       (String name, String value) {
         lines.add(
