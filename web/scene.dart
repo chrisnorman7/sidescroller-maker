@@ -14,7 +14,8 @@ class Scene {
   ) {
     completed = false;
     sound = Sound(
-      url: url
+      url: url,
+      output: mainGain
     );
     sound.onEnded = done;
   }
