@@ -11,11 +11,11 @@ enum ObjectTypes {
 }
 
 const Map<ObjectTypes, String> objectTypeDescriptions = <ObjectTypes, String>{
-  ObjectTypes.object: 'An object which can be picked up by the player',
-  ObjectTypes.aggressiveMonster: 'A monster which will attack the player',
-  ObjectTypes.peacefulMonster: 'A monster which will ignore the player',
-  ObjectTypes.weapon: 'A weapon which can be wielded',
-  ObjectTypes.exit: 'An exit to another level'
+  ObjectTypes.object: 'Standard object',
+  ObjectTypes.aggressiveMonster: 'Aggressive monster',
+  ObjectTypes.peacefulMonster: 'Peaceful monster',
+  ObjectTypes.weapon: 'Weapon',
+  ObjectTypes.exit: 'An exit'
 };
 
 class GameObject {
