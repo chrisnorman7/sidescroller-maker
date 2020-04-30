@@ -157,11 +157,7 @@ class GameObject {
       bool silent = false,
     }
   ) {
-    final LevelObject content = LevelObject(
-      level: level,
-      object: this,
-      position: position
-    );
+    final LevelObject content = LevelObject(level, this, position);
     level.contents.add(content);
     content.spawn();
     if (!silent) {

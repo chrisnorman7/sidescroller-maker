@@ -348,7 +348,7 @@ Page levelsMenu(Book b) {
     Line(
       titleString: 'Add Level',
       func: (Book b) {
-        b.game.levels.add(Level());
+        b.game.levels.add(Level(b.game));
         b.pop();
         b.push(levelsMenu(b));
       }

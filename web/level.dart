@@ -23,24 +23,12 @@ const Map<LevelDirections, int> levelDirectionConvertions = <LevelDirections, in
 };
 
 class LevelObject {
-  LevelObject(
-    {
-      this.level,
-      this.object,
-      this.position,
-    }
-  ) {
+  LevelObject(this.level, this.object, this.position) {
     health = object.health;
   }
 
-  LevelObject.fromJson(
-    {
-      this.level,
-      Map<String, int> data,
-      Game game,
-    }
-  ) {
-    object = game.objects[data['objectIndex']];
+  LevelObject.fromJson(this.level, Map<String, int> data) {
+    object = level.game.objects[data['objectIndex']];
     health = object.health;
     position = data['position'];
   }
@@ -51,13 +39,9 @@ class LevelObject {
   PannerNode panner;
   Sound sound, hit, dieSound, drop;
 
-  Map<String, int> toJson(
-    {
-      Game game
-    }
-  ) {
+  Map<String, int> toJson() {
     return <String, int>{
-      'objectIndex': game.objects.indexOf(object),
+      'objectIndex': level.game.objects.indexOf(object),
       'position': position
     };
   }
@@ -161,27 +145,18 @@ class NearestObject {
 }
 
 class Level extends Page {
-  Level() {
+  Level(this.game) {
     reset();
   }
 
-  Level.fromJson(
-    {
-      Map<String, dynamic> data,
-      Game game,
-    }
-  ) {
+  Level.fromJson(this.game, Map<String, dynamic> data) {
     reset();
     for (final dynamic contentDataJson in data['contents']) {
       final Map<String, int> contentData = <String, int>{
         'objectIndex': contentDataJson['objectIndex'] as int,
         'position': contentDataJson['position'] as int,
       };
-      final LevelObject content = LevelObject.fromJson(
-        level: this,
-        data: contentData,
-        game: game
-      );
+      final LevelObject content = LevelObject.fromJson(this, contentData);
       contents.add(content);
     }
     if (data.containsKey('titleString')) {
@@ -243,6 +218,7 @@ class Level extends Page {
   String noWeaponUrl;
 
   bool loading = false;
+  Game game;
   List<LevelObject> contents, deadObjects;
   Sound beforeScene, music, ambiance, footstep, wall, turn, trip, noWeapon;
   ConvolverNode convolver;
@@ -258,9 +234,7 @@ class Level extends Page {
     };
     for (final LevelObject content in contents) {
       data['contents'].add(
-        content.toJson(
-          game: game
-        )
+        content.toJson()
       );
     }
     data['titleString'] = titleString;

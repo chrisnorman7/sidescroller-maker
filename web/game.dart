@@ -24,10 +24,7 @@ class Game {
       objects.add(obj);
     }
     for (final dynamic levelData in data['levels']) {
-      final Level level = Level.fromJson(
-        data: levelData as Map<String, dynamic>,
-        game: this
-      );
+      final Level level = Level.fromJson(this, levelData as Map<String, dynamic>);
       levels.add(level);
     }
     for (final GameObject obj in objects) {
