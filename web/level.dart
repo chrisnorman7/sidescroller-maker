@@ -396,7 +396,7 @@ class Level extends Page {
             jumpTimer = null;
           } else {
             if (direction != LevelDirections.either) {
-              move(book, direction, performChecks: false);
+              move(book, direction, performChecks: false, silent: true);
             }
           }
         }
@@ -416,6 +416,7 @@ class Level extends Page {
     Book book, LevelDirections direction,
     {
       bool performChecks= true,
+      bool silent = false,
     }
   ) {
     final Player player = book.player;
@@ -436,7 +437,9 @@ class Level extends Page {
         if (direction != player.facing) {
           turnPlayer(player, direction: direction);
         }
-        footstep.play(url: footstepUrl);
+        if (!silent) {
+          footstep.play(url: footstepUrl);
+        }
       }
     }
   }
