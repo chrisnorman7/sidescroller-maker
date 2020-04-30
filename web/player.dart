@@ -3,6 +3,7 @@ import 'object.dart';
 
 class Player {
   Player() {
+    airborn = false;
     facing = LevelDirections.either;
     health = 100;
     lastMoved = 0;
@@ -14,4 +15,5 @@ class Player {
   LevelDirections facing;
   List<GameObject> carrying;
   GameObject weapon;
+  bool airborn;
 }

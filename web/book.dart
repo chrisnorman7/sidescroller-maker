@@ -632,7 +632,7 @@ class Book{
       final LevelObject content = nearestObject.content;
       final GameObject obj = content.object;
       final int distance = nearestObject.distance;
-      if (distance <= weapon.range) {
+      if (obj.airborn == player.airborn && distance <= weapon.range) {
         weapon.use.play(url: weapon.useUrl);
         content.hit.play(url: obj.hitUrl);
         content.health -= randint(
