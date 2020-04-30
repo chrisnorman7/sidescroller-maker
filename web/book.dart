@@ -22,7 +22,7 @@ enum OutputTypes {
 class Book{
   Book() {
     game = Game();
-    const String activateString = 'Activate a menu item"';
+    const String activateString = 'Activate a menu item';
     const String cancelString = 'Return to the previous menu';
     hotkeys = <String, Hotkey>{
       'ArrowUp': Hotkey(
@@ -54,10 +54,11 @@ class Book{
       ),
       'Enter': Hotkey(
         titleFunc: (Page page) {
+          String description = activateString;
           if (page.isLevel) {
-            return 'Take the object at your current location';
+            description = 'Take the object at your current location';
           }
-          return activateString;
+          return description + ' or cancel a playing scene';
         },
         func: (Book b) => takeOrActivate(),
       ),
@@ -309,6 +310,9 @@ class Book{
   }
 
   void takeOrActivate() {
+    if (scene != null) {
+      return scene.done(null);
+    }
     final Page page = getPage();
     if (!page.isLevel) {
       return activate();
@@ -515,12 +519,6 @@ class Book{
       return; // Don't work with modifiers.
     }
     final String key = e.key;
-    if (scene != null) {
-      if (key == 'Enter') {
-        scene.done(null);
-      }
-      return;
-    }
     final Hotkey hotkey = hotkeys[key];
     if (hotkey == null || (hotkey.levelOnly && player.level == null)) {
       if (key.length == 1) { // Don't search with number pad keys for example.
