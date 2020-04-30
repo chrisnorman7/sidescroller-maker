@@ -1,3 +1,4 @@
+import 'dart:html';
 import 'dart:web_audio';
 
 import 'constants.dart';
@@ -28,7 +29,15 @@ class Music {
   }
 
   void stop(num when) {
-    source.stop(when);
-    source = null;
+    try {
+      source.stop(when);
+    }
+    on DomException {
+      // Music can't be stopped if it's not already been started.
+    }
+    finally {
+      source.disconnect();
+      source = null;
+    }
   }
 }
