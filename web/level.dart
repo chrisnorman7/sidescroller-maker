@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:html';
 import 'dart:web_audio';
 
@@ -171,6 +172,21 @@ class Level extends Page {
     if (data.containsKey('speed')) {
       speed = data['speed'] as int;
     }
+    if (data.containsKey('jumpDuration')) {
+      jumpDuration = data['jumpDuration'] as int;
+    }
+    if (data.containsKey('beforeJumpUrl')) {
+      beforeJumpUrl = data['beforeJumpUrl'] as String;
+    }
+    if (data.containsKey('jumpUrl')) {
+      jumpUrl = data['jumpUrl'] as String;
+    }
+    if (data.containsKey('landUrl')) {
+      landUrl = data['landUrl'] as String;
+    }
+    if (data.containsKey('cancelJumpUrl')) {
+      cancelJumpUrl = data['cancelJumpUrl'] as String;
+    }
     if (data.containsKey('beforeSceneUrl')) {
       beforeSceneUrl = data['beforeSceneUrl'] as String;
     }
@@ -206,6 +222,11 @@ class Level extends Page {
   int size;
   int initialPosition;
   int speed;
+  int jumpDuration;
+  String beforeJumpUrl;
+  String jumpUrl;
+  String landUrl;
+  String cancelJumpUrl;
   String beforeSceneUrl;
   String footstepUrl;
   String wallUrl;
@@ -220,9 +241,11 @@ class Level extends Page {
   bool loading = false;
   Game game;
   List<LevelObject> contents, deadObjects;
-  Sound beforeScene, music, ambiance, footstep, wall, turn, trip, noWeapon;
+  Sound beforeJumpSound, jumpSound, landSound, cancelJumpSound, beforeScene, music, ambiance, footstep, wall, turn, trip, noWeapon;
   ConvolverNode convolver;
   GainNode convolverGain;
+  Timer jumpTimer;
+  LevelDirections jumpPlan;
 
   Map<String, dynamic> toJson(
     {
@@ -241,6 +264,11 @@ class Level extends Page {
     data['size'] = size;
     data['initialPosition'] = initialPosition;
     data['speed'] = speed;
+    data['jumpDuration'] = jumpDuration;
+    data['beforeJumpUrl'] = beforeJumpUrl;
+    data['jumpUrl'] = jumpUrl;
+    data['landUrl'] = landUrl;
+    data['cancelJumpUrl'] = cancelJumpUrl;
     data['beforeSceneUrl'] = beforeSceneUrl;
     data['footstepUrl'] = footstepUrl;
     data['wallUrl'] = wallUrl;
@@ -262,6 +290,11 @@ class Level extends Page {
     size = 200;
     initialPosition = 0;
     speed = 200;
+    jumpDuration = 1500;
+    beforeJumpUrl = 'res/level/beforejump.wav';
+    jumpUrl = 'res/level/jump.wav';
+    landUrl = 'res/level/land.wav';
+    cancelJumpUrl = 'res/level/land.wav';
     beforeSceneUrl = 'res/level/beforescene.wav';
     footstepUrl = 'res/footsteps/stone.wav';
     wallUrl = 'res/level/wall.wav';
@@ -272,6 +305,22 @@ class Level extends Page {
     convolverUrl = 'res/impulses/EchoThiefImpulseResponseLibrary/Underground/TunnelToHell.wav';
     convolverVolume = 0.5;
     noWeaponUrl = 'res/level/noweapon.wav';
+    beforeJumpSound = Sound(
+      url: beforeJumpUrl,
+      output: soundGain
+    );
+    jumpSound = Sound(
+      url: jumpUrl,
+      output: soundGain
+    );
+    landSound = Sound(
+      url: landUrl,
+      output: soundGain
+    );
+    cancelJumpSound = Sound(
+      url: cancelJumpUrl,
+      output: soundGain
+    );
     beforeScene = Sound(
       url: beforeSceneUrl,
     );
@@ -325,43 +374,64 @@ class Level extends Page {
   }
 
   void jump(Book book) {
-    if (loading) {
-      return;
+    final Player player = book.player;
+    if (loading || player.airborn) {
+      // Don't do anything while the scene plays or while they're already airborn.
+    } else if (jumpPlan == null) {
+      jumpPlan = LevelDirections.either;
+      beforeJumpSound.play(url: beforeJumpUrl);
+    } else {
+      final int jumpStarted = timestamp();
+      final LevelDirections direction = jumpPlan;
+      jumpPlan = null;
+      jumpSound.play(url: jumpUrl);
+      player.airborn = true;
+      jumpTimer = Timer.periodic(
+        Duration(milliseconds: speed),
+        (Timer t) {
+          if ((timestamp() - jumpStarted) >= jumpDuration) {
+            player.airborn = false;
+            landSound.play(url: landUrl);
+            t.cancel();
+            jumpTimer = null;
+          } else {
+            if (direction != LevelDirections.either) {
+              move(book, direction, performChecks: false);
+            }
+          }
+        }
+      );
     }
-    book.message('Jumping.');
   }
 
   void left(Book book) {
-    move(
-      book: book,
-      direction: LevelDirections.backwards
-    );
+    move(book, LevelDirections.backwards);
   }
 
   void right(Book book) {
-    move(
-      book: book,
-      direction: LevelDirections.forwards
-    );
+    move(book, LevelDirections.forwards);
   }
 
   void move(
+    Book book, LevelDirections direction,
     {
-      Book book,
-      LevelDirections direction
+      bool performChecks= true,
     }
   ) {
-    if (loading) {
-      return;
-    }
     final Player player = book.player;
     final int time = timestamp();
-    if ((time - player.lastMoved) > speed) {
+    if (performChecks && (loading || player.airborn || (time - player.lastMoved) < speed)) {
+      // Don't do anything while the scene plays, while they're already airborn, or if they can't move again yet.
+    } else if (jumpPlan == LevelDirections.either) {
+      // They want to jump in the given direction.
+      jumpPlan = direction;
+      jump(book);
+    } else {
       final int position = player.position + levelDirectionConvertions[direction];
+      player.lastMoved = time;
       if (position < 0 || position > size) {
         wall.play(url: wallUrl);
       } else {
-        player.lastMoved = time;
         book.setPlayerPosition(position);
         if (direction != player.facing) {
           turnPlayer(player, direction: direction);

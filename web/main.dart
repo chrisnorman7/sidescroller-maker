@@ -169,7 +169,81 @@ Page editLevelMenu(Level level) {
       ).dispatch(),
     ),
     Line(
-      titleFunc: (Book b) => 'Before scene URL (${level.beforeSceneUrl ?? "Not set"})',
+      titleFunc: (Book b) => 'Jump duration (${level.jumpDuration ?? "Not set"})',
+      func: (Book b) => GetText<int>(
+        b,
+        prompt: 'New value',
+        value: level.jumpDuration,
+        onok: (int value) {
+          if (value != level.jumpDuration) {
+            level.jumpDuration = value;
+            b.showFocus();
+          }
+        }
+      ).dispatch(),
+    ),
+    Line(
+      titleFunc: (Book b) => 'Before jump sound (${level.beforeJumpUrl ?? "Not set"})',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: level.beforeJumpUrl,
+        onok: (String value) {
+          if (value != level.beforeJumpUrl) {
+            level.beforeJumpUrl = value;
+            b.showFocus();
+          }
+        }
+      ).dispatch(),
+      soundUrl: (Book b) => level.beforeJumpUrl,
+    ),
+    Line(
+      titleFunc: (Book b) => 'Jump sound (${level.jumpUrl ?? "Not set"})',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: level.jumpUrl,
+        onok: (String value) {
+          if (value != level.jumpUrl) {
+            level.jumpUrl = value;
+            b.showFocus();
+          }
+        }
+      ).dispatch(),
+      soundUrl: (Book b) => level.jumpUrl,
+    ),
+    Line(
+      titleFunc: (Book b) => 'Land sound (${level.landUrl ?? "Not set"})',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: level.landUrl,
+        onok: (String value) {
+          if (value != level.landUrl) {
+            level.landUrl = value;
+            b.showFocus();
+          }
+        }
+      ).dispatch(),
+      soundUrl: (Book b) => level.landUrl,
+    ),
+    Line(
+      titleFunc: (Book b) => 'Cancel jump sound (${level.cancelJumpUrl ?? "Not set"})',
+      func: (Book b) => GetText<String>(
+        b,
+        prompt: 'New value',
+        value: level.cancelJumpUrl,
+        onok: (String value) {
+          if (value != level.cancelJumpUrl) {
+            level.cancelJumpUrl = value;
+            b.showFocus();
+          }
+        }
+      ).dispatch(),
+      soundUrl: (Book b) => level.cancelJumpUrl,
+    ),
+    Line(
+      titleFunc: (Book b) => 'Before level scene (${level.beforeSceneUrl ?? "Not set"})',
       func: (Book b) => GetText<String>(
         b,
         prompt: 'New value',

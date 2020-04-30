@@ -111,8 +111,32 @@ Map<String, List<Attribute<dynamic>>> attributes = <String, List<Attribute<dynam
       'speed', 'Player speed',
       value: 200
     ),
+    Attribute<int>(
+      'jumpDuration', 'Jump duration',
+      value: 1500
+    ),
     Attribute<String>(
-      'beforeSceneUrl', 'Before scene URL',
+      'beforeJumpUrl', 'Before jump sound',
+      value: 'res/level/beforejump.wav',
+      soundUrl: true
+    ),
+    Attribute<String>(
+      'jumpUrl', 'Jump sound',
+      value: 'res/level/jump.wav',
+      soundUrl: true
+    ),
+    Attribute<String>(
+      'landUrl', 'Land sound',
+      value: 'res/level/land.wav',
+      soundUrl: true
+    ),
+    Attribute<String>(
+      'cancelJumpUrl', 'Cancel jump sound',
+      value: 'res/level/land.wav',
+      soundUrl: true
+    ),
+    Attribute<String>(
+      'beforeSceneUrl', 'Before level scene',
       value: 'res/level/beforescene.wav',
       soundUrl: true
     ),

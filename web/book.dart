@@ -35,7 +35,7 @@ class Book{
         func: (Book b) => moveUp(),
       ),
       'ArrowDown': Hotkey(
-        titleString: 'Move down in a menu',
+        titleFunc: (Page page) => page.isLevel ? 'Cancel jump' : 'Move down in a menu',
         func: (Book b) => moveDown(),
       ),
       ' ': Hotkey(
@@ -303,16 +303,23 @@ class Book{
 
   void moveDown() {
     final Page page = getPage();
-    if (page == null || page.isLevel) {
-      return; // There"s either no pages, or we're in a level where there's no down key mapped.
+    if (page == null) {
+      return; // There"s no pages.
+    } else if (page.isLevel) {
+      if (!player.airborn) {
+        final Level level = player.level;
+        level.jumpPlan = null;
+        level.cancelJumpSound.play(url: level.cancelJumpUrl);
+      }
+    } else {
+      final int focus = getFocus();
+      if (focus == (page.lines.length - 1)) {
+        return; // Can't move down any further.
+      }
+      page.focus++;
+      showFocus();
     }
-    final int focus = getFocus();
-    if (focus == (page.lines.length - 1)) {
-      return; // Can't move up any further.
     }
-    page.focus++;
-    showFocus();
-  }
 
   void takeOrActivate() {
     if (scene != null) {
