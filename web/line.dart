@@ -1,4 +1,5 @@
 import 'book.dart';
+import 'constants.dart';
 
 class Line {
   Line(
@@ -11,8 +12,8 @@ class Line {
   );
   
   String titleString;
-  String Function(Book) titleFunc, soundUrl;
-  void Function(Book) func;
+  TitleFunctionType titleFunc, soundUrl;
+  BookFunctionType func;
 
   String getTitle(Book book) {
     if (titleString == null) {

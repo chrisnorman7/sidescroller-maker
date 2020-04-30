@@ -21,7 +21,7 @@ class Page {
   int focus = -1;
   final List<Line> lines;
   String titleString;
-  String Function(Book) titleFunc;
+  TitleFunctionType titleFunc;
   
   String getTitle(Book book) {
     if (titleString == null) {
@@ -43,8 +43,8 @@ Page confirmPage(
     String title = 'Are you sure?',
     String okTitle = 'OK',
     String cancelTitle = 'Cancel',
-    void Function(Book) onok,
-    void Function(Book) oncancel ,
+    BookFunctionType onok,
+    BookFunctionType oncancel ,
   }
 ) {
   final List<Line> lines = <Line>[

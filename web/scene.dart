@@ -1,6 +1,7 @@
 import 'dart:html';
 
 import 'book.dart';
+import 'constants.dart';
 import 'sound.dart';
 
 class Scene {
@@ -32,5 +33,5 @@ class Scene {
   Sound sound;
   final Book book;
   final String url;
-  void Function(Book) onfinish;
+  BookFunctionType onfinish;
 }

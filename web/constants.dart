@@ -1,7 +1,11 @@
 import 'dart:web_audio';
 
+import 'book.dart';
 import 'object.dart';
 import 'tts.dart';
+
+typedef TitleFunctionType = String Function(Book);
+typedef BookFunctionType = void Function(Book);
 
 const int audioDivider = 10;
 

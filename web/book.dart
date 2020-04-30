@@ -609,7 +609,7 @@ class Book{
   Scene playScene(
     {
       String url,
-      void Function(Book) onfinish,
+      BookFunctionType onfinish,
     }
   ) {
     game.stopMusic();

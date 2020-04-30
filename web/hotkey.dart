@@ -1,4 +1,4 @@
-import 'book.dart';
+import 'constants.dart';
 import 'page.dart';
 
 class Hotkey {
@@ -13,7 +13,7 @@ class Hotkey {
 
   String titleString;
   String Function(Page) titleFunc;
-  void Function(Book) func;
+  BookFunctionType func;
   bool levelOnly;
 
   String getTitle(Page page,) {
