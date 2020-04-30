@@ -30,7 +30,9 @@ class GameObject {
   ) {
     reset();
     type = ObjectTypes.values[data['type'] as int];
-    airborn = data['airborn'] as bool;
+    if (data.containsKey('airborn')) {
+      airborn = data['airborn'] as bool;
+    }
     targetLevelIndex = data['targetLevelIndex'] as int;
     for (final dynamic containedObjectIndexData in data['contains']) {
       final int containedObjectIndex = containedObjectIndexData as int;
