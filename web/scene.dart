@@ -18,6 +18,12 @@ class Scene {
     );
     sound.onEnded = done;
   }
+  
+  bool completed = false;
+  Sound sound;
+  final Book book;
+  final String url;
+  BookFunctionType onfinish;
 
   void done(Event e) {
     if (completed) {
@@ -28,10 +34,4 @@ class Scene {
     sound.stop();
     onfinish(book);
   }
-  
-  bool completed = false;
-  Sound sound;
-  final Book book;
-  final String url;
-  BookFunctionType onfinish;
 }
