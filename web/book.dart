@@ -116,13 +116,26 @@ class Book{
         func: (Book b) => showPosition(),
         levelOnly: true,
       ),
+      'n': Hotkey(
+        titleString: 'Show the nearest object or monster',
+        func: (Book b) {
+          final NearestObject nearestObject = player.level.nearestObject(
+            position: player.position,
+            direction: player.facing
+          );
+          if (nearestObject == null) {
+            message('Nothing visible in that direction.');
+          } else {
+            final GameObject obj = nearestObject.content.object;
+            message('${obj.title} is ${obj.airborn ? "airborn " : ""}at ${nearestObject.distance} metres.');
+          }
+        },
+        levelOnly: true,
+      ),
       'x': Hotkey(
         titleString: 'Examine object',
         func: (Book b) {
           final Level level = player.level;
-          if (level != b.getPage()) {
-            return; // Most likely a menu overlay.
-          }
           final List<LevelObject> contents = level.contents.where(
             (LevelObject item) => item.position == player.position
           ).toList();
@@ -181,7 +194,7 @@ class Book{
   void examine(LevelObject content) {
     final GameObject obj = content.object;
     final Map<String, String> stats = <String, String>{
-      'Name': obj.title,
+      'Name': '${obj.title}${obj.airborn ? " (Airborn)" : ""}',
       'Type': objectTypeDescriptions[obj.type],
       'Health': '${content.health}',
       'Damage': '${obj.damage}',
