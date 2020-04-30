@@ -528,7 +528,7 @@ class Book{
     } else if (player.facing == LevelDirections.forwards) {
       direction = 'forwards';
     } else if (player.facing == LevelDirections.either) {
-      direction = 'both ways at once';
+      direction = 'in no particular direction';
     } else {
       direction = 'the wrong way';
     }
