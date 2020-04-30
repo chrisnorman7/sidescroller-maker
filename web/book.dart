@@ -545,7 +545,7 @@ class Book{
     }
     final String key = e.key;
     final Hotkey hotkey = hotkeys[key];
-    if (hotkey == null || (hotkey.levelOnly && player.level == null)) {
+    if (hotkey == null || (hotkey.levelOnly && (player.level == null || getPage() != player.level))) {
       if (key.length == 1) { // Don't search with number pad keys for example.
         handleSearch(key);
       } else {
