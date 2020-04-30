@@ -30,6 +30,7 @@ class GameObject {
   ) {
     reset();
     type = ObjectTypes.values[data['type'] as int];
+    airborn = data['airborn'] as bool;
     targetLevelIndex = data['targetLevelIndex'] as int;
     for (final dynamic containedObjectIndexData in data['contains']) {
       final int containedObjectIndex = containedObjectIndexData as int;
@@ -92,6 +93,7 @@ class GameObject {
   int targetLevelIndex;
   List<GameObject> contains;
   List<int> containedObjectIndices;
+  bool airborn;
 
   Map<String, dynamic> toJson(
     {
@@ -100,7 +102,8 @@ class GameObject {
   ) {
     final Map<String, dynamic>data = <String, dynamic>{
       'type': type.index,
-      'contains': <int>[]
+      'contains': <int>[],
+      'airborn': airborn,
     };
     if (targetLevel == null) {
       data['targetLevelIndex'] = null;
@@ -126,6 +129,7 @@ class GameObject {
   }
   
   void reset() {
+    airborn = false;
     type = ObjectTypes.object;
     title = null;
     takeUrl = 'res/objects/take.wav';

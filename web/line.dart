@@ -1,5 +1,6 @@
 import 'book.dart';
 import 'constants.dart';
+import 'sound.dart';
 
 class Line {
   Line(
@@ -21,4 +22,27 @@ class Line {
     }
     return titleString;
   }
+}
+
+class CheckboxLine extends Line {
+  CheckboxLine(
+    bool Function() getValue,
+    void Function(Book, bool) setValue,
+    {
+      String titleString,
+      TitleFunctionType titleFunc,
+      String enableUrl = 'res/menus/enable.wav',
+      String disableUrl = 'res/menus/disable.wav',
+    }
+  ): super(
+    titleString: titleString,
+    titleFunc: titleFunc,
+    func: (Book b) {
+      final bool oldValue = getValue();
+      final bool newValue = !oldValue;
+      final String soundUrl = newValue ? enableUrl : disableUrl;
+      Sound().play(url: soundUrl);
+      setValue(b, newValue);
+    },
+  );
 }

@@ -187,6 +187,14 @@ Page levelsMenu(Book b) {
 
 Page editObjectMenu(GameObject object) {
   final List<Line> lines = <Line>[
+    CheckboxLine(
+      () => object.airborn,
+      (Book b, bool value) {
+        object.airborn = value;
+        b.showFocus();
+      },
+      titleFunc: (Book b) => 'Airborn object (${object.airborn ? "Airborn" : "Grounded"})',
+    ),
     {{#object}}
     Line(
       titleFunc: (Book b) => '{{description}} (${object.{{name}} ?? "Not set"})',
