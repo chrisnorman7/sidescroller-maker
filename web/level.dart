@@ -357,7 +357,7 @@ class Level extends Page {
   ) {
     NearestObject obj;
     for (final LevelObject content in contents) {
-      if ((direction == LevelDirections.forwards && content.position >= position) || (direction == LevelDirections.backwards && content.position <= position)) {
+      if (direction == LevelDirections.either || (direction == LevelDirections.forwards && content.position >= position) || (direction == LevelDirections.backwards && content.position <= position)) {
         final int distance = distanceBetween(
           a: position,
           b: content.position
